@@ -10,6 +10,7 @@ import (
 	"github.com/enchant97/recipes/api/routes"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Validator struct {
@@ -35,6 +36,8 @@ func main() {
 	defer db.CloseDB()
 
 	e := echo.New()
+	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
 	e.Validator = &Validator{validator: validator.New()}
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
