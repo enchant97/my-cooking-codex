@@ -35,6 +35,7 @@ func main() {
 	defer db.CloseDB()
 
 	e := echo.New()
+	e.Validator = &Validator{validator: validator.New()}
 	routes.InitRoutes(e)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", appConfig.Host, appConfig.Port)))

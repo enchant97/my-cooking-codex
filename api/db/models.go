@@ -5,8 +5,7 @@ import (
 )
 
 type User struct {
-	ID             string `rethinkdb:"id,omitempty" json:"id"`
-	Username       string `rethinkdb:"username" json:"username"`
+	Username       string `rethinkdb:"id" json:"username"`
 	HashedPassword []byte `rethinkdb:"hashedPassword" json:"-"`
 }
 
@@ -30,7 +29,7 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 
 type Ingredient struct {
 	Name        string  `rethinkdb:"name" json:"name"`
-	Amount      int     `rethinkdb:"amount" json:"amount"`
+	Amount      uint    `rethinkdb:"amount" json:"amount"`
 	UnitType    string  `rethinkdb:"unitType" json:"unitType"`
 	Description *string `rethinkdb:"description,omitempty" json:"description,omitempty"`
 }
