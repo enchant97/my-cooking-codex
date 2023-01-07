@@ -15,3 +15,14 @@ func CreateUser(userData core.CreateUser) (User, error) {
 	}
 	return user, nil
 }
+
+func GetUserByUsername(username string) (User, error) {
+	cursor, err := r.Table(TableNameUsers).Get(username).Run(session)
+	if err != nil {
+		return User{}, err
+	}
+	defer cursor.Close()
+	var user User
+	err = cursor.One(&user)
+	return user, err
+}

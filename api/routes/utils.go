@@ -21,6 +21,12 @@ func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 		},
 		SigningKey: []byte(appConfig.SecretKey),
 	}
-	// TODO use this middleware
-	echojwt.WithConfig(config)
+	jwtMiddleware := echojwt.WithConfig(config)
+
+	apiRoutes := e.Group("/api/")
+	{
+		apiRoutes.Use(jwtMiddleware)
+		apiRoutes.GET("users/me/", getUserMe)
+	}
+
 }
