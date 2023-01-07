@@ -6,3 +6,9 @@ type DBConfig struct {
 	Username string `env:"USERNAME,required"`
 	Password string `env:"PASSWORD,required"`
 }
+
+type AppConfig struct {
+	Host string   `env:"HOST" envDefault:"127.0.0.1"`
+	Port uint     `env:"PORT" envDefault:"8000"`
+	DB   DBConfig `envPrefix:"DB__"`
+}
