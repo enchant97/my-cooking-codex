@@ -1,5 +1,13 @@
 package core
 
+import "github.com/golang-jwt/jwt/v4"
+
+type JWTClaims struct {
+	Username string `json:"username"`
+	IsAdmin  bool   `json:"isAdmin"`
+	jwt.RegisteredClaims
+}
+
 type CreateUser struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`

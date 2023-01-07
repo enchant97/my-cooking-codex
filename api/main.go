@@ -36,7 +36,13 @@ func main() {
 
 	e := echo.New()
 	e.Validator = &Validator{validator: validator.New()}
-	routes.InitRoutes(e)
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			ctx.Set("AppConfig", appConfig)
+			return next(ctx)
+		}
+	})
+	routes.InitRoutes(e, appConfig)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", appConfig.Host, appConfig.Port)))
 }
