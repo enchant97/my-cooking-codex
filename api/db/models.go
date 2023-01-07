@@ -29,9 +29,15 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 }
 
 type Ingredient struct {
-	Name     string `rethinkdb:"name" json:"name"`
-	Amount   int    `rethinkdb:"amount" json:"amount"`
-	UnitType string `rethinkdb:"unitType" json:"unitType"`
+	Name        string  `rethinkdb:"name" json:"name"`
+	Amount      int     `rethinkdb:"amount" json:"amount"`
+	UnitType    string  `rethinkdb:"unitType" json:"unitType"`
+	Description *string `rethinkdb:"description,omitempty" json:"description,omitempty"`
+}
+
+type Step struct {
+	Title       *string `rethinkdb:"title,omitempty" json:"title,omitempty"`
+	Description string  `rethinkdb:"description" json:"description"`
 }
 
 type Recipe struct {
@@ -40,8 +46,8 @@ type Recipe struct {
 	Title            string       `rethinkdb:"title" json:"title"`
 	ShortDescription *string      `rethinkdb:"shortDescription,omitempty" json:"shortDescription,omitempty"`
 	LongDescription  *string      `rethinkdb:"longDescription,omitempty" json:"longDescription,omitempty"`
-	ThumbnailName    *[]string    `rethinkdb:"thumbnailName,omitempty" json:"thumbnailName,omitempty"`
+	ThumbnailName    *string      `rethinkdb:"thumbnailName,omitempty" json:"thumbnailName,omitempty"`
 	Tags             []string     `rethinkdb:"tags,omitempty" json:"tags,omitempty"`
 	Ingredients      []Ingredient `rethinkdb:"ingredients,omitempty" json:"ingredients,omitempty"`
-	Steps            []string     `rethinkdb:"steps,omitempty" json:"steps,omitempty"`
+	Steps            []Step       `rethinkdb:"steps,omitempty" json:"steps,omitempty"`
 }
