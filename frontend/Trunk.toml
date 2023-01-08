@@ -1,0 +1,7 @@
+[[hooks]]
+stage = "pre_build"
+command = "sh"
+command_arguments = [
+    "-c",
+    "pnpm run css:build"
+]
