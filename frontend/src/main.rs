@@ -1,6 +1,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+mod core;
 mod pages;
 
 use crate::pages::{Home, Login};
