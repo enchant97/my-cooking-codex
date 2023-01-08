@@ -2,17 +2,36 @@ use wasm_bindgen::JsCast;
 use web_sys::{console, EventTarget, HtmlInputElement};
 use yew::prelude::*;
 
+use crate::core::api::sanitise_base_url;
 use crate::core::storage;
 use crate::core::{api::Api, types};
 
 #[function_component(Login)]
 pub fn login() -> Html {
+    let api_url_state = use_state(|| String::default());
     let username_state = use_state(String::default);
     let password_state = use_state(String::default);
 
-    let api_url = "http://127.0.0.1:8000/".to_owned();
+    let api_url = (*api_url_state).clone();
     let username = (*username_state).clone();
     let password = (*password_state).clone();
+
+    {
+        let api_url_state = api_url_state.clone();
+        use_effect_with_deps(
+            move |_| {
+                match gloo_utils::window().location().origin() {
+                    Ok(href) => {
+                        let href = sanitise_base_url(href.to_owned());
+                        let href = href + "/api";
+                        api_url_state.set(href);
+                    }
+                    Err(_) => (),
+                };
+            },
+            (),
+        );
+    }
 
     let on_submit = {
         Callback::from(move |e: SubmitEvent| {
@@ -42,7 +61,18 @@ pub fn login() -> Html {
             });
         })
     };
+    let on_api_url_change = {
+        let api_url_state = api_url_state.clone();
+        Callback::from(move |e: InputEvent| {
+            let target: Option<EventTarget> = e.target();
+            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            if let Some(input) = input {
+                api_url_state.set(input.value());
+            }
+        })
+    };
     let on_username_change = {
+        let username_state = username_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
@@ -52,6 +82,7 @@ pub fn login() -> Html {
         })
     };
     let on_password_change = {
+        let password_state = password_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
@@ -73,15 +104,15 @@ pub fn login() -> Html {
                         <form onsubmit={on_submit}>
                             <div class="form-control mb-2">
                                 <label class="label"><span class="label-text">{ "Api Url" }</span></label>
-                                <input type="url" autocomplete="https://" class="input input-bordered" />
+                                <input value={ (*api_url_state).clone() } oninput={on_api_url_change} type="url" autocomplete="https://" class="input input-bordered" required=true />
                             </div>
                             <div class="form-control mb-2">
                                 <label class="label"><span class="label-text">{ "Username" }</span></label>
-                                <input oninput={on_username_change} type="text" placeholder="username" autocomplete="username" class="input input-bordered" />
+                                <input value={ (*username_state).clone() } oninput={on_username_change} type="text" placeholder="username" autocomplete="username" class="input input-bordered" required=true />
                             </div>
                             <div class="form-control mb-6">
                                 <label class="label"><span class="label-text">{ "Password" }</span></label>
-                                <input oninput={on_password_change} type="password" placeholder="password" autocomplete="current-password" class="input input-bordered" />
+                                <input value={ (*password_state).clone() } oninput={on_password_change} type="password" placeholder="password" autocomplete="current-password" class="input input-bordered" required=true />
                             </div>
                             <div class="form-control">
                                 <button type="submit" class="btn btn-primary">{"Login"}</button>
