@@ -1,3 +1,8 @@
+[serve]
+address = "127.0.0.1"
+port = 8001
+open = false
+
 [[hooks]]
 stage = "pre_build"
 command = "sh"
