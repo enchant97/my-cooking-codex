@@ -1,9 +1,11 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+mod contexts;
 mod core;
 mod pages;
 
+use crate::contexts::login::{CurrentLogin, CurrentLoginContext};
 use crate::pages::{Home, Login};
 
 #[derive(Clone, Routable, PartialEq)]
@@ -23,10 +25,13 @@ fn switch(routes: Route) -> Html {
 
 #[function_component(App)]
 fn app() -> Html {
+    let login_context = use_reducer(|| CurrentLogin::new());
     html! {
-        <BrowserRouter>
-            <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
-        </BrowserRouter>
+        <ContextProvider<CurrentLoginContext> context={login_context}>
+            <BrowserRouter>
+                <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
+            </BrowserRouter>
+        </ContextProvider<CurrentLoginContext>>
     }
 }
 

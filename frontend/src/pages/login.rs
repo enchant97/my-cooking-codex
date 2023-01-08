@@ -2,12 +2,14 @@ use wasm_bindgen::JsCast;
 use web_sys::{console, EventTarget, HtmlInputElement};
 use yew::prelude::*;
 
+use crate::contexts::CurrentLoginContext;
 use crate::core::api::sanitise_base_url;
-use crate::core::storage;
 use crate::core::{api::Api, types};
 
 #[function_component(Login)]
 pub fn login() -> Html {
+    let login_ctx = use_context::<CurrentLoginContext>().unwrap();
+
     let api_url_state = use_state(|| String::default());
     let username_state = use_state(String::default);
     let password_state = use_state(String::default);
@@ -50,6 +52,7 @@ pub fn login() -> Html {
                 password: password.clone(),
             };
 
+            let login_ctx = login_ctx.clone();
             wasm_bindgen_futures::spawn_local(async move {
                 let token = Api::new(api_url.clone()).post_login(&login).await.unwrap();
                 let login_details = types::StoredLogin {
@@ -57,7 +60,7 @@ pub fn login() -> Html {
                     token,
                 };
                 console::debug_1(&format!("got details: '{:?}'", login_details).into());
-                storage::set_login_token(login_details);
+                login_ctx.dispatch(Some(login_details));
             });
         })
     };
