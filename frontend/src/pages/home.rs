@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
 use crate::{
-    components::Header,
+    components::drawer,
     core::effects::{use_login_redirect_effect, LoginState},
     Route,
 };
@@ -11,21 +11,14 @@ pub fn home() -> Html {
     use_login_redirect_effect(LoginState::HasLogin, Route::Login);
 
     html! {
-        <div class="drawer drawer-mobile">
-        <input id="main-drawer" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content">
-            <Header/>
-            <div class="pt-3 px-3">
+        <drawer::Drawer r#for="main-drawer">
+            <drawer::DrawerContent header=true>
                 <h1 class={classes!("text-3xl", "font-bold")}>{ "Hello World" }</h1>
-            </div>
-        </div>
-        <div class="drawer-side">
-          <label for="main-drawer" class="drawer-overlay"></label>
-          <ul class="menu p-4 w-80 bg-base-200 text-base-content">
-            <li><a>{"Sidebar Item 1"}</a></li>
-            <li><a>{"Sidebar Item 2"}</a></li>
-          </ul>
-        </div>
-      </div>
+            </drawer::DrawerContent>
+            <drawer::DrawerDraw r#for="main-drawer">
+                <a>{"Sidebar Item 1"}</a>
+                <a>{"Sidebar Item 2"}</a>
+            </drawer::DrawerDraw>
+        </drawer::Drawer>
     }
 }
