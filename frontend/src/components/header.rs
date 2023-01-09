@@ -21,7 +21,7 @@ pub fn header() -> Html {
             <a class="btn btn-ghost normal-case text-xl">{"Recipes"}</a>
         </div>
         <div class="flex-none">
-            if current_login == None {
+            if current_login.is_none() {
                 <Link<Route> to={Route::Login} classes={classes!("btn", "btn-ghost")}>{"Login"}</Link<Route>>
             } else{
                 <Link<Route> to={Route::Logout} classes={classes!("btn", "btn-ghost")}>{"Logout"}</Link<Route>>

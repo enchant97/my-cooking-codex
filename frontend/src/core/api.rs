@@ -2,7 +2,7 @@ use super::types::{Login, LoginToken};
 use gloo_net::http::Request;
 
 pub fn sanitise_base_url(base: String) -> String {
-    let base = match base.strip_suffix("/") {
+    let base = match base.strip_suffix('/') {
         Some(v) => v.to_owned(),
         None => base,
     };
