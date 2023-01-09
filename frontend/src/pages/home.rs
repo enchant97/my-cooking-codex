@@ -1,6 +1,9 @@
 use yew::prelude::*;
 
-use crate::{core::effects::{use_login_redirect_effect, LoginState}, Route};
+use crate::{
+    core::effects::{use_login_redirect_effect, LoginState},
+    Route,
+};
 
 #[function_component(Home)]
 pub fn home() -> Html {

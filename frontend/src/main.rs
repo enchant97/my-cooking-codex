@@ -1,12 +1,14 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+mod components;
 mod contexts;
 mod core;
 mod pages;
 
+use crate::components::Header;
 use crate::contexts::login::{CurrentLogin, CurrentLoginContext};
-use crate::pages::{Home, Login};
+use crate::pages::{Home, Login, Logout};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -14,12 +16,15 @@ pub enum Route {
     Home,
     #[at("/login")]
     Login,
+    #[at("/logout")]
+    Logout,
 }
 
 fn switch(routes: Route) -> Html {
     match routes {
         Route::Home => html! { <Home></Home> },
         Route::Login => html! {<Login></Login>},
+        Route::Logout => html! {<Logout></Logout>},
     }
 }
 
@@ -29,6 +34,7 @@ fn app() -> Html {
     html! {
         <ContextProvider<CurrentLoginContext> context={login_context}>
             <BrowserRouter>
+                <Header />
                 <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
             </BrowserRouter>
         </ContextProvider<CurrentLoginContext>>
