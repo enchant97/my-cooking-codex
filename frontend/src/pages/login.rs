@@ -1,17 +1,16 @@
 use wasm_bindgen::JsCast;
 use web_sys::{console, EventTarget, HtmlInputElement};
 use yew::prelude::*;
-use yew_router::prelude::use_navigator;
 
 use crate::contexts::CurrentLoginContext;
 use crate::core::api::sanitise_base_url;
+use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::{api::Api, types};
 use crate::Route;
 
 #[function_component(Login)]
 pub fn login() -> Html {
     let login_ctx = use_context::<CurrentLoginContext>().unwrap();
-    let navigator = use_navigator().unwrap();
 
     let api_url_state = use_state(|| String::default());
     let username_state = use_state(String::default);
@@ -21,6 +20,9 @@ pub fn login() -> Html {
     let username = (*username_state).clone();
     let password = (*password_state).clone();
 
+    // redirect if user is logged in
+    use_login_redirect_effect(LoginState::NoLogin, Route::Home);
+    // get the default api base url from current window location
     {
         let api_url_state = api_url_state.clone();
         use_effect_with_deps(
@@ -35,19 +37,6 @@ pub fn login() -> Html {
                 };
             },
             (),
-        );
-    }
-    // redirect if user is logged in
-    {
-        let login_ctx = login_ctx.clone();
-        let current_login = login_ctx.inner.to_owned();
-        let navigator = navigator.clone();
-        use_effect_with_deps(
-            move |_| match current_login {
-                Some(_) => navigator.push(&Route::Home),
-                None => (),
-            },
-            login_ctx,
         );
     }
 

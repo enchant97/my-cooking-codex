@@ -9,7 +9,7 @@ use crate::contexts::login::{CurrentLogin, CurrentLoginContext};
 use crate::pages::{Home, Login};
 
 #[derive(Clone, Routable, PartialEq)]
-enum Route {
+pub enum Route {
     #[at("/")]
     Home,
     #[at("/login")]
