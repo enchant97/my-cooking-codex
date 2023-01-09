@@ -34,7 +34,6 @@ fn app() -> Html {
     html! {
         <ContextProvider<CurrentLoginContext> context={login_context}>
             <BrowserRouter>
-                <Header />
                 <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
             </BrowserRouter>
         </ContextProvider<CurrentLoginContext>>
