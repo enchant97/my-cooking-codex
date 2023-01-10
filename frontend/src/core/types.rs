@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+pub mod recipe;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Login {
     pub username: String,
