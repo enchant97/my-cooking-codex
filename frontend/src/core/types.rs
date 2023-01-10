@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 pub mod recipe;
+pub mod user;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Login {
