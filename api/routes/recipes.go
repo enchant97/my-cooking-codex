@@ -27,3 +27,15 @@ func postCreateRecipe(ctx echo.Context) error {
 	}
 	return ctx.JSON(http.StatusCreated, recipe)
 }
+
+func getRecipes(ctx echo.Context) error {
+	userToken := ctx.Get("user").(*jwt.Token)
+	tokenClaims := userToken.Claims.(*core.JWTClaims)
+	username := tokenClaims.Username
+	recipes, err := db.GetRecipesByUsername(username)
+	if err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(500)
+	}
+	return ctx.JSON(http.StatusOK, recipes)
+}

@@ -27,6 +27,7 @@ func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 	{
 		apiRoutes.GET("users/me/", getUserMe)
 		apiRoutes.POST("recipes/", postCreateRecipe)
+		apiRoutes.GET("recipes/", getRecipes)
 	}
 
 }

@@ -32,3 +32,14 @@ func CreateRecipe(recipe Recipe) (Recipe, error) {
 	recipe.ID = id
 	return recipe, nil
 }
+
+func GetRecipesByUsername(username string) ([]Recipe, error) {
+	cursor, err := r.Table(TableNameRecipes).Filter(map[string]interface{}{"ownerId": username}).Run(session)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close()
+	var recipes []Recipe
+	err = cursor.All(&recipes)
+	return recipes, err
+}
