@@ -6,7 +6,6 @@ mod contexts;
 mod core;
 mod pages;
 
-use crate::components::Header;
 use crate::contexts::login::{CurrentLogin, CurrentLoginContext};
 use crate::pages::{Home, Login, Logout};
 
