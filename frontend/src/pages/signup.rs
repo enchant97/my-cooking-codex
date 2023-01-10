@@ -25,11 +25,13 @@ pub fn signup() -> Html {
     let username_state = use_state(String::default);
     let password_state = use_state(String::default);
     let password_confirm_state = use_state(String::default);
+    let error_tooltip_state: UseStateHandle<Option<String>> = use_state(Option::default);
 
+    let api_url = (*api_url_state).clone();
     let username = (*username_state).clone();
     let password = (*password_state).clone();
     let password_confirm = (*password_confirm_state).clone();
-    let api_url = (*api_url_state).clone();
+    let error_tooltip = (*error_tooltip_state).clone();
 
     // redirect if user is logged in
     use_login_redirect_effect(LoginState::NoLogin, Route::Home);
@@ -112,22 +114,38 @@ pub fn signup() -> Html {
         })
     };
     let on_password_change = {
+        let error_tooltip_state = error_tooltip_state.clone();
+        let password_confirm = (*password_confirm_state).clone();
         let password_state = password_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
-                password_state.set(input.value());
+                let value = input.value();
+                password_state.set(value.clone());
+                if value != password_confirm {
+                    error_tooltip_state.set(Some("passwords do not match!".to_owned()));
+                } else {
+                    error_tooltip_state.set(None);
+                }
             }
         })
     };
     let on_password_confirm_change = {
+        let error_tooltip_state = error_tooltip_state.clone();
+        let password = (*password_state).clone();
         let password_confirm_state = password_confirm_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
-                password_confirm_state.set(input.value());
+                let value = input.value();
+                password_confirm_state.set(value.clone());
+                if value != password {
+                    error_tooltip_state.set(Some("passwords do not match!".to_owned()));
+                } else {
+                    error_tooltip_state.set(None);
+                }
             }
         })
     };
@@ -190,7 +208,13 @@ pub fn signup() -> Html {
                                 />
                             </div>
                             <div class="form-control btn-group btn-group-vertical">
-                                <button type="submit" class="btn btn-primary">{"Signup"}</button>
+                                if error_tooltip.is_none() {
+                                    <button type="submit" class="btn btn-primary">{"Signup"}</button>
+                                } else {
+                                    <div class="tooltip tooltip-open tooltip-error" data-tip={error_tooltip.unwrap()}>
+                                        <button type="submit" disabled=true class="btn btn-disabled btn-block">{"Signup"}</button>
+                                    </div>
+                                }
                                 <Link<Route> to={Route::Login} classes={classes!("btn")}>{"Login Instead?"}</Link<Route>>
                             </div>
                         </form>
