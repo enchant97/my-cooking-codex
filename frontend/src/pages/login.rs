@@ -2,7 +2,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{console, EventTarget, HtmlInputElement};
 use yew::prelude::*;
 
-use crate::contexts::CurrentLoginContext;
+use crate::contexts::toasts::{Toast, ToastChange};
+use crate::contexts::{CurrentLoginContext, ToastsContext};
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::{api::Api, types};
@@ -11,6 +12,7 @@ use crate::Route;
 #[function_component(Login)]
 pub fn login() -> Html {
     let login_ctx = use_context::<CurrentLoginContext>().unwrap();
+    let toasts_ctx = use_context::<ToastsContext>().unwrap();
 
     let api_url_state = use_state(|| String::default());
     let username_state = use_state(String::default);
@@ -58,8 +60,18 @@ pub fn login() -> Html {
             };
 
             let login_ctx = login_ctx.clone();
+            let toasts_ctx = toasts_ctx.clone();
             wasm_bindgen_futures::spawn_local(async move {
-                let token = Api::new(api_url.clone()).post_login(&login).await.unwrap();
+                let token = match Api::new(api_url.clone()).post_login(&login).await {
+                    Ok(v) => v,
+                    Err(_) => {
+                        // TODO handle the actual errors
+                        toasts_ctx.dispatch(ToastChange::Push(Toast {
+                            message: "failed login!",
+                        }));
+                        return;
+                    }
+                };
                 let login_details = types::StoredLogin {
                     api_url: api_url.clone(),
                     token,
