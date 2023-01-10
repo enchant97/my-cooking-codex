@@ -1,4 +1,4 @@
-use super::types::{Login, LoginToken, StoredLogin};
+use super::types::{user, Login, LoginToken, StoredLogin};
 use gloo_net::http::Request;
 use serde::de::DeserializeOwned;
 use std::convert::From;
@@ -92,6 +92,17 @@ impl Api {
             Request::post(&req_url).json(login).unwrap().send().await,
         )?;
         ApiError::check_json_response_ok::<LoginToken>(response).await
+    }
+
+    pub async fn post_create_account(
+        &self,
+        details: &user::CreateUser,
+    ) -> Result<user::User, ApiError> {
+        let req_url = self.base_url.clone() + "/users/";
+        let response = ApiError::from_response_result(
+            Request::post(&req_url).json(details).unwrap().send().await,
+        )?;
+        ApiError::check_json_response_ok::<user::User>(response).await
     }
 }
 

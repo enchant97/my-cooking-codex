@@ -1,6 +1,7 @@
 use wasm_bindgen::JsCast;
 use web_sys::{console, EventTarget, HtmlInputElement};
 use yew::prelude::*;
+use yew_router::prelude::Link;
 
 use crate::contexts::toasts::{Toast, ToastChange};
 use crate::contexts::{CurrentLoginContext, HttpApiContext, ToastsContext};
@@ -137,8 +138,9 @@ pub fn login() -> Html {
                                 <label class="label"><span class="label-text">{ "Password" }</span></label>
                                 <input value={ (*password_state).clone() } oninput={on_password_change} type="password" placeholder="password" autocomplete="current-password" class="input input-bordered" required=true />
                             </div>
-                            <div class="form-control">
+                            <div class="form-control btn-group btn-group-vertical">
                                 <button type="submit" class="btn btn-primary">{"Login"}</button>
+                                <Link<Route> to={Route::Signup} classes={classes!("btn")}>{"Signup Instead?"}</Link<Route>>
                             </div>
                         </form>
                     </div>
