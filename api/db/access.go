@@ -1,15 +1,10 @@
 package db
 
 import (
-	"github.com/enchant97/recipes/api/core"
 	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
-func CreateUser(userData core.CreateUser) (User, error) {
-	user := User{
-		Username: userData.Username,
-	}
-	user.SetPassword(userData.Password)
+func CreateUser(user User) (User, error) {
 	if _, err := r.Table(TableNameUsers).Insert(&user).RunWrite(session); err != nil {
 		return User{}, err
 	}
@@ -25,4 +20,15 @@ func GetUserByUsername(username string) (User, error) {
 	var user User
 	err = cursor.One(&user)
 	return user, err
+}
+
+func CreateRecipe(recipe Recipe) (Recipe, error) {
+	response, err := r.Table(TableNameRecipes).Insert(&recipe).RunWrite(session)
+	if err != nil {
+		return Recipe{}, err
+	}
+	// HACK
+	id := response.GeneratedKeys[0]
+	recipe.ID = id
+	return recipe, nil
 }

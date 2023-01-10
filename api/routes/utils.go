@@ -23,10 +23,10 @@ func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 	}
 	jwtMiddleware := echojwt.WithConfig(config)
 
-	apiRoutes := e.Group("/api/")
+	apiRoutes := e.Group("/api/", jwtMiddleware)
 	{
-		apiRoutes.Use(jwtMiddleware)
 		apiRoutes.GET("users/me/", getUserMe)
+		apiRoutes.POST("recipes/", postCreateRecipe)
 	}
 
 }

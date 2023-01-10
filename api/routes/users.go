@@ -17,7 +17,7 @@ func postCreateUser(ctx echo.Context) error {
 	if err := ctx.Validate(userData); err != nil {
 		return err
 	}
-	user, err := db.CreateUser(userData)
+	user, err := db.CreateUser(userData.IntoUser())
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(500)
