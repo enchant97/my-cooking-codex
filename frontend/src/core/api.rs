@@ -1,6 +1,7 @@
-use super::types::{Login, LoginToken};
+use super::types::{Login, LoginToken, StoredLogin};
 use gloo_net::http::Request;
 use serde::de::DeserializeOwned;
+use std::convert::From;
 
 pub fn sanitise_base_url(base: String) -> String {
     let base = match base.strip_suffix('/') {
@@ -64,14 +65,24 @@ impl ApiError {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct Api {
     base_url: String,
+    login_token: Option<LoginToken>,
 }
 
 impl Api {
-    pub fn new(base: String) -> Self {
+    pub fn new(base: String, token: Option<LoginToken>) -> Self {
         Api {
             base_url: sanitise_base_url(base),
+            login_token: token,
+        }
+    }
+
+    fn get_authorization_value(&self) -> Option<String> {
+        match &self.login_token {
+            Some(token) => Some(format!("{} {}", token.r#type, token.token)),
+            None => None,
         }
     }
 
@@ -81,5 +92,14 @@ impl Api {
             Request::post(&req_url).json(login).unwrap().send().await,
         )?;
         ApiError::check_json_response_ok::<LoginToken>(response).await
+    }
+}
+
+impl From<StoredLogin> for Api {
+    fn from(login: StoredLogin) -> Self {
+        Api {
+            base_url: login.api_url,
+            login_token: Some(login.token),
+        }
     }
 }
