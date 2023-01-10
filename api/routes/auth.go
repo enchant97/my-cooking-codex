@@ -6,6 +6,7 @@ import (
 
 	"github.com/enchant97/recipes/api/config"
 	"github.com/enchant97/recipes/api/core"
+	"github.com/enchant97/recipes/api/db"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -30,7 +31,12 @@ func postLogin(ctx echo.Context) error {
 		return err
 	}
 
-	// FIXME validate password & username
+	// validate username & password
+	user, err := db.GetUserByUsername(loginData.Username)
+	// TODO catch the specific db error
+	if err != nil || !user.IsPasswordMatch(loginData.Password) {
+		return ctx.NoContent(http.StatusUnauthorized)
+	}
 
 	claims := &core.JWTClaims{
 		Username: loginData.Username,
