@@ -1,5 +1,6 @@
 use super::types::{Login, LoginToken};
 use gloo_net::http::Request;
+use serde::de::DeserializeOwned;
 
 pub fn sanitise_base_url(base: String) -> String {
     let base = match base.strip_suffix('/') {
@@ -7,6 +8,60 @@ pub fn sanitise_base_url(base: String) -> String {
         None => base,
     };
     base
+}
+
+#[derive(Debug)]
+pub enum ApiInternalError {
+    Connection,
+    Deserialization,
+    Generic(gloo_net::Error),
+}
+
+#[derive(Debug)]
+pub struct ApiResponseError {
+    pub status_code: u16,
+}
+
+#[derive(Debug)]
+pub enum ApiError {
+    Internal(ApiInternalError),
+    Response(ApiResponseError),
+}
+
+impl ApiError {
+    pub fn from_response_result(
+        response: Result<gloo_net::http::Response, gloo_net::Error>,
+    ) -> Result<gloo_net::http::Response, Self> {
+        match response {
+            Ok(v) => Ok(v),
+            Err(err) => match err {
+                gloo_net::Error::JsError(_) => {
+                    Err(ApiError::Internal(ApiInternalError::Connection))
+                }
+                err => Err(ApiError::Internal(ApiInternalError::Generic(err))),
+            },
+        }
+    }
+
+    pub async fn check_json_response_ok<T>(response: gloo_net::http::Response) -> Result<T, Self>
+    where
+        T: DeserializeOwned,
+    {
+        match response.ok() {
+            false => Err(ApiError::Response(ApiResponseError {
+                status_code: response.status(),
+            })),
+            true => match response.json::<T>().await {
+                Err(err) => match err {
+                    gloo_net::Error::SerdeError(_) => {
+                        Err(ApiError::Internal(ApiInternalError::Deserialization))
+                    }
+                    err => Err(ApiError::Internal(ApiInternalError::Generic(err))),
+                },
+                Ok(v) => Ok(v),
+            },
+        }
+    }
 }
 
 pub struct Api {
@@ -20,14 +75,11 @@ impl Api {
         }
     }
 
-    pub async fn post_login(&self, login: &Login) -> Option<LoginToken> {
+    pub async fn post_login(&self, login: &Login) -> Result<LoginToken, ApiError> {
         let req_url = self.base_url.clone() + "/login/";
-        let response = Request::post(&req_url)
-            .json(login)
-            .unwrap()
-            .send()
-            .await
-            .unwrap();
-        Some(response.json::<LoginToken>().await.unwrap())
+        let response = ApiError::from_response_result(
+            Request::post(&req_url).json(login).unwrap().send().await,
+        )?;
+        ApiError::check_json_response_ok::<LoginToken>(response).await
     }
 }
