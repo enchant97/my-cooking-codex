@@ -1,7 +1,5 @@
-pub mod api;
-pub mod toasts;
 pub mod login;
+pub mod toasts;
 
-pub use api::HttpApiContext;
-pub use toasts::ToastsContext;
 pub use login::CurrentLoginContext;
+pub use toasts::ToastsContext;

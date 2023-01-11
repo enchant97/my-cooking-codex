@@ -4,7 +4,7 @@ use yew::prelude::*;
 use yew_router::prelude::Link;
 
 use crate::contexts::toasts::{Toast, ToastChange};
-use crate::contexts::{CurrentLoginContext, HttpApiContext, ToastsContext};
+use crate::contexts::{CurrentLoginContext, ToastsContext};
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::{api::Api, types};
@@ -13,7 +13,6 @@ use crate::Route;
 #[function_component(Login)]
 pub fn login() -> Html {
     let login_ctx = use_context::<CurrentLoginContext>().unwrap();
-    let api_ctx = use_context::<HttpApiContext>().unwrap();
     let toasts_ctx = use_context::<ToastsContext>().unwrap();
 
     let api_url_state = use_state(|| String::default());
@@ -62,7 +61,6 @@ pub fn login() -> Html {
             };
 
             let login_ctx = login_ctx.clone();
-            let api_ctx = api_ctx.clone();
             let toasts_ctx = toasts_ctx.clone();
             wasm_bindgen_futures::spawn_local(async move {
                 let token = match Api::new(api_url.clone(), None).post_login(&login).await {
@@ -81,7 +79,6 @@ pub fn login() -> Html {
                 };
                 console::debug_1(&format!("got details: '{:?}'", login_details).into());
                 login_ctx.dispatch(Some(login_details.clone()));
-                api_ctx.dispatch(Some(Api::from(login_details.clone())));
             });
         })
     };
