@@ -34,7 +34,7 @@ pub struct CreateRecipe {
     pub steps: Vec<CreateStep>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Ingredient {
     pub name: String,
@@ -44,7 +44,7 @@ pub struct Ingredient {
     pub description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Step {
     #[serde(default)]
@@ -52,7 +52,7 @@ pub struct Step {
     pub description: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Recipe {
     pub id: String,
@@ -67,7 +67,7 @@ pub struct Recipe {
     #[serde(default)]
     pub tags: Vec<String>,
     #[serde(default)]
-    pub ingredients: Vec<CreateIngredient>,
+    pub ingredients: Vec<Ingredient>,
     #[serde(default)]
-    pub steps: Vec<CreateStep>,
+    pub steps: Vec<Step>,
 }
