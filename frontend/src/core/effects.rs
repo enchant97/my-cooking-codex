@@ -12,7 +12,7 @@ pub enum LoginState {
 #[hook]
 pub fn use_login_redirect_effect(require_state: LoginState, redirect_to: Route) {
     let login_ctx = use_context::<CurrentLoginContext>().unwrap();
-    let current_login = login_ctx.inner.to_owned();
+    let current_login = login_ctx.login.to_owned();
     let navigator = use_navigator().unwrap();
     use_effect_with_deps(
         move |_| match (current_login, require_state) {

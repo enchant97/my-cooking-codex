@@ -9,7 +9,7 @@ use crate::{contexts::CurrentLoginContext, Route};
 #[function_component(Header)]
 pub fn header() -> Html {
     let login_ctx = use_context::<CurrentLoginContext>().unwrap();
-    let current_login = login_ctx.inner.to_owned();
+    let current_login = login_ctx.login.to_owned();
     html! {
         <div class="navbar bg-neutral text-neutral-content">
         <div class="flex-none">

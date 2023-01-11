@@ -6,7 +6,7 @@ use crate::core::{api::Api, storage, types::StoredLogin};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct CurrentLogin {
-    pub inner: Option<StoredLogin>,
+    pub login: Option<StoredLogin>,
     pub http_api: Option<Api>,
 }
 
@@ -18,7 +18,7 @@ impl CurrentLogin {
             None => None,
         };
         Self {
-            inner: login,
+            login,
             http_api,
         }
     }
@@ -39,7 +39,7 @@ impl Reducible for CurrentLogin {
             }
         };
         CurrentLogin {
-            inner: action,
+            login: action,
             http_api,
         }
         .into()
