@@ -38,7 +38,7 @@ pub struct GridProps {
 #[function_component(Grid)]
 pub fn grid(props: &GridProps) -> Html {
     html! {
-        <div class="grid gap-4 grid-cols-3 grid-rows-3 rounded p-3 bg-base-200">
+        <div class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 rounded p-3 bg-base-200">
             { for props.children.iter() }
         </div>
     }
