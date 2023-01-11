@@ -1,4 +1,4 @@
-use gloo_timers::callback::Timeout;
+use gloo::timers::callback::Timeout;
 use yew::{
     prelude::{function_component, html, Html},
     use_context, use_effect_with_deps, Properties,

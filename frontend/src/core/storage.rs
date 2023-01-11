@@ -1,5 +1,5 @@
 use super::types::StoredLogin;
-use gloo_storage::{LocalStorage, Storage};
+use gloo::storage::{LocalStorage, Storage};
 
 const LOGIN_DETAILS_KEY: &str = "login-details";
 

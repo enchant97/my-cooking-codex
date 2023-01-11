@@ -1,5 +1,5 @@
 use super::types::{recipe, user, Login, LoginToken, StoredLogin};
-use gloo_net::http::Request;
+use gloo::net::http::Request;
 use serde::de::DeserializeOwned;
 use std::convert::From;
 
@@ -15,7 +15,7 @@ pub fn sanitise_base_url(base: String) -> String {
 pub enum ApiInternalError {
     Connection,
     Deserialization,
-    Generic(gloo_net::Error),
+    Generic(gloo::net::Error),
 }
 
 #[derive(Debug)]
@@ -31,12 +31,12 @@ pub enum ApiError {
 
 impl ApiError {
     pub fn from_response_result(
-        response: Result<gloo_net::http::Response, gloo_net::Error>,
-    ) -> Result<gloo_net::http::Response, Self> {
+        response: Result<gloo::net::http::Response, gloo::net::Error>,
+    ) -> Result<gloo::net::http::Response, Self> {
         match response {
             Ok(v) => Ok(v),
             Err(err) => match err {
-                gloo_net::Error::JsError(_) => {
+                gloo::net::Error::JsError(_) => {
                     Err(ApiError::Internal(ApiInternalError::Connection))
                 }
                 err => Err(ApiError::Internal(ApiInternalError::Generic(err))),
@@ -44,7 +44,7 @@ impl ApiError {
         }
     }
 
-    pub async fn check_json_response_ok<T>(response: gloo_net::http::Response) -> Result<T, Self>
+    pub async fn check_json_response_ok<T>(response: gloo::net::http::Response) -> Result<T, Self>
     where
         T: DeserializeOwned,
     {
@@ -54,7 +54,7 @@ impl ApiError {
             })),
             true => match response.json::<T>().await {
                 Err(err) => match err {
-                    gloo_net::Error::SerdeError(_) => {
+                    gloo::net::Error::SerdeError(_) => {
                         Err(ApiError::Internal(ApiInternalError::Deserialization))
                     }
                     err => Err(ApiError::Internal(ApiInternalError::Generic(err))),

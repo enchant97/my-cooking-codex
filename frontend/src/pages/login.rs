@@ -30,7 +30,7 @@ pub fn login() -> Html {
         let api_url_state = api_url_state.clone();
         use_effect_with_deps(
             move |_| {
-                match gloo_utils::window().location().origin() {
+                match gloo::utils::window().location().origin() {
                     Ok(href) => {
                         let href = sanitise_base_url(href.to_owned());
                         let href = href + "/api";
