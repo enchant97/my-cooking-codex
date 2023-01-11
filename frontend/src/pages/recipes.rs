@@ -34,15 +34,17 @@ pub fn recipes() -> Html {
     html! {
         <drawer::Drawer r#for="main-drawer">
             <drawer::DrawerContent header=true>
-                <h1 class={classes!("text-3xl", "font-bold")}>{ "Recipes" }</h1>
-                <card_grid::Grid>
-                    { for recipes.iter().map(|recipe| {
-                        html!{
-                            <card_grid::GridItem title={recipe.title.clone()}>
-                            </card_grid::GridItem>
-                        }
-                    })}
-                </card_grid::Grid>
+                <div class="p-4 rounded bg-base-200">
+                    <h1 class={classes!("text-3xl", "font-bold", "mb-2")}>{ "Recipes" }</h1>
+                    <card_grid::Grid>
+                        { for recipes.iter().map(|recipe| {
+                            html!{
+                                <card_grid::GridItem title={recipe.title.clone()}>
+                                </card_grid::GridItem>
+                            }
+                        })}
+                    </card_grid::Grid>
+                </div>
             </drawer::DrawerContent>
             <drawer::DrawerDraw r#for="main-drawer">
                 <drawer::DrawerLink to={Route::Home}>{"Home"}</drawer::DrawerLink>

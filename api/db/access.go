@@ -43,3 +43,14 @@ func GetRecipesByUsername(username string) ([]Recipe, error) {
 	err = cursor.All(&recipes)
 	return recipes, err
 }
+
+func GetRecipesByUsernameCount(username string) (int, error) {
+	cursor, err := r.Table(TableNameRecipes).Filter(map[string]interface{}{"ownerId": username}).Count().Run(session)
+	if err != nil {
+		return 0, err
+	}
+	defer cursor.Close()
+	var count int
+	err = cursor.One(&count)
+	return count, err
+}

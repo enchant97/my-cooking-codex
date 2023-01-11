@@ -1,4 +1,4 @@
-use super::types::{recipe, user, Login, LoginToken, StoredLogin};
+use super::types::{recipe, stats, user, Login, LoginToken, StoredLogin};
 use gloo::net::http::Request;
 use serde::de::DeserializeOwned;
 use std::convert::From;
@@ -114,6 +114,17 @@ impl Api {
                 .await,
         )?;
         ApiError::check_json_response_ok::<Vec<recipe::Recipe>>(response).await
+    }
+
+    pub async fn get_stats(&self) -> Result<stats::AccountStats, ApiError> {
+        let req_url = self.base_url.clone() + "/stats/me/";
+        let response = ApiError::from_response_result(
+            Request::get(&req_url)
+                .header("Authorization", &self.get_authorization_value().unwrap())
+                .send()
+                .await,
+        )?;
+        ApiError::check_json_response_ok::<stats::AccountStats>(response).await
     }
 }
 
