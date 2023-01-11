@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yew_router::prelude::Link;
 
 use crate::{
     components::{card_grid, drawer},
@@ -46,8 +45,8 @@ pub fn recipes() -> Html {
                 </card_grid::Grid>
             </drawer::DrawerContent>
             <drawer::DrawerDraw r#for="main-drawer">
-                <Link<Route> to={Route::Home}>{"Home"}</Link<Route>>
-                <Link<Route> to={Route::Recipes}>{"Recipes"}</Link<Route>>
+                <drawer::DrawerLink to={Route::Home}>{"Home"}</drawer::DrawerLink>
+                <drawer::DrawerLink to={Route::Recipes} active=true>{"Recipes"}</drawer::DrawerLink>
             </drawer::DrawerDraw>
         </drawer::Drawer>
     }
