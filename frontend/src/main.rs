@@ -8,7 +8,7 @@ mod pages;
 
 use crate::contexts::login::{CurrentLogin, CurrentLoginContext};
 use crate::contexts::toasts::{Toasts, ToastsContext};
-use crate::pages::{Home, Login, Logout, Signup};
+use crate::pages::{Home, Login, Logout, Recipes, Signup};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -20,6 +20,8 @@ pub enum Route {
     Login,
     #[at("/logout")]
     Logout,
+    #[at("/recipes")]
+    Recipes,
 }
 
 fn switch(routes: Route) -> Html {
@@ -28,6 +30,7 @@ fn switch(routes: Route) -> Html {
         Route::Signup => html! {<Signup/>},
         Route::Login => html! {<Login/>},
         Route::Logout => html! {<Logout/>},
+        Route::Recipes => html! {<Recipes/>},
     }
 }
 
