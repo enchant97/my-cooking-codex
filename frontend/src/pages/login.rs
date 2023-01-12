@@ -4,8 +4,8 @@ use yew::prelude::*;
 use yew_hooks::use_async;
 use yew_router::prelude::Link;
 
-use crate::contexts::toasts::{Toast, ToastChange};
-use crate::contexts::{CurrentLoginContext, ToastsContext};
+use crate::contexts::prelude::{use_login, use_toasts, Toast};
+use crate::contexts::toasts::ToastChange;
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::{api::Api, types};
@@ -13,8 +13,8 @@ use crate::Route;
 
 #[function_component(Login)]
 pub fn login() -> Html {
-    let login_ctx = use_context::<CurrentLoginContext>().unwrap();
-    let toasts_ctx = use_context::<ToastsContext>().unwrap();
+    let login_ctx = use_login().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
 
     let api_url_state = use_state(|| String::default());
     let username_state = use_state(String::default);

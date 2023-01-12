@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::rc::Rc;
 
-use yew::{Reducible, UseReducerHandle};
+use yew::{hook, use_context, Reducible, UseReducerHandle};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Toast {
@@ -48,3 +48,8 @@ impl Reducible for Toasts {
 }
 
 pub type ToastsContext = UseReducerHandle<Toasts>;
+
+#[hook]
+pub fn use_toasts() -> Option<UseReducerHandle<Toasts>> {
+    use_context::<ToastsContext>()
+}

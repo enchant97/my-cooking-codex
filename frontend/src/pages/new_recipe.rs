@@ -5,16 +5,16 @@ use yew_hooks::use_async;
 use yew_router::prelude::use_navigator;
 
 use crate::components::drawer;
-use crate::contexts::toasts::{Toast, ToastChange};
-use crate::contexts::{CurrentLoginContext, ToastsContext};
+use crate::contexts::prelude::{use_login, use_toasts, Toast};
+use crate::contexts::toasts::ToastChange;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::types;
 use crate::Route;
 
 #[function_component(NewRecipe)]
 pub fn new_recipe() -> Html {
-    let login_ctx = use_context::<CurrentLoginContext>().unwrap();
-    let toasts_ctx = use_context::<ToastsContext>().unwrap();
+    let login_ctx = use_login().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
     let navigator = use_navigator().unwrap();
 
     let title_state = use_state(String::default);

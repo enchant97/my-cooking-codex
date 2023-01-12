@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use yew::{Reducible, UseReducerHandle};
+use yew::{Reducible, UseReducerHandle, use_context, hook};
 
 use crate::core::{api::Api, storage, types::StoredLogin};
 
@@ -47,3 +47,8 @@ impl Reducible for CurrentLogin {
 }
 
 pub type CurrentLoginContext = UseReducerHandle<CurrentLogin>;
+
+#[hook]
+pub fn use_login() -> Option<UseReducerHandle<CurrentLogin>> {
+    use_context::<CurrentLoginContext>()
+}

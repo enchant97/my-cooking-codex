@@ -1,11 +1,11 @@
 use gloo::timers::callback::Timeout;
 use yew::{
     prelude::{function_component, html, Html},
-    use_context, use_effect_with_deps, Properties,
+    use_effect_with_deps, Properties,
 };
 
-use crate::contexts::toasts::{Toast, ToastChange};
-use crate::contexts::ToastsContext;
+use crate::contexts::prelude::{use_toasts, Toast};
+use crate::contexts::toasts::ToastChange;
 
 #[derive(Properties, PartialEq)]
 struct ToastProps {
@@ -14,7 +14,7 @@ struct ToastProps {
 
 #[function_component(ToastRow)]
 fn toast_row(props: &ToastProps) -> Html {
-    let toasts_ctx = use_context::<ToastsContext>().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
     {
         let toast = props.toast.to_owned();
         use_effect_with_deps(
@@ -32,7 +32,7 @@ fn toast_row(props: &ToastProps) -> Html {
 
 #[function_component(Toasts)]
 pub fn toasts() -> Html {
-    let toasts_ctx = use_context::<ToastsContext>().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
     let toasts = toasts_ctx.inner.to_owned();
     html! {
         <div class="toast toast-top toast-start">

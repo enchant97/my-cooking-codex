@@ -2,7 +2,7 @@ use yew::prelude::*;
 
 use crate::{
     components::{card_grid, drawer},
-    contexts::CurrentLoginContext,
+    contexts::prelude::use_login,
     core::{
         effects::{use_login_redirect_effect, LoginState},
         types::recipe,
@@ -12,7 +12,7 @@ use crate::{
 
 #[function_component(Recipes)]
 pub fn recipes() -> Html {
-    let login_ctx = use_context::<CurrentLoginContext>().unwrap();
+    let login_ctx = use_login().unwrap();
 
     let recipes_state: UseStateHandle<Vec<recipe::Recipe>> = use_state(Vec::default);
 

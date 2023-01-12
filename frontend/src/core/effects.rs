@@ -1,7 +1,7 @@
-use yew::{hook, use_context, use_effect_with_deps};
+use yew::{hook, use_effect_with_deps};
 use yew_router::prelude::use_navigator;
 
-use crate::{contexts::CurrentLoginContext, Route};
+use crate::{contexts::prelude::use_login, Route};
 
 pub enum LoginState {
     NoLogin,
@@ -11,7 +11,7 @@ pub enum LoginState {
 /// redirect when login state is not the required state
 #[hook]
 pub fn use_login_redirect_effect(require_state: LoginState, redirect_to: Route) {
-    let login_ctx = use_context::<CurrentLoginContext>().unwrap();
+    let login_ctx = use_login().unwrap();
     let current_login = login_ctx.login.to_owned();
     let navigator = use_navigator().unwrap();
     use_effect_with_deps(

@@ -6,8 +6,8 @@ use yew_router::prelude::{use_navigator, Link};
 
 use crate::{
     contexts::{
-        toasts::{Toast, ToastChange},
-        ToastsContext,
+        prelude::{use_toasts, Toast},
+        toasts::ToastChange,
     },
     core::{
         api::{sanitise_base_url, Api},
@@ -19,7 +19,7 @@ use crate::{
 
 #[function_component(Signup)]
 pub fn signup() -> Html {
-    let toasts_ctx = use_context::<ToastsContext>().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
     let navigator = use_navigator().unwrap();
 
     let api_url_state = use_state(String::default);

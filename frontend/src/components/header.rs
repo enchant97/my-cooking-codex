@@ -1,14 +1,11 @@
-use yew::{
-    prelude::{classes, function_component, html, Html},
-    use_context,
-};
+use yew::prelude::{classes, function_component, html, Html};
 use yew_router::prelude::Link;
 
-use crate::{contexts::CurrentLoginContext, Route};
+use crate::{contexts::prelude::use_login, Route};
 
 #[function_component(Header)]
 pub fn header() -> Html {
-    let login_ctx = use_context::<CurrentLoginContext>().unwrap();
+    let login_ctx = use_login().unwrap();
     let current_login = login_ctx.login.to_owned();
     html! {
         <div class="navbar bg-neutral text-neutral-content">

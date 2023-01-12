@@ -3,7 +3,7 @@ use yew::prelude::*;
 use crate::{
     components::drawer,
     components::stats,
-    contexts::CurrentLoginContext,
+    contexts::prelude::use_login,
     core::effects::{use_login_redirect_effect, LoginState},
     core::types,
     Route,
@@ -11,7 +11,7 @@ use crate::{
 
 #[function_component(HomeAccountStats)]
 fn home_account_stats() -> HtmlResult {
-    let login_ctx = use_context::<CurrentLoginContext>().unwrap();
+    let login_ctx = use_login().unwrap();
 
     let stats_state: UseStateHandle<Option<types::stats::AccountStats>> =
         use_state(Option::default);
