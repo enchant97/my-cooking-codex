@@ -5,10 +5,7 @@ use yew_hooks::use_async;
 use yew_router::prelude::{use_navigator, Link};
 
 use crate::{
-    contexts::{
-        prelude::{use_toasts, Toast},
-        toasts::ToastChange,
-    },
+    contexts::prelude::{create_push_toast_change, use_toasts, Toast},
     core::{
         api::{sanitise_base_url, Api},
         effects::{use_login_redirect_effect, LoginState},
@@ -63,13 +60,13 @@ pub fn signup() -> Html {
                 match &response.error {
                     Some(_) => {
                         // TODO handle the actual errors
-                        toasts_ctx.dispatch(ToastChange::Push(Toast {
+                        toasts_ctx.dispatch(create_push_toast_change(Toast {
                             message: "failed account creation!",
                         }));
                     }
                     None => match &response.data {
                         Some(_) => {
-                            toasts_ctx.dispatch(ToastChange::Push(Toast {
+                            toasts_ctx.dispatch(create_push_toast_change(Toast {
                                 message: "Account Created",
                             }));
                             navigator.push(&Route::Login);
@@ -110,7 +107,7 @@ pub fn signup() -> Html {
             e.prevent_default();
 
             if password != password_confirm {
-                toasts_ctx.dispatch(ToastChange::Push(Toast {
+                toasts_ctx.dispatch(create_push_toast_change(Toast {
                     message: "Passwords do not match",
                 }));
                 return;

@@ -4,8 +4,7 @@ use yew::{
     use_effect_with_deps, Properties,
 };
 
-use crate::contexts::prelude::{use_toasts, Toast};
-use crate::contexts::toasts::ToastChange;
+use crate::contexts::prelude::{create_remove_toast_change, use_toasts, Toast};
 
 #[derive(Properties, PartialEq)]
 struct ToastProps {
@@ -20,7 +19,7 @@ fn toast_row(props: &ToastProps) -> Html {
         use_effect_with_deps(
             move |_| {
                 let timeout = Timeout::new(6_000, move || {
-                    toasts_ctx.dispatch(ToastChange::Remove(toast));
+                    toasts_ctx.dispatch(create_remove_toast_change(toast));
                 });
                 timeout.forget();
             },

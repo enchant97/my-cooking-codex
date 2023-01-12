@@ -5,6 +5,7 @@ use yew::{hook, use_context, Reducible, UseReducerHandle};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Toast {
+    /// Message to display to user
     pub message: &'static str,
 }
 
@@ -52,4 +53,14 @@ pub type ToastsContext = UseReducerHandle<Toasts>;
 #[hook]
 pub fn use_toasts() -> Option<UseReducerHandle<Toasts>> {
     use_context::<ToastsContext>()
+}
+
+/// Method to create a "push toast" change
+pub fn create_push_toast_change(toast: Toast) -> ToastChange {
+    ToastChange::Push(toast)
+}
+
+/// Method to create a "remove toast" change
+pub fn create_remove_toast_change(toast: Toast) -> ToastChange {
+    ToastChange::Remove(toast)
 }

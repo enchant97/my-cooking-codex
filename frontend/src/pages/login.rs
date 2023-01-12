@@ -4,8 +4,7 @@ use yew::prelude::*;
 use yew_hooks::use_async;
 use yew_router::prelude::Link;
 
-use crate::contexts::prelude::{use_login, use_toasts, Toast};
-use crate::contexts::toasts::ToastChange;
+use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::{api::Api, types};
@@ -50,7 +49,7 @@ pub fn login() -> Html {
                 match &token_response.error {
                     Some(_) => {
                         // TODO handle the actual errors
-                        toasts_ctx.dispatch(ToastChange::Push(Toast {
+                        toasts_ctx.dispatch(create_push_toast_change(Toast {
                             message: "failed login!",
                         }));
                     }
