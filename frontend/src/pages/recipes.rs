@@ -21,8 +21,11 @@ pub fn recipes() -> Html {
     use_login_redirect_effect(LoginState::HasLogin, crate::Route::Login);
     use_effect_with_deps(
         move |_| {
+            let api = match &login_ctx.http_api {
+                Some(v) => v.clone(),
+                None => return,
+            };
             let recipes_state = recipes_state.clone();
-            let api = login_ctx.http_api.clone().unwrap();
             wasm_bindgen_futures::spawn_local(async move {
                 let new_recipes = api.get_recipes().await.unwrap();
                 recipes_state.set(new_recipes);

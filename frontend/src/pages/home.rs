@@ -19,7 +19,10 @@ fn home_account_stats() -> HtmlResult {
 
     use_effect_with_deps(
         move |_| {
-            let api = login_ctx.http_api.clone().unwrap();
+            let api = match &login_ctx.http_api {
+                Some(v) => v.clone(),
+                None => return,
+            };
             let stats_state = stats_state.clone();
             wasm_bindgen_futures::spawn_local(async move {
                 let new_stats = api.get_stats().await.unwrap();
