@@ -1,6 +1,7 @@
 use wasm_bindgen::JsCast;
 use web_sys::{console, EventTarget, HtmlInputElement};
 use yew::prelude::*;
+use yew_hooks::use_async;
 use yew_router::prelude::Link;
 
 use crate::contexts::toasts::{Toast, ToastChange};
@@ -19,12 +20,56 @@ pub fn login() -> Html {
     let username_state = use_state(String::default);
     let password_state = use_state(String::default);
 
-    let api_url = (*api_url_state).clone();
-    let username = (*username_state).clone();
-    let password = (*password_state).clone();
-
     // redirect if user is logged in
     use_login_redirect_effect(LoginState::NoLogin, Route::Home);
+    // try and get a login token, when the form is submitted
+    let get_new_token = {
+        let api_url = (*api_url_state).clone();
+        let username = (*username_state).clone();
+        let password = (*password_state).clone();
+
+        use_async(async move {
+            let api_url = sanitise_base_url(api_url.clone());
+            let login = types::Login {
+                username: username.clone(),
+                password: password.clone(),
+            };
+            Api::new(api_url.clone(), None).post_login(&login).await
+        })
+    };
+
+    // requested login token value has changed
+    {
+        let get_new_token = get_new_token.clone();
+        let api_url = (*api_url_state).clone();
+        use_effect_with_deps(
+            move |token_response| {
+                if token_response.loading {
+                    return;
+                }
+                match &token_response.error {
+                    Some(_) => {
+                        // TODO handle the actual errors
+                        toasts_ctx.dispatch(ToastChange::Push(Toast {
+                            message: "failed login!",
+                        }));
+                    }
+                    None => match &token_response.data {
+                        Some(token) => {
+                            let login_details = types::StoredLogin {
+                                api_url: api_url.clone(),
+                                token: token.clone(),
+                            };
+                            console::debug_1(&format!("got details: '{:?}'", login_details).into());
+                            login_ctx.dispatch(Some(login_details.clone()));
+                        }
+                        None => (),
+                    },
+                }
+            },
+            get_new_token,
+        );
+    }
     // get the default api base url from current window location
     {
         let api_url_state = api_url_state.clone();
@@ -44,42 +89,20 @@ pub fn login() -> Html {
     }
 
     let on_submit = {
+        let api_url = (*api_url_state).clone();
+        let username = (*username_state).clone();
+        let get_new_token = get_new_token.clone();
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
             console::debug_1(
                 &format!(
-                    "Login submitted: '{}', '{}', {}",
-                    username, password, api_url
+                    "Login submitted: '{}', '...', {}",
+                    username, api_url
                 )
                 .into(),
             );
-
-            let api_url = sanitise_base_url(api_url.clone());
-            let login = types::Login {
-                username: username.clone(),
-                password: password.clone(),
-            };
-
-            let login_ctx = login_ctx.clone();
-            let toasts_ctx = toasts_ctx.clone();
-            wasm_bindgen_futures::spawn_local(async move {
-                let token = match Api::new(api_url.clone(), None).post_login(&login).await {
-                    Ok(v) => v,
-                    Err(_) => {
-                        // TODO handle the actual errors
-                        toasts_ctx.dispatch(ToastChange::Push(Toast {
-                            message: "failed login!",
-                        }));
-                        return;
-                    }
-                };
-                let login_details = types::StoredLogin {
-                    api_url: api_url.clone(),
-                    token,
-                };
-                console::debug_1(&format!("got details: '{:?}'", login_details).into());
-                login_ctx.dispatch(Some(login_details.clone()));
-            });
+            // get new token in background
+            get_new_token.run();
         })
     };
     let on_api_url_change = {
@@ -136,7 +159,11 @@ pub fn login() -> Html {
                                 <input value={ (*password_state).clone() } oninput={on_password_change} type="password" placeholder="password" autocomplete="current-password" class="input input-bordered" required=true />
                             </div>
                             <div class="form-control btn-group btn-group-vertical">
-                                <button type="submit" class="btn btn-primary">{"Login"}</button>
+                                if get_new_token.loading {
+                                    <button type="submit" disabled=true class="btn loading">{"Loading"}</button>
+                                } else {
+                                    <button type="submit" class="btn btn-primary">{"Login"}</button>
+                                }
                                 <Link<Route> to={Route::Signup} classes={classes!("btn")}>{"Signup Instead?"}</Link<Route>>
                             </div>
                         </form>

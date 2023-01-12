@@ -11,19 +11,19 @@ pub fn sanitise_base_url(base: String) -> String {
     base
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ApiInternalError {
     Connection,
     Deserialization,
-    Generic(gloo::net::Error),
+    Generic,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ApiResponseError {
     pub status_code: u16,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ApiError {
     Internal(ApiInternalError),
     Response(ApiResponseError),
@@ -39,7 +39,7 @@ impl ApiError {
                 gloo::net::Error::JsError(_) => {
                     Err(ApiError::Internal(ApiInternalError::Connection))
                 }
-                err => Err(ApiError::Internal(ApiInternalError::Generic(err))),
+                _ => Err(ApiError::Internal(ApiInternalError::Generic)),
             },
         }
     }
@@ -57,7 +57,7 @@ impl ApiError {
                     gloo::net::Error::SerdeError(_) => {
                         Err(ApiError::Internal(ApiInternalError::Deserialization))
                     }
-                    err => Err(ApiError::Internal(ApiInternalError::Generic(err))),
+                    _ => Err(ApiError::Internal(ApiInternalError::Generic)),
                 },
                 Ok(v) => Ok(v),
             },
