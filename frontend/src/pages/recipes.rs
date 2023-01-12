@@ -51,6 +51,7 @@ pub fn recipes() -> Html {
             </drawer::DrawerContent>
             <drawer::DrawerDraw r#for="main-drawer">
                 <drawer::DrawerLink to={Route::Home}>{"Home"}</drawer::DrawerLink>
+                <drawer::DrawerLink to={Route::NewRecipe}>{"New Recipe"}</drawer::DrawerLink>
                 <drawer::DrawerLink to={Route::Recipes} active=true>{"Recipes"}</drawer::DrawerLink>
             </drawer::DrawerDraw>
         </drawer::Drawer>
