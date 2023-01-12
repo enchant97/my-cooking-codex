@@ -1,5 +1,5 @@
 use wasm_bindgen::JsCast;
-use web_sys::{console, EventTarget, HtmlInputElement};
+use web_sys::{EventTarget, HtmlInputElement};
 use yew::prelude::*;
 use yew_hooks::use_async;
 use yew_router::prelude::Link;
@@ -60,7 +60,7 @@ pub fn login() -> Html {
                                 api_url: api_url.clone(),
                                 token: token.clone(),
                             };
-                            console::debug_1(&format!("got details: '{:?}'", login_details).into());
+                            gloo::console::debug!(format!("got details: '{:?}'", login_details));
                             login_ctx.dispatch(Some(login_details.clone()));
                         }
                         None => (),
@@ -94,13 +94,10 @@ pub fn login() -> Html {
         let get_new_token = get_new_token.clone();
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
-            console::debug_1(
-                &format!(
-                    "Login submitted: '{}', '...', {}",
-                    username, api_url
-                )
-                .into(),
-            );
+            gloo::console::debug!(format!(
+                "Login submitted: '{}', '...', {}",
+                username, api_url
+            ));
             // get new token in background
             get_new_token.run();
         })
