@@ -126,6 +126,22 @@ impl Api {
         )?;
         ApiError::check_json_response_ok::<stats::AccountStats>(response).await
     }
+
+    pub async fn post_new_recipe(
+        &self,
+        new_recipe: &recipe::CreateRecipe,
+    ) -> Result<recipe::Recipe, ApiError> {
+        let req_url = self.base_url.clone() + "/recipes/";
+        let response = ApiError::from_response_result(
+            Request::post(&req_url)
+                .header("Authorization", &self.get_authorization_value().unwrap())
+                .json(new_recipe)
+                .unwrap()
+                .send()
+                .await,
+        )?;
+        ApiError::check_json_response_ok::<recipe::Recipe>(response).await
+    }
 }
 
 impl From<StoredLogin> for Api {
