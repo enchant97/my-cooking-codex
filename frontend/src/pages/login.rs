@@ -65,7 +65,7 @@ pub fn login() -> Html {
                         }
                         None => (),
                     },
-                }
+                };
             },
             get_new_token,
         );

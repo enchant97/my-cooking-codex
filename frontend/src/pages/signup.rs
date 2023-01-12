@@ -1,6 +1,7 @@
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
 use yew::prelude::*;
+use yew_hooks::use_async;
 use yew_router::prelude::{use_navigator, Link};
 
 use crate::{
@@ -27,14 +28,60 @@ pub fn signup() -> Html {
     let password_confirm_state = use_state(String::default);
     let error_tooltip_state: UseStateHandle<Option<String>> = use_state(Option::default);
 
-    let api_url = (*api_url_state).clone();
-    let username = (*username_state).clone();
-    let password = (*password_state).clone();
-    let password_confirm = (*password_confirm_state).clone();
     let error_tooltip = (*error_tooltip_state).clone();
 
     // redirect if user is logged in
     use_login_redirect_effect(LoginState::NoLogin, Route::Home);
+
+    // try and create new account
+    let get_new_user = {
+        let api_url = (*api_url_state).clone();
+        let username = (*username_state).clone();
+        let password = (*password_state).clone();
+
+        use_async(async move {
+            let api_url = sanitise_base_url(api_url.clone());
+            let details = user::CreateUser {
+                username: username.clone(),
+                password: password.clone(),
+            };
+            Api::new(api_url.clone(), None)
+                .post_create_account(&details)
+                .await
+        })
+    };
+
+    // new user value has changed
+    {
+        let get_new_user = get_new_user.clone();
+        let toasts_ctx = toasts_ctx.clone();
+        use_effect_with_deps(
+            move |response| {
+                if response.loading {
+                    return;
+                }
+                match &response.error {
+                    Some(_) => {
+                        // TODO handle the actual errors
+                        toasts_ctx.dispatch(ToastChange::Push(Toast {
+                            message: "failed account creation!",
+                        }));
+                    }
+                    None => match &response.data {
+                        Some(_) => {
+                            toasts_ctx.dispatch(ToastChange::Push(Toast {
+                                message: "Account Created",
+                            }));
+                            navigator.push(&Route::Login);
+                        }
+                        None => (),
+                    },
+                };
+            },
+            get_new_user,
+        );
+    }
+
     // get the default api base url from current window location
     {
         let api_url_state = api_url_state.clone();
@@ -54,6 +101,11 @@ pub fn signup() -> Html {
     }
 
     let on_submit = {
+        let password = (*password_state).clone();
+        let password_confirm = (*password_confirm_state).clone();
+        let get_new_user = get_new_user.clone();
+        let toasts_ctx = toasts_ctx.clone();
+
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
 
@@ -63,34 +115,8 @@ pub fn signup() -> Html {
                 }));
                 return;
             }
-
-            let api_url = sanitise_base_url(api_url.clone());
-            let details = user::CreateUser {
-                username: username.clone(),
-                password: password.clone(),
-            };
-
-            let navigator = navigator.clone();
-            let toasts_ctx = toasts_ctx.clone();
-            wasm_bindgen_futures::spawn_local(async move {
-                match Api::new(api_url.clone(), None)
-                    .post_create_account(&details)
-                    .await
-                {
-                    Ok(_) => {
-                        toasts_ctx.dispatch(ToastChange::Push(Toast {
-                            message: "Account Created",
-                        }));
-                        navigator.push(&Route::Login);
-                    }
-                    Err(_) => {
-                        // TODO handle the actual errors
-                        toasts_ctx.dispatch(ToastChange::Push(Toast {
-                            message: "failed account creation!",
-                        }));
-                    }
-                };
-            });
+            // create new user in background
+            get_new_user.run();
         })
     };
     let on_api_url_change = {
@@ -208,12 +234,16 @@ pub fn signup() -> Html {
                                 />
                             </div>
                             <div class="form-control btn-group btn-group-vertical">
-                                if error_tooltip.is_none() {
-                                    <button type="submit" class="btn btn-primary">{"Signup"}</button>
+                                if get_new_user.loading {
+                                    <button type="submit" disabled=true class="btn loading">{"Loading"}</button>
                                 } else {
-                                    <div class="tooltip tooltip-open tooltip-error" data-tip={error_tooltip.unwrap()}>
-                                        <button type="submit" disabled=true class="btn btn-disabled btn-block">{"Signup"}</button>
-                                    </div>
+                                    if error_tooltip.is_none() {
+                                        <button type="submit" class="btn btn-primary">{"Signup"}</button>
+                                    } else {
+                                        <div class="tooltip tooltip-open tooltip-error" data-tip={error_tooltip.unwrap()}>
+                                            <button type="submit" disabled=true class="btn btn-disabled btn-block">{"Signup"}</button>
+                                        </div>
+                                    }
                                 }
                                 <Link<Route> to={Route::Login} classes={classes!("btn")}>{"Login Instead?"}</Link<Route>>
                             </div>
