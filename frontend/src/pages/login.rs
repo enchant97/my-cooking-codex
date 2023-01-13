@@ -126,11 +126,11 @@ pub fn login() -> Html {
                             <ApiUrlSelector onchange={on_api_url_change}/>
                             <div class="form-control mb-2">
                                 <label class="label"><span class="label-text">{ "Username" }</span></label>
-                                <input value={ (*username_state).clone() } oninput={on_username_change} type="text" placeholder="username" autocomplete="username" class="input input-bordered" required=true />
+                                <input value={ (*username_state).clone() } oninput={on_username_change} type="text" placeholder="e.g. leo" autocomplete="username" class="input input-bordered" required=true />
                             </div>
                             <div class="form-control mb-6">
                                 <label class="label"><span class="label-text">{ "Password" }</span></label>
-                                <input value={ (*password_state).clone() } oninput={on_password_change} type="password" placeholder="password" autocomplete="current-password" class="input input-bordered" required=true />
+                                <input value={ (*password_state).clone() } oninput={on_password_change} type="password" placeholder="e.g. ••••••••" autocomplete="current-password" class="input input-bordered" required=true />
                             </div>
                             <div class="form-control btn-group btn-group-vertical">
                                 if get_new_token.loading {

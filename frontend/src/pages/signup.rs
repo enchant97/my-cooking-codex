@@ -170,7 +170,7 @@ pub fn signup() -> Html {
                                     value={ (*username_state).clone() }
                                     oninput={on_username_change}
                                     type="text"
-                                    placeholder="username"
+                                    placeholder="e.g. leo"
                                     autocomplete="username"
                                     class="input input-bordered"
                                     required=true
@@ -182,7 +182,7 @@ pub fn signup() -> Html {
                                     value={ (*password_state).clone() }
                                     oninput={on_password_change}
                                     type="password"
-                                    placeholder="password"
+                                    placeholder="e.g. ••••••••"
                                     autocomplete="new-password"
                                     class="input input-bordered"
                                     required=true
@@ -194,7 +194,7 @@ pub fn signup() -> Html {
                                     value={ (*password_confirm_state).clone() }
                                     oninput={on_password_confirm_change}
                                     type="password"
-                                    placeholder="password confirm"
+                                    placeholder="e.g. ••••••••"
                                     autocomplete="new-password"
                                     class="input input-bordered"
                                     required=true
