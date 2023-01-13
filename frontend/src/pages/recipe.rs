@@ -1,9 +1,10 @@
 use yew::prelude::*;
 use yew_hooks::prelude::{use_async_with_options, UseAsyncOptions};
 
+use crate::components::recipe::Steps;
 use crate::contexts::prelude::use_login;
 use crate::{
-    components::drawer,
+    components::{drawer, recipe::Ingredients},
     core::effects::{use_login_redirect_effect, LoginState},
     Route,
 };
@@ -20,10 +21,14 @@ pub fn recipe(props: &RecipeProps) -> Html {
     let get_recipe = {
         let id = props.id.to_string();
         let api = login_ctx.clone().http_api.clone();
-        use_async_with_options(async move {
-            let api = api.expect("expected api to exist");
-            api.get_recipe_by_id(id).await
-    }, UseAsyncOptions::enable_auto()) };
+        use_async_with_options(
+            async move {
+                let api = api.expect("expected api to exist");
+                api.get_recipe_by_id(id).await
+            },
+            UseAsyncOptions::enable_auto(),
+        )
+    };
 
     use_login_redirect_effect(LoginState::HasLogin, Route::Login);
 
@@ -32,10 +37,17 @@ pub fn recipe(props: &RecipeProps) -> Html {
     html! {
         <drawer::Drawer r#for="main-drawer">
             <drawer::DrawerContent header=true>
-                <div class="p-4 rounded bg-base-200">
+                <div>
                     if !get_recipe.loading && get_recipe.error.is_none() && get_recipe.data.is_some() {
-                        <h1 class="text-2xl font-bold mb-2">{recipes.as_ref().unwrap().title.clone()}</h1>
-                        <p>{recipes.as_ref().unwrap().short_description.clone()}</p>
+                        <div class="mb-4 p-4 rounded bg-base-200">
+                            <h1 class="text-2xl font-bold mb-2">{recipes.as_ref().unwrap().title.clone()}</h1>
+                        </div>
+                        <p class="mb-4 p-4 rounded bg-base-200">{recipes.as_ref().unwrap().short_description.clone()}</p>
+                        <p class="mb-4 p-4 rounded bg-base-200">{recipes.as_ref().unwrap().long_description.clone()}</p>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <Ingredients classes="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200" items={recipes.as_ref().unwrap().ingredients.clone()}/>
+                            <Steps classes="w-full p-4 rounded bg-base-200" items={recipes.unwrap().steps}/>
+                        </div>
                     }
                 </div>
             </drawer::DrawerContent>
