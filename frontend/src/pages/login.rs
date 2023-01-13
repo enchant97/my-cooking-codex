@@ -4,6 +4,7 @@ use yew::prelude::*;
 use yew_hooks::use_async;
 use yew_router::prelude::Link;
 
+use crate::components::input::ApiUrlSelector;
 use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
@@ -15,7 +16,7 @@ pub fn login() -> Html {
     let login_ctx = use_login().unwrap();
     let toasts_ctx = use_toasts().unwrap();
 
-    let api_url_state = use_state(|| String::default());
+    let api_url_state = use_state(String::default);
     let username_state = use_state(String::default);
     let password_state = use_state(String::default);
 
@@ -69,23 +70,6 @@ pub fn login() -> Html {
             get_new_token,
         );
     }
-    // get the default api base url from current window location
-    {
-        let api_url_state = api_url_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                match gloo::utils::window().location().origin() {
-                    Ok(href) => {
-                        let href = sanitise_base_url(href.to_owned());
-                        let href = href + "/api";
-                        api_url_state.set(href);
-                    }
-                    Err(_) => (),
-                };
-            },
-            (),
-        );
-    }
 
     let on_submit = {
         let api_url = (*api_url_state).clone();
@@ -103,12 +87,9 @@ pub fn login() -> Html {
     };
     let on_api_url_change = {
         let api_url_state = api_url_state.clone();
-        Callback::from(move |e: InputEvent| {
-            let target: Option<EventTarget> = e.target();
-            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = input {
-                api_url_state.set(input.value());
-            }
+        Callback::from(move |new_value: String| {
+            gloo::console::debug!(format!("api url base set to: '{}'", new_value));
+            api_url_state.set(new_value);
         })
     };
     let on_username_change = {
@@ -142,10 +123,7 @@ pub fn login() -> Html {
                             <h2 class="text-4xl font-bold">{ "Please Login" }</h2>
                         </div>
                         <form onsubmit={on_submit}>
-                            <div class="form-control mb-2">
-                                <label class="label"><span class="label-text">{ "Api Url" }</span></label>
-                                <input value={ (*api_url_state).clone() } oninput={on_api_url_change} type="url" autocomplete="https://" class="input input-bordered" required=true />
-                            </div>
+                            <ApiUrlSelector onchange={on_api_url_change}/>
                             <div class="form-control mb-2">
                                 <label class="label"><span class="label-text">{ "Username" }</span></label>
                                 <input value={ (*username_state).clone() } oninput={on_username_change} type="text" placeholder="username" autocomplete="username" class="input input-bordered" required=true />

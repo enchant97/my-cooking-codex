@@ -5,6 +5,7 @@ use yew_hooks::use_async;
 use yew_router::prelude::{use_navigator, Link};
 
 use crate::{
+    components::input::ApiUrlSelector,
     contexts::prelude::{create_push_toast_change, use_toasts, Toast},
     core::{
         api::{sanitise_base_url, Api},
@@ -79,24 +80,6 @@ pub fn signup() -> Html {
         );
     }
 
-    // get the default api base url from current window location
-    {
-        let api_url_state = api_url_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                match gloo::utils::window().location().origin() {
-                    Ok(href) => {
-                        let href = sanitise_base_url(href.to_owned());
-                        let href = href + "/api";
-                        api_url_state.set(href);
-                    }
-                    Err(_) => (),
-                };
-            },
-            (),
-        );
-    }
-
     let on_submit = {
         let password = (*password_state).clone();
         let password_confirm = (*password_confirm_state).clone();
@@ -118,12 +101,9 @@ pub fn signup() -> Html {
     };
     let on_api_url_change = {
         let api_url_state = api_url_state.clone();
-        Callback::from(move |e: InputEvent| {
-            let target: Option<EventTarget> = e.target();
-            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = input {
-                api_url_state.set(input.value());
-            }
+        Callback::from(move |new_value: String| {
+            gloo::console::debug!(format!("api url base set to: '{}'", new_value));
+            api_url_state.set(new_value);
         })
     };
     let on_username_change = {
@@ -183,17 +163,7 @@ pub fn signup() -> Html {
                             <h2 class="text-4xl font-bold">{ "Create Account" }</h2>
                         </div>
                         <form onsubmit={on_submit}>
-                            <div class="form-control mb-2">
-                                <label class="label"><span class="label-text">{ "Api Url" }</span></label>
-                                <input
-                                    value={ (*api_url_state).clone() }
-                                    oninput={on_api_url_change}
-                                    type="url"
-                                    autocomplete="https://"
-                                    class="input input-bordered"
-                                    required=true
-                                />
-                            </div>
+                            <ApiUrlSelector onchange={on_api_url_change}/>
                             <div class="form-control mb-2">
                                 <label class="label"><span class="label-text">{ "Username" }</span></label>
                                 <input
