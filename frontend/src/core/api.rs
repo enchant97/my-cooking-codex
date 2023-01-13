@@ -116,6 +116,17 @@ impl Api {
         ApiError::check_json_response_ok::<Vec<recipe::Recipe>>(response).await
     }
 
+    pub async fn get_recipe_by_id(&self, id: String) -> Result<recipe::Recipe, ApiError> {
+        let req_url = format!("{}/recipes/{}/", self.base_url.clone(), &id);
+        let response = ApiError::from_response_result(
+            Request::get(&req_url)
+                .header("Authorization", &self.get_authorization_value().unwrap())
+                .send()
+                .await,
+        )?;
+        ApiError::check_json_response_ok::<recipe::Recipe>(response).await
+    }
+
     pub async fn get_stats(&self) -> Result<stats::AccountStats, ApiError> {
         let req_url = self.base_url.clone() + "/stats/me/";
         let response = ApiError::from_response_result(

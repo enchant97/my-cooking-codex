@@ -1,4 +1,5 @@
 use yew::prelude::*;
+use yew_router::prelude::Link;
 
 use crate::{
     components::{card_grid, drawer},
@@ -43,6 +44,7 @@ pub fn recipes() -> Html {
                         { for recipes.iter().map(|recipe| {
                             html!{
                                 <card_grid::GridItem title={recipe.title.clone()}>
+                                    <Link<Route> to={Route::Recipe { id: recipe.id.clone() }} classes="btn">{"View"}</Link<Route>>
                                 </card_grid::GridItem>
                             }
                         })}
