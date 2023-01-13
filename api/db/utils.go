@@ -40,11 +40,12 @@ func InitDB(config config.DBConfig) error {
 	if err = ensureTableCreated(TableNameUsers); err != nil {
 		return err
 	}
-
 	if err = ensureTableCreated(TableNameRecipes); err != nil {
 		return err
 	}
-
+	if err = ensureTableCreated(TableNameRecipeImages); err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -45,8 +45,15 @@ type Recipe struct {
 	Title            string       `rethinkdb:"title" json:"title"`
 	ShortDescription *string      `rethinkdb:"shortDescription,omitempty" json:"shortDescription,omitempty"`
 	LongDescription  *string      `rethinkdb:"longDescription,omitempty" json:"longDescription,omitempty"`
-	ThumbnailName    *string      `rethinkdb:"thumbnailName,omitempty" json:"thumbnailName,omitempty"`
 	Tags             []string     `rethinkdb:"tags,omitempty" json:"tags,omitempty"`
 	Ingredients      []Ingredient `rethinkdb:"ingredients,omitempty" json:"ingredients,omitempty"`
 	Steps            []Step       `rethinkdb:"steps,omitempty" json:"steps,omitempty"`
+	MainImageID      *string      `rethinkdb:"mainImageId,omitempty" json:"mainImageId,omitempty"`
+}
+
+type RecipeImage struct {
+	ID       string `rethinkdb:"id,omitempty" json:"id"`
+	RecipeID string `rethinkdb:"recipeId" json:"recipeId"`
+	Content  []byte `rethinkdb:"content" json:"-"`
+	MimeType string `rethinkdb:"mimeType" json:"mimeType"`
 }

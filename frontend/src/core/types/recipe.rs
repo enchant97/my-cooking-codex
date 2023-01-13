@@ -63,11 +63,11 @@ pub struct Recipe {
     #[serde(default)]
     pub long_description: Option<String>,
     #[serde(default)]
-    pub thumbnail_name: Option<String>,
-    #[serde(default)]
     pub tags: Vec<String>,
     #[serde(default)]
     pub ingredients: Vec<Ingredient>,
     #[serde(default)]
     pub steps: Vec<Step>,
+    #[serde(default)]
+    pub main_image_id: Option<String>,
 }
