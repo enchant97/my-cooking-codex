@@ -57,7 +57,7 @@ pub fn new_recipe() -> Html {
                     None => match &response.data {
                         Some(recipe) => {
                             gloo::console::debug!(format!("new recipe created: '{:?}'", recipe));
-                            navigator.push(&Route::Recipes);
+                            navigator.push(&Route::Recipe { id: recipe.id.clone() });
                         }
                         None => (),
                     },
