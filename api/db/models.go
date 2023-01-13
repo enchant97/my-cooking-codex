@@ -52,8 +52,8 @@ type Recipe struct {
 }
 
 type RecipeImage struct {
-	ID       string `rethinkdb:"id,omitempty" json:"id"`
-	RecipeID string `rethinkdb:"recipeId" json:"recipeId"`
-	Content  []byte `rethinkdb:"content" json:"-"`
-	MimeType string `rethinkdb:"mimeType" json:"mimeType"`
+	ID        string `rethinkdb:"id,omitempty" json:"id"`
+	RecipeID  string `rethinkdb:"recipeId" json:"recipeId"`
+	ImageType string `rethinkdb:"imageType" json:"imageType"`
+	Content   []byte `rethinkdb:"content" json:"-"`
 }

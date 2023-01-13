@@ -84,3 +84,16 @@ func (r *CreateRecipe) IntoRecipe(ownerID string) db.Recipe {
 		}(),
 	}
 }
+
+type CreateRecipeImage struct {
+	RecipeID  string `json:"recipeId" validate:"required"`
+	ImageType string `json:"imageType" validate:"required"`
+}
+
+func (i *CreateRecipeImage) IntoRecipeImage(content []byte) db.RecipeImage {
+	return db.RecipeImage{
+		RecipeID:  i.RecipeID,
+		ImageType: i.ImageType,
+		Content:   content,
+	}
+}

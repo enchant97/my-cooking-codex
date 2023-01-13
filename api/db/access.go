@@ -65,3 +65,49 @@ func GetRecipeById(id string, username string) (Recipe, error) {
 	err = cursor.One(&recipe)
 	return recipe, err
 }
+
+func DoesUserOwnRecipe(username string, recipeID string) (bool, error) {
+	cursor, err := r.Table(TableNameRecipes).Filter(map[string]interface{}{"id": recipeID, "ownerId": username}).IsEmpty().Not().Run(session)
+	if err != nil {
+		return false, err
+	}
+	defer cursor.Close()
+	var isOwner bool
+	err = cursor.One(&isOwner)
+	return isOwner, err
+}
+
+func CreateRecipeImage(recipeImage RecipeImage) (RecipeImage, error) {
+	response, err := r.Table(TableNameRecipeImages).Insert(&recipeImage).RunWrite(session)
+	if err != nil {
+		return RecipeImage{}, err
+	}
+	// HACK
+	id := response.GeneratedKeys[0]
+	recipeImage.ID = id
+	return recipeImage, nil
+}
+
+// Gets the recipe image by it's id without the binary content
+func GetRecipeImage(id string) (RecipeImage, error) {
+	cursor, err := r.Table(TableNameRecipes).Get(id).Without("content").Run(session)
+	if err != nil {
+		return RecipeImage{}, err
+	}
+	defer cursor.Close()
+	var recipeImage RecipeImage
+	err = cursor.One(&recipeImage)
+	return recipeImage, err
+}
+
+// Gets the recipe image by it's id, returning just the binary content
+func GetRecipeImageContentByID(id string) ([]byte, error) {
+	cursor, err := r.Table(TableNameRecipes).Get(id).Pluck("content").Run(session)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close()
+	var content []byte
+	err = cursor.One(&content)
+	return content, err
+}
