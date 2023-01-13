@@ -6,14 +6,14 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct ApiUrlSelectorProps {
-    pub onchange: Callback<String>,
+    pub onchange: Callback<AttrValue>,
 }
 
 /// Component to provide a user adjustable api url base input (for use in login/signup)
 #[function_component(ApiUrlSelector)]
 pub fn api_url_selector(props: &ApiUrlSelectorProps) -> Html {
-    let api_url_state = use_state(String::default);
-    let api_host_state: UseStateHandle<Option<String>> = use_state(Option::default);
+    let api_url_state = use_state(AttrValue::default);
+    let api_host_state: UseStateHandle<Option<AttrValue>> = use_state(Option::default);
     let change_state = use_state(bool::default);
 
     // get the default api base url from current window location
@@ -23,9 +23,9 @@ pub fn api_url_selector(props: &ApiUrlSelectorProps) -> Html {
             move |_| {
                 match gloo::utils::window().location().origin() {
                     Ok(href) => {
-                        let href = sanitise_base_url(href.to_owned());
+                        let href = sanitise_base_url(href);
                         let href = href + "/api";
-                        api_url_state.set(href);
+                        api_url_state.set(href.into());
                     }
                     Err(_) => (),
                 };
@@ -51,8 +51,8 @@ pub fn api_url_selector(props: &ApiUrlSelectorProps) -> Html {
                         return;
                     }
                 };
-                let new_host = url.host_str().unwrap();
-                api_host_state.set(Some(new_host.to_owned()));
+                let new_host = url.host_str().unwrap().to_owned();
+                api_host_state.set(Some(new_host.into()));
             },
             api_url_state.clone(),
         );
@@ -92,7 +92,7 @@ pub fn api_url_selector(props: &ApiUrlSelectorProps) -> Html {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
-                api_url_state.set(sanitise_base_url(input.value()));
+                api_url_state.set(sanitise_base_url(input.value()).into());
             }
         })
     };
@@ -105,7 +105,7 @@ pub fn api_url_selector(props: &ApiUrlSelectorProps) -> Html {
                     <button onclick={on_change_click} type="button" class="btn">{"Save"}</button>
                 } else {
                     <span>{"Using API At: "}</span>
-                    <span>{(*api_host_state).clone().unwrap_or("(unset)".to_owned())}</span>
+                    <span>{(*api_host_state).clone().unwrap_or("(unset)".into())}</span>
                     <button onclick={on_change_click} type="button" class="btn">{"Change"}</button>
                 }
             </div>

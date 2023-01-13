@@ -16,14 +16,14 @@ pub fn new_recipe() -> Html {
     let toasts_ctx = use_toasts().unwrap();
     let navigator = use_navigator().unwrap();
 
-    let title_state = use_state(String::default);
+    let title_state = use_state(AttrValue::default);
 
     use_login_redirect_effect(LoginState::HasLogin, Route::Home);
 
     // create a new recipe from form values
     let create_new_recipe = {
         let api = (*login_ctx).http_api.clone();
-        let title = (*title_state).clone();
+        let title = (*title_state).to_string().clone();
 
         use_async(async move {
             api.unwrap()
@@ -80,7 +80,7 @@ pub fn new_recipe() -> Html {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
-                title_state.set(input.value());
+                title_state.set(input.value().into());
             }
         })
     };

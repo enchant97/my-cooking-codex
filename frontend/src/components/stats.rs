@@ -1,11 +1,11 @@
-use yew::{function_component, html, ChildrenWithProps, Html, Properties};
+use yew::{function_component, html, ChildrenWithProps, Html, Properties, AttrValue};
 
 #[derive(Properties, PartialEq)]
 pub struct StatProps {
-    pub title: String,
-    pub value: String,
+    pub title: AttrValue,
+    pub value: AttrValue,
     #[prop_or_default]
-    pub description: Option<String>,
+    pub description: Option<AttrValue>,
 }
 
 #[function_component(Stat)]

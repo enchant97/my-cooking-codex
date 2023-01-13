@@ -1,11 +1,11 @@
-use yew::{function_component, html, Children, Html, Properties};
+use yew::{function_component, html, Children, Html, Properties, AttrValue};
 
 #[derive(Properties, PartialEq)]
 pub struct GridItemProps {
     #[prop_or_default]
-    pub image_src: Option<String>,
+    pub image_src: Option<AttrValue>,
     #[prop_or_default]
-    pub title: Option<String>,
+    pub title: Option<AttrValue>,
     #[prop_or_default]
     pub children: Children,
 }

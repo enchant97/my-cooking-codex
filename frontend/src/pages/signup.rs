@@ -20,11 +20,11 @@ pub fn signup() -> Html {
     let toasts_ctx = use_toasts().unwrap();
     let navigator = use_navigator().unwrap();
 
-    let api_url_state = use_state(String::default);
-    let username_state = use_state(String::default);
-    let password_state = use_state(String::default);
-    let password_confirm_state = use_state(String::default);
-    let error_tooltip_state: UseStateHandle<Option<String>> = use_state(Option::default);
+    let api_url_state = use_state(AttrValue::default);
+    let username_state = use_state(AttrValue::default);
+    let password_state = use_state(AttrValue::default);
+    let password_confirm_state = use_state(AttrValue::default);
+    let error_tooltip_state: UseStateHandle<Option<AttrValue>> = use_state(Option::default);
 
     let error_tooltip = (*error_tooltip_state).clone();
 
@@ -38,10 +38,10 @@ pub fn signup() -> Html {
         let password = (*password_state).clone();
 
         use_async(async move {
-            let api_url = sanitise_base_url(api_url.clone());
+            let api_url = sanitise_base_url(api_url.to_string());
             let details = user::CreateUser {
-                username: username.clone(),
-                password: password.clone(),
+                username: username.to_string(),
+                password: password.to_string(),
             };
             Api::new(api_url.clone(), None)
                 .post_create_account(&details)
@@ -101,7 +101,7 @@ pub fn signup() -> Html {
     };
     let on_api_url_change = {
         let api_url_state = api_url_state.clone();
-        Callback::from(move |new_value: String| {
+        Callback::from(move |new_value: AttrValue| {
             gloo::console::debug!(format!("api url base set to: '{}'", new_value));
             api_url_state.set(new_value);
         })
@@ -112,7 +112,7 @@ pub fn signup() -> Html {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
-                username_state.set(input.value());
+                username_state.set(input.value().into());
             }
         })
     };
@@ -124,10 +124,10 @@ pub fn signup() -> Html {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
-                let value = input.value();
+                let value: AttrValue = input.value().into();
                 password_state.set(value.clone());
                 if value != password_confirm {
-                    error_tooltip_state.set(Some("passwords do not match!".to_owned()));
+                    error_tooltip_state.set(Some("passwords do not match!".into()));
                 } else {
                     error_tooltip_state.set(None);
                 }
@@ -142,10 +142,10 @@ pub fn signup() -> Html {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
-                let value = input.value();
+                let value: AttrValue = input.value().into();
                 password_confirm_state.set(value.clone());
                 if value != password {
-                    error_tooltip_state.set(Some("passwords do not match!".to_owned()));
+                    error_tooltip_state.set(Some("passwords do not match!".into()));
                 } else {
                     error_tooltip_state.set(None);
                 }
