@@ -21,12 +21,9 @@ pub fn base_url_selector(props: &BaseUrlSelectorProps) -> Html {
         let base_url_state = base_url_state.clone();
         use_effect_with_deps(
             move |_| {
-                match gloo::utils::window().location().origin() {
-                    Ok(href) => {
-                        let href = sanitise_base_url(href);
-                        base_url_state.set(href.into());
-                    }
-                    Err(_) => (),
+                if let Ok(href) = gloo::utils::window().location().origin() {
+                    let href = sanitise_base_url(href);
+                    base_url_state.set(href.into());
                 };
             },
             (),
@@ -104,7 +101,7 @@ pub fn base_url_selector(props: &BaseUrlSelectorProps) -> Html {
                     <button onclick={on_change_click} type="button" class="btn">{"Save"}</button>
                 } else {
                     <span>{"Using Server At: "}</span>
-                    <span>{(*api_host_state).clone().unwrap_or("(unset)".into())}</span>
+                    <span>{(*api_host_state).clone().unwrap_or_else(||"(unset)".into())}</span>
                     <button onclick={on_change_click} type="button" class="btn">{"Change"}</button>
                 }
             </div>

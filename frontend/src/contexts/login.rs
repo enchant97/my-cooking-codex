@@ -13,10 +13,7 @@ pub struct CurrentLogin {
 impl CurrentLogin {
     pub fn new() -> Self {
         let login = storage::read_login_token();
-        let http_api = match &login {
-            Some(v) => Some(Api::from(v.clone())),
-            None => None,
-        };
+        let http_api = login.as_ref().map(|v| Api::from(v.clone()));
         Self {
             login,
             http_api,

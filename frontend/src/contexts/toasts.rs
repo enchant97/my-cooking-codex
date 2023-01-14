@@ -35,11 +35,8 @@ impl Reducible for Toasts {
         match action {
             ToastChange::Push(v) => inner.push_back(v),
             ToastChange::Remove(v) => {
-                match inner.iter().position(|toast| *toast == v) {
-                    Some(i) => {
-                        inner.remove(i).unwrap();
-                    }
-                    None => (),
+                if let Some(i) = inner.iter().position(|toast| *toast == v) {
+                    inner.remove(i).unwrap();
                 };
             }
         }

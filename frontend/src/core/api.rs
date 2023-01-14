@@ -80,10 +80,7 @@ impl Api {
     }
 
     fn get_authorization_value(&self) -> Option<String> {
-        match &self.login_token {
-            Some(token) => Some(format!("{} {}", token.r#type, token.token)),
-            None => None,
-        }
+        self.login_token.as_ref().map(|token| format!("{} {}", token.r#type, token.token))
     }
 
     pub async fn post_login(&self, login: &Login) -> Result<LoginToken, ApiError> {
