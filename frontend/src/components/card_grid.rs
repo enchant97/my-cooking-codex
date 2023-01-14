@@ -1,4 +1,4 @@
-use yew::{function_component, html, Children, Html, Properties, AttrValue};
+use yew::{function_component, html, AttrValue, Children, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct GridItemProps {
@@ -15,7 +15,9 @@ pub fn grid_item(props: &GridItemProps) -> Html {
     html! {
         <div class="card card-compact bg-base-100 shadow-xl">
             if !props.image_src.is_none() {
-                <figure><img src={props.image_src.clone()} /></figure>
+                <figure class="h-3/5"><img class="object-cover w-full h-full" src={props.image_src.clone()} /></figure>
+            } else {
+                <div class="h-3/5"></div>
             }
             <div class="card-body">
                 if !props.title.is_none() {

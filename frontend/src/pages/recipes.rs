@@ -20,20 +20,23 @@ pub fn recipes() -> Html {
     let recipes = (*recipes_state).clone();
 
     use_login_redirect_effect(LoginState::HasLogin, crate::Route::Login);
-    use_effect_with_deps(
-        move |_| {
-            let api = match &login_ctx.http_api {
-                Some(v) => v.clone(),
-                None => return,
-            };
-            let recipes_state = recipes_state.clone();
-            wasm_bindgen_futures::spawn_local(async move {
-                let new_recipes = api.get_recipes().await.unwrap();
-                recipes_state.set(new_recipes);
-            });
-        },
-        (),
-    );
+    {
+        let login_ctx = login_ctx.clone();
+        use_effect_with_deps(
+            move |_| {
+                let api = match &login_ctx.http_api {
+                    Some(v) => v.clone(),
+                    None => return,
+                };
+                let recipes_state = recipes_state.clone();
+                wasm_bindgen_futures::spawn_local(async move {
+                    let new_recipes = api.get_recipes().await.unwrap();
+                    recipes_state.set(new_recipes);
+                });
+            },
+            (),
+        );
+    }
 
     html! {
         <drawer::Drawer r#for="main-drawer">
@@ -41,9 +44,14 @@ pub fn recipes() -> Html {
                 <div class="p-4 rounded bg-base-200">
                     <h1 class={classes!("text-3xl", "font-bold", "mb-2")}>{ "Recipes" }</h1>
                     <card_grid::Grid>
-                        { for recipes.iter().map(|recipe| {
+                        {
+                            for recipes.iter().map(|recipe| {
+                            let image_src = match &recipe.main_image_id {
+                                Some(v) => Some(format!("{}/recipe-image/{}", login_ctx.login.as_ref().unwrap().media_url, v)),
+                                None => None,
+                            };
                             html!{
-                                <card_grid::GridItem title={recipe.title.clone()}>
+                                <card_grid::GridItem title={recipe.title.clone()} image_src={image_src}>
                                     <Link<Route> to={Route::Recipe { id: recipe.id.clone() }} classes="btn">{"View"}</Link<Route>>
                                 </card_grid::GridItem>
                             }

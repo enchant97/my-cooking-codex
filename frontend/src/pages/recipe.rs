@@ -40,6 +40,14 @@ pub fn recipe(props: &RecipeProps) -> Html {
                 <div>
                     if !get_recipe.loading && get_recipe.error.is_none() && get_recipe.data.is_some() {
                         <div class="mb-4 p-4 rounded bg-base-200">
+                            if get_recipe.data.as_ref().unwrap().main_image_id.is_some() {
+                                <figure class="h-64 w-full mb-4">
+                                    <img
+                                        class="object-cover w-full h-full rounded"
+                                        src={format!("{}/recipe-image/{}", login_ctx.login.as_ref().unwrap().media_url, get_recipe.data.as_ref().unwrap().main_image_id.as_ref().unwrap())}
+                                    />
+                                </figure>
+                            }
                             <h1 class="text-2xl font-bold mb-2">{recipes.as_ref().unwrap().title.clone()}</h1>
                         </div>
                         <p class="mb-4 p-4 rounded bg-base-200">{recipes.as_ref().unwrap().short_description.clone()}</p>
