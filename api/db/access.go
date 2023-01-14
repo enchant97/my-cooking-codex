@@ -77,6 +77,11 @@ func DoesUserOwnRecipe(username string, recipeID string) (bool, error) {
 	return isOwner, err
 }
 
+func UpdateRecipe(recipeID string, newRecipe interface{}) error {
+	_, err := r.Table(TableNameRecipes).Get(recipeID).Update(newRecipe).RunWrite(session)
+	return err
+}
+
 func CreateRecipeImage(recipeImage RecipeImage) (RecipeImage, error) {
 	response, err := r.Table(TableNameRecipeImages).Insert(&recipeImage).RunWrite(session)
 	if err != nil {

@@ -56,6 +56,37 @@ func getRecipe(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, recipe)
 }
 
+func patchRecipe(ctx echo.Context) error {
+	recipeID := ctx.Param("id")
+	userToken := ctx.Get("user").(*jwt.Token)
+	tokenClaims := userToken.Claims.(*core.JWTClaims)
+	username := tokenClaims.Username
+
+	// validate whether user can modify the recipe content
+	isOwner, err := db.DoesUserOwnRecipe(username, recipeID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(500)
+	} else if !isOwner {
+		return ctx.NoContent(http.StatusForbidden)
+	}
+
+	var recipeData core.UpdateRecipe
+	if err := ctx.Bind(&recipeData); err != nil {
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+	if err := ctx.Validate(recipeData); err != nil {
+		return err
+	}
+
+	if db.UpdateRecipe(recipeID, recipeData) != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(500)
+	}
+
+	return ctx.NoContent(http.StatusNoContent)
+}
+
 func postAddRecipeImage(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
 	userToken := ctx.Get("user").(*jwt.Token)

@@ -97,3 +97,26 @@ func (i *CreateRecipeImage) IntoRecipeImage(content []byte) db.RecipeImage {
 		Content:   content,
 	}
 }
+
+type UpdateIngredient struct {
+	Name        *string `rethinkdb:"name,omitempty" json:"name,omitempty"`
+	Amount      *uint   `rethinkdb:"amount,omitempty" json:"amount,omitempty"`
+	UnitType    *string `rethinkdb:"unitType,omitempty" json:"unitType,omitempty"`
+	Description *string `rethinkdb:"description,omitempty" json:"description,omitempty"`
+}
+
+type UpdateStep struct {
+	Title       *string `rethinkdb:"title,omitempty" json:"title,omitempty"`
+	Description *string `rethinkdb:"description,omitempty" json:"description,omitempty"`
+}
+
+type UpdateRecipe struct {
+	OwnerID          *string             `rethinkdb:"ownerId,omitempty" json:"ownerId,omitempty"`
+	Title            *string             `rethinkdb:"title,omitempty" json:"title,omitempty"`
+	ShortDescription *string             `rethinkdb:"shortDescription,omitempty" json:"shortDescription,omitempty"`
+	LongDescription  *string             `rethinkdb:"longDescription,omitempty" json:"longDescription,omitempty"`
+	Tags             *[]string           `rethinkdb:"tags,omitempty" json:"tags,omitempty"`
+	Ingredients      *[]UpdateIngredient `rethinkdb:"ingredients,omitempty" json:"ingredients,omitempty"`
+	Steps            *[]UpdateStep       `rethinkdb:"steps,omitempty" json:"steps,omitempty"`
+	MainImageID      *string             `rethinkdb:"mainImageId,omitempty" json:"mainImageId,omitempty"`
+}
