@@ -22,8 +22,8 @@ pub fn new_recipe() -> Html {
 
     // create a new recipe from form values
     let create_new_recipe = {
-        let api = (*login_ctx).http_api.clone();
-        let title = (*title_state).to_string().clone();
+        let api = login_ctx.http_api.clone();
+        let title = title_state.to_string();
 
         use_async(async move {
             api.unwrap()
@@ -75,7 +75,6 @@ pub fn new_recipe() -> Html {
         })
     };
     let on_title_input = {
-        let title_state = title_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());

@@ -59,11 +59,11 @@ pub fn base_url_selector(props: &BaseUrlSelectorProps) -> Html {
 
     {
         let base_url = (*base_url_state).clone();
-        let change_mode = (*change_state).clone();
+        let change_mode = *change_state;
         let onchange_callback = props.onchange.clone();
         use_effect_with_deps(
             move |_| {
-                if change_mode == false && base_url != "" {
+                if !change_mode && base_url != "" {
                     onchange_callback.emit(base_url);
                 }
             },
@@ -75,10 +75,10 @@ pub fn base_url_selector(props: &BaseUrlSelectorProps) -> Html {
         let base_url = (*base_url_state).clone();
         let api_host = (*api_host_state).clone();
         let change_state = change_state.clone();
-        let change_mode = (*change_state).clone();
+        let change_mode = *change_state;
         let onchange_callback = props.onchange.clone();
         Callback::from(move |_: MouseEvent| {
-            if change_mode && !api_host.is_none() {
+            if change_mode && api_host.is_some() {
                 onchange_callback.emit(base_url.clone());
             }
             change_state.set(!change_mode);
@@ -99,7 +99,7 @@ pub fn base_url_selector(props: &BaseUrlSelectorProps) -> Html {
     html! {
         <div class="form-control">
             <div class="input-group">
-                if (*change_state).clone() {
+                if *change_state {
                     <input value={ (*base_url_state).clone() } oninput={on_base_url_change} type="url" placeholder="https://" class="input input-bordered" required=true />
                     <button onclick={on_change_click} type="button" class="btn">{"Save"}</button>
                 } else {

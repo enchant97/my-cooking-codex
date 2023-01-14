@@ -20,7 +20,7 @@ pub fn recipe(props: &RecipeProps) -> Html {
 
     let get_recipe = {
         let id = props.id.to_string();
-        let api = login_ctx.clone().http_api.clone();
+        let api = login_ctx.http_api.clone();
         use_async_with_options(
             async move {
                 let api = api.expect("expected api to exist");

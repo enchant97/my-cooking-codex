@@ -63,7 +63,7 @@ pub fn login() -> Html {
                                 token: token.clone(),
                             };
                             gloo::console::debug!(format!("got details: '{:?}'", login_details));
-                            login_ctx.dispatch(Some(login_details.clone()));
+                            login_ctx.dispatch(Some(login_details));
                         }
                         None => (),
                     },
@@ -88,7 +88,6 @@ pub fn login() -> Html {
         })
     };
     let on_base_url_change = {
-        let base_url_state = base_url_state.clone();
         Callback::from(move |new_value: AttrValue| {
             gloo::console::debug!(format!("base url base set to: '{}'", new_value));
             base_url_state.set(new_value);

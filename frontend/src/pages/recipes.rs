@@ -28,7 +28,6 @@ pub fn recipes() -> Html {
                     Some(v) => v.clone(),
                     None => return,
                 };
-                let recipes_state = recipes_state.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let new_recipes = api.get_recipes().await.unwrap();
                     recipes_state.set(new_recipes);

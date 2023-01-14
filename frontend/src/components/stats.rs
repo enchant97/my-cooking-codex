@@ -14,7 +14,7 @@ pub fn stat(props: &StatProps) -> Html {
         <div class="stat place-items-center">
             <div class="stat-title">{props.title.clone()}</div>
             <div class="stat-value">{props.value.clone()}</div>
-            if !props.description.is_none() {
+            if props.description.is_some() {
                 <div class="stat-desc">{props.description.clone().unwrap()}</div>
             }
         </div>

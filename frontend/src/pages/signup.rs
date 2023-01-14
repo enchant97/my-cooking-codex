@@ -84,7 +84,6 @@ pub fn signup() -> Html {
         let password = (*password_state).clone();
         let password_confirm = (*password_confirm_state).clone();
         let get_new_user = get_new_user.clone();
-        let toasts_ctx = toasts_ctx.clone();
 
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
@@ -100,7 +99,6 @@ pub fn signup() -> Html {
         })
     };
     let on_base_url_change = {
-        let base_url_state = base_url_state.clone();
         Callback::from(move |new_value: AttrValue| {
             gloo::console::debug!(format!("base url base set to: '{}'", new_value));
             base_url_state.set(new_value);
@@ -135,7 +133,7 @@ pub fn signup() -> Html {
         })
     };
     let on_password_confirm_change = {
-        let error_tooltip_state = error_tooltip_state.clone();
+        let error_tooltip_state = error_tooltip_state;
         let password = (*password_state).clone();
         let password_confirm_state = password_confirm_state.clone();
         Callback::from(move |e: InputEvent| {
