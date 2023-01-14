@@ -89,8 +89,20 @@ func CreateRecipeImage(recipeImage RecipeImage) (RecipeImage, error) {
 }
 
 // Gets the recipe image by it's id without the binary content
+func GetRecipeImageWithoutContent(id string) (RecipeImage, error) {
+	cursor, err := r.Table(TableNameRecipeImages).Get(id).Without("content").Run(session)
+	if err != nil {
+		return RecipeImage{}, err
+	}
+	defer cursor.Close()
+	var recipeImage RecipeImage
+	err = cursor.One(&recipeImage)
+	return recipeImage, err
+}
+
+// Gets the recipe image by it's id, including binary content
 func GetRecipeImage(id string) (RecipeImage, error) {
-	cursor, err := r.Table(TableNameRecipes).Get(id).Without("content").Run(session)
+	cursor, err := r.Table(TableNameRecipeImages).Get(id).Run(session)
 	if err != nil {
 		return RecipeImage{}, err
 	}
@@ -102,7 +114,7 @@ func GetRecipeImage(id string) (RecipeImage, error) {
 
 // Gets the recipe image by it's id, returning just the binary content
 func GetRecipeImageContentByID(id string) ([]byte, error) {
-	cursor, err := r.Table(TableNameRecipes).Get(id).Pluck("content").Run(session)
+	cursor, err := r.Table(TableNameRecipeImages).Get(id).Pluck("content").Run(session)
 	if err != nil {
 		return nil, err
 	}
@@ -110,4 +122,16 @@ func GetRecipeImageContentByID(id string) ([]byte, error) {
 	var content []byte
 	err = cursor.One(&content)
 	return content, err
+}
+
+// Gets images for given recipe id, will not include binary content
+func GetRecipeImagesByID(recipeID string) ([]RecipeImage, error) {
+	cursor, err := r.Table(TableNameRecipeImages).Filter(map[string]interface{}{"recipeId": recipeID}).Without("content").Run(session)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close()
+	var images []RecipeImage
+	err = cursor.All(&images)
+	return images, err
 }

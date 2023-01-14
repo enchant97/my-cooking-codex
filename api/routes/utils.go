@@ -6,6 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
@@ -29,7 +30,13 @@ func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 		apiRoutes.POST("recipes/", postCreateRecipe)
 		apiRoutes.GET("recipes/", getRecipes)
 		apiRoutes.GET("recipes/:id/", getRecipe)
+		apiRoutes.POST("recipes/:id/images/", postAddRecipeImage, middleware.BodyLimit("4M"))
+		apiRoutes.GET("recipes/:id/images/", getRecipeImages)
 		apiRoutes.GET("stats/me/", getAccountStats)
 	}
 
+	mediaRoutes := e.Group("/media/")
+	{
+		mediaRoutes.GET("recipe-image/:id", getRecipeImageContent)
+	}
 }
