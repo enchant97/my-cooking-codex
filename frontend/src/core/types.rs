@@ -19,5 +19,6 @@ pub struct LoginToken {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct StoredLogin {
     pub api_url: String,
+    pub media_url: String,
     pub token: LoginToken,
 }

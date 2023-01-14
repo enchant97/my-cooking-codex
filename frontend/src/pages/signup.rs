@@ -5,7 +5,7 @@ use yew_hooks::use_async;
 use yew_router::prelude::{use_navigator, Link};
 
 use crate::{
-    components::input::ApiUrlSelector,
+    components::input::BaseUrlSelector,
     contexts::prelude::{create_push_toast_change, use_toasts, Toast},
     core::{
         api::{sanitise_base_url, Api},
@@ -20,7 +20,7 @@ pub fn signup() -> Html {
     let toasts_ctx = use_toasts().unwrap();
     let navigator = use_navigator().unwrap();
 
-    let api_url_state = use_state(AttrValue::default);
+    let base_url_state = use_state(AttrValue::default);
     let username_state = use_state(AttrValue::default);
     let password_state = use_state(AttrValue::default);
     let password_confirm_state = use_state(AttrValue::default);
@@ -33,17 +33,17 @@ pub fn signup() -> Html {
 
     // try and create new account
     let get_new_user = {
-        let api_url = (*api_url_state).clone();
+        let base_url = (*base_url_state).clone();
         let username = (*username_state).clone();
         let password = (*password_state).clone();
 
         use_async(async move {
-            let api_url = sanitise_base_url(api_url.to_string());
+            let api_url = sanitise_base_url(base_url.to_string()) + "/api";
             let details = user::CreateUser {
                 username: username.to_string(),
                 password: password.to_string(),
             };
-            Api::new(api_url.clone(), None)
+            Api::new(api_url, None)
                 .post_create_account(&details)
                 .await
         })
@@ -99,11 +99,11 @@ pub fn signup() -> Html {
             get_new_user.run();
         })
     };
-    let on_api_url_change = {
-        let api_url_state = api_url_state.clone();
+    let on_base_url_change = {
+        let base_url_state = base_url_state.clone();
         Callback::from(move |new_value: AttrValue| {
-            gloo::console::debug!(format!("api url base set to: '{}'", new_value));
-            api_url_state.set(new_value);
+            gloo::console::debug!(format!("base url base set to: '{}'", new_value));
+            base_url_state.set(new_value);
         })
     };
     let on_username_change = {
@@ -163,7 +163,7 @@ pub fn signup() -> Html {
                             <h2 class="text-4xl font-bold">{ "Create Account" }</h2>
                         </div>
                         <form onsubmit={on_submit}>
-                            <ApiUrlSelector onchange={on_api_url_change}/>
+                            <BaseUrlSelector onchange={on_base_url_change}/>
                             <div class="form-control mb-2">
                                 <label class="label"><span class="label-text">{ "Username" }</span></label>
                                 <input

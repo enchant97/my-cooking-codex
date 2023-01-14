@@ -4,7 +4,7 @@ use yew::prelude::*;
 use yew_hooks::use_async;
 use yew_router::prelude::Link;
 
-use crate::components::input::ApiUrlSelector;
+use crate::components::input::BaseUrlSelector;
 use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
@@ -16,7 +16,7 @@ pub fn login() -> Html {
     let login_ctx = use_login().unwrap();
     let toasts_ctx = use_toasts().unwrap();
 
-    let api_url_state = use_state(AttrValue::default);
+    let base_url_state = use_state(AttrValue::default);
     let username_state = use_state(AttrValue::default);
     let password_state = use_state(AttrValue::default);
 
@@ -24,24 +24,24 @@ pub fn login() -> Html {
     use_login_redirect_effect(LoginState::NoLogin, Route::Home);
     // try and get a login token, when the form is submitted
     let get_new_token = {
-        let api_url = (*api_url_state).clone();
+        let base_url = (*base_url_state).clone();
         let username = (*username_state).clone();
         let password = (*password_state).clone();
 
         use_async(async move {
-            let api_url = sanitise_base_url(api_url.to_string());
+            let api_url = sanitise_base_url(base_url.to_string()) + "/api";
             let login = types::Login {
                 username: username.to_string(),
                 password: password.to_string(),
             };
-            Api::new(api_url.clone(), None).post_login(&login).await
+            Api::new(api_url, None).post_login(&login).await
         })
     };
 
     // requested login token value has changed
     {
         let get_new_token = get_new_token.clone();
-        let api_url = (*api_url_state).clone();
+        let base_url = (*base_url_state).clone();
         use_effect_with_deps(
             move |token_response| {
                 if token_response.loading {
@@ -56,8 +56,10 @@ pub fn login() -> Html {
                     }
                     None => match &token_response.data {
                         Some(token) => {
+                            let base_url = base_url.to_string();
                             let login_details = types::StoredLogin {
-                                api_url: api_url.to_string(),
+                                api_url: base_url.clone() + "/api",
+                                media_url: base_url + "/media",
                                 token: token.clone(),
                             };
                             gloo::console::debug!(format!("got details: '{:?}'", login_details));
@@ -72,24 +74,24 @@ pub fn login() -> Html {
     }
 
     let on_submit = {
-        let api_url = (*api_url_state).clone();
+        let base_url = (*base_url_state).clone();
         let username = (*username_state).clone();
         let get_new_token = get_new_token.clone();
         Callback::from(move |e: SubmitEvent| {
             e.prevent_default();
             gloo::console::debug!(format!(
                 "Login submitted: '{}', '...', {}",
-                username, api_url
+                username, base_url
             ));
             // get new token in background
             get_new_token.run();
         })
     };
-    let on_api_url_change = {
-        let api_url_state = api_url_state.clone();
+    let on_base_url_change = {
+        let base_url_state = base_url_state.clone();
         Callback::from(move |new_value: AttrValue| {
-            gloo::console::debug!(format!("api url base set to: '{}'", new_value));
-            api_url_state.set(new_value);
+            gloo::console::debug!(format!("base url base set to: '{}'", new_value));
+            base_url_state.set(new_value);
         })
     };
     let on_username_change = {
@@ -123,7 +125,7 @@ pub fn login() -> Html {
                             <h2 class="text-4xl font-bold">{ "Please Login" }</h2>
                         </div>
                         <form onsubmit={on_submit}>
-                            <ApiUrlSelector onchange={on_api_url_change}/>
+                            <BaseUrlSelector onchange={on_base_url_change}/>
                             <div class="form-control mb-2">
                                 <label class="label"><span class="label-text">{ "Username" }</span></label>
                                 <input value={ (*username_state).clone() } oninput={on_username_change} type="text" placeholder="e.g. leo" autocomplete="username" class="input input-bordered" required=true />
