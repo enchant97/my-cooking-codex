@@ -69,3 +69,36 @@ pub fn steps(props: &StepsProps) -> Html {
         </div>
     }
 }
+
+#[derive(Properties, PartialEq)]
+pub struct RecipeContentProps {
+    #[prop_or_default]
+    pub classes: Classes,
+    pub recipe: types::recipe::Recipe,
+    pub media_url: AttrValue,
+}
+
+#[function_component(RecipeContent)]
+pub fn recipe_content(props: &RecipeContentProps) -> Html {
+    html! {
+        <div class={props.classes.clone()}>
+            <div class="mb-4 p-4 rounded bg-base-200">
+                if props.recipe.main_image_id.is_some() {
+                    <figure class="h-64 w-full mb-4">
+                        <img
+                            class="object-cover w-full h-full rounded"
+                            src={format!("{}/recipe-image/{}", props.media_url, props.recipe.main_image_id.as_ref().unwrap())}
+                        />
+                    </figure>
+                }
+                <h1 class="text-2xl font-bold mb-2">{props.recipe.title.clone()}</h1>
+            </div>
+            <p class="mb-4 p-4 rounded bg-base-200">{props.recipe.short_description.clone()}</p>
+            <p class="mb-4 p-4 rounded bg-base-200">{props.recipe.long_description.clone()}</p>
+            <div class="flex flex-col md:flex-row gap-4">
+                <Ingredients classes="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200" items={props.recipe.ingredients.clone()}/>
+                <Steps classes="w-full p-4 rounded bg-base-200" items={props.recipe.steps.clone()}/>
+            </div>
+        </div>
+    }
+}
