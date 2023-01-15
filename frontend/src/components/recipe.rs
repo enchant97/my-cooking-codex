@@ -1,6 +1,9 @@
 use yew::prelude::*;
 
-use crate::core::types;
+use crate::{
+    core::types,
+    modals::{self, ModalController},
+};
 
 #[derive(Properties, PartialEq)]
 pub struct IngredientsProps {
@@ -80,7 +83,28 @@ pub struct RecipeContentProps {
 
 #[function_component(RecipeContent)]
 pub fn recipe_content(props: &RecipeContentProps) -> Html {
+    let modal_html_state: UseStateHandle<Option<Html>> = use_state(Option::default);
+
+    let on_close_modal = {
+        let modal_html_state = modal_html_state.clone();
+        Callback::from(move |_: ()| {
+            modal_html_state.set(None);
+        })
+    };
+
+    let on_edit_title_click = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe = props.recipe.clone();
+        Callback::from(move |_: MouseEvent| {
+            modal_html_state.set(Some(html! {
+                <modals::recipe::EditTitle title={recipe.title.clone()} onclose={on_close_modal.clone()}/>
+            }));
+        })
+    };
+
     html! {
+        <>
+        <ModalController modal={(*modal_html_state).clone()}/>
         <div class={props.classes.clone()}>
             <div class="mb-4 p-4 rounded bg-base-200">
                 if props.recipe.main_image_id.is_some() {
@@ -91,7 +115,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                         />
                     </figure>
                 }
-                <h1 class="text-2xl font-bold mb-2">{props.recipe.title.clone()}</h1>
+                <h1 class="text-2xl font-bold mb-2">{props.recipe.title.clone()}<button class="btn" onclick={on_edit_title_click}>{"Edit"}</button></h1>
             </div>
             <p class="mb-4 p-4 rounded bg-base-200">{props.recipe.short_description.clone()}</p>
             <p class="mb-4 p-4 rounded bg-base-200">{props.recipe.long_description.clone()}</p>
@@ -100,5 +124,6 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                 <Steps classes="w-full p-4 rounded bg-base-200" items={props.recipe.steps.clone()}/>
             </div>
         </div>
+        </>
     }
 }

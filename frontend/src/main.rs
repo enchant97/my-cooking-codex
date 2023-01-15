@@ -4,6 +4,7 @@ use yew_router::prelude::*;
 mod components;
 mod contexts;
 mod core;
+mod modals;
 mod pages;
 
 use crate::contexts::login::{CurrentLogin, CurrentLoginContext};
@@ -47,6 +48,7 @@ fn app() -> Html {
     html! {
         <ContextProvider<CurrentLoginContext> context={login_context}>
         <ContextProvider<ToastsContext> context={toasts_context}>
+            <div id="modal_host"></div>
             <crate::components::Toasts/>
             <BrowserRouter>
                 <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
