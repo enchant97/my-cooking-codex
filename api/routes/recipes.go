@@ -124,6 +124,11 @@ func postAddRecipeImage(ctx echo.Context) error {
 	// NOTE we don't want to send the file content back to client
 	recipeImage.Content = nil
 
+	// set as main image, if one has not been set
+	if err = db.SetRecipeMainImageIfUnset(recipeID, recipeImage.ID); err != nil {
+		ctx.Logger().Error(err)
+	}
+
 	return ctx.JSON(http.StatusCreated, recipeImage)
 }
 

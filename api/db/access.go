@@ -82,6 +82,25 @@ func UpdateRecipe(recipeID string, newRecipe interface{}) error {
 	return err
 }
 
+// set the main recipe image id, if one has not been set already,
+// will not check for validity of image id
+func SetRecipeMainImageIfUnset(recipeID string, imageID string) error {
+	cursor, err := r.Table(TableNameRecipes).Get(recipeID).Pluck("mainImageId").Count().Eq(1).Run(session)
+	if err != nil {
+		return err
+	}
+	defer cursor.Close()
+	var isSet bool
+	if err = cursor.One(&isSet); err != nil {
+		return err
+	}
+	if !isSet {
+		_, err := r.Table(TableNameRecipes).Get(recipeID).Update(map[string]interface{}{"mainImageId": imageID}).RunWrite(session)
+		return err
+	}
+	return nil
+}
+
 func CreateRecipeImage(recipeImage RecipeImage) (RecipeImage, error) {
 	response, err := r.Table(TableNameRecipeImages).Insert(&recipeImage).RunWrite(session)
 	if err != nil {
