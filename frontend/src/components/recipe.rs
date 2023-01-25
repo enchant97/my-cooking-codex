@@ -84,20 +84,27 @@ pub struct RecipeContentProps {
 #[function_component(RecipeContent)]
 pub fn recipe_content(props: &RecipeContentProps) -> Html {
     let modal_html_state: UseStateHandle<Option<Html>> = use_state(Option::default);
+    let recipe_state = use_state(|| props.recipe.clone());
 
-    let on_close_modal = {
+    let title_modal_closed = {
         let modal_html_state = modal_html_state.clone();
-        Callback::from(move |_: ()| {
+        let recipe_state = recipe_state.clone();
+        Callback::from(move |new_title: Option<String>| {
             modal_html_state.set(None);
+            if let Some(title) = new_title {
+                let mut recipe = (*recipe_state).clone();
+                recipe.title = title;
+                recipe_state.set(recipe)
+            }
         })
     };
 
     let on_edit_title_click = {
         let modal_html_state = modal_html_state.clone();
-        let recipe = props.recipe.clone();
+        let recipe = (*recipe_state).clone();
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
-                <modals::recipe::EditTitle title={recipe.title.clone()} onclose={on_close_modal.clone()}/>
+                <modals::recipe::EditTitle title={recipe.title.clone()} onclose={title_modal_closed.clone()}/>
             }));
         })
     };
@@ -107,21 +114,21 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         <ModalController modal={(*modal_html_state).clone()}/>
         <div class={props.classes.clone()}>
             <div class="mb-4 p-4 rounded bg-base-200">
-                if props.recipe.main_image_id.is_some() {
+                if (*recipe_state).main_image_id.is_some() {
                     <figure class="h-64 w-full mb-4">
                         <img
                             class="object-cover w-full h-full rounded"
-                            src={format!("{}/recipe-image/{}", props.media_url, props.recipe.main_image_id.as_ref().unwrap())}
+                            src={format!("{}/recipe-image/{}", props.media_url, (*recipe_state).main_image_id.as_ref().unwrap())}
                         />
                     </figure>
                 }
-                <h1 class="text-2xl font-bold mb-2">{props.recipe.title.clone()}<button class="btn" onclick={on_edit_title_click}>{"Edit"}</button></h1>
+                <h1 class="text-2xl font-bold mb-2">{(*recipe_state).title.clone()}<button class="btn" onclick={on_edit_title_click}>{"Edit"}</button></h1>
             </div>
-            <p class="mb-4 p-4 rounded bg-base-200">{props.recipe.short_description.clone()}</p>
-            <p class="mb-4 p-4 rounded bg-base-200">{props.recipe.long_description.clone()}</p>
+            <p class="mb-4 p-4 rounded bg-base-200">{(*recipe_state).short_description.clone()}</p>
+            <p class="mb-4 p-4 rounded bg-base-200">{(*recipe_state).long_description.clone()}</p>
             <div class="flex flex-col md:flex-row gap-4">
-                <Ingredients classes="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200" items={props.recipe.ingredients.clone()}/>
-                <Steps classes="w-full p-4 rounded bg-base-200" items={props.recipe.steps.clone()}/>
+                <Ingredients classes="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200" items={(*recipe_state).ingredients.clone()}/>
+                <Steps classes="w-full p-4 rounded bg-base-200" items={(*recipe_state).steps.clone()}/>
             </div>
         </div>
         </>
