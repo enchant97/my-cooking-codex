@@ -150,6 +150,22 @@ impl Api {
         )?;
         ApiError::check_json_response_ok::<recipe::Recipe>(response).await
     }
+    pub async fn patch_update_recipe(
+        &self,
+        id: String,
+        updated_recipe: &recipe::UpdateRecipe,
+    ) -> Result<(), ApiError> {
+        let req_url = format!("{}/recipes/{}/", self.base_url.clone(), id);
+        ApiError::from_response_result(
+            Request::patch(&req_url)
+                .header("Authorization", &self.get_authorization_value().unwrap())
+                .json(updated_recipe)
+                .unwrap()
+                .send()
+                .await,
+        )?;
+        Ok(())
+    }
 }
 
 impl From<StoredLogin> for Api {

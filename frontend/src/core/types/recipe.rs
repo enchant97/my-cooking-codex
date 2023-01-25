@@ -34,6 +34,45 @@ pub struct CreateRecipe {
     pub steps: Vec<CreateStep>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateIngredient {
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(default)]
+    pub amount: Option<usize>,
+    #[serde(default)]
+    pub unit_type: Option<String>,
+    #[serde(default)]
+    pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateStep {
+    #[serde(default)]
+    pub title: Option<String>,
+    #[serde(default)]
+    pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateRecipe {
+    #[serde(default)]
+    pub title: Option<String>,
+    #[serde(default)]
+    pub short_description: Option<String>,
+    #[serde(default)]
+    pub long_description: Option<String>,
+    #[serde(default)]
+    pub tags: Option<Vec<String>>,
+    #[serde(default)]
+    pub ingredients: Option<Vec<UpdateIngredient>>,
+    #[serde(default)]
+    pub steps: Option<Vec<UpdateStep>>,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Ingredient {

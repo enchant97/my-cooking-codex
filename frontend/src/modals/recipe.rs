@@ -1,3 +1,5 @@
+use crate::{contexts::login::use_login, core::types::recipe::UpdateRecipe};
+
 use super::Modal;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
@@ -5,12 +7,14 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct EditTitleProps {
+    pub id: String,
     pub title: AttrValue,
     pub onclose: Callback<Option<String>>,
 }
 
 #[function_component(EditTitle)]
-pub fn recipe_content(props: &EditTitleProps) -> Html {
+pub fn recipe_title(props: &EditTitleProps) -> Html {
+    let login_ctx = use_login().unwrap();
     let title_state = use_state(AttrValue::default);
 
     {
@@ -25,11 +29,31 @@ pub fn recipe_content(props: &EditTitleProps) -> Html {
     }
 
     let on_save = {
+        let api = login_ctx.http_api.clone();
+        let id = props.id.to_string();
         let on_close_callback = props.onclose.clone();
         let title_state = title_state.clone();
         Callback::from(move |_| {
+            let api = api.clone().unwrap();
+            let id = id.clone();
+            let on_close_callback = on_close_callback.clone();
             let title = (*title_state).clone();
-            on_close_callback.emit(Some(title.to_string()));
+            wasm_bindgen_futures::spawn_local(async move {
+                api.patch_update_recipe(
+                    id,
+                    &UpdateRecipe {
+                        title: Some(title.to_string()),
+                        short_description: None,
+                        long_description: None,
+                        tags: None,
+                        ingredients: None,
+                        steps: None,
+                    },
+                )
+                .await
+                .unwrap();
+                on_close_callback.emit(Some(title.to_string()));
+            });
         })
     };
 

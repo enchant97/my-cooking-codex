@@ -104,7 +104,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         let recipe = (*recipe_state).clone();
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
-                <modals::recipe::EditTitle title={recipe.title.clone()} onclose={title_modal_closed.clone()}/>
+                <modals::recipe::EditTitle id={recipe.id.clone()} title={recipe.title.clone()} onclose={title_modal_closed.clone()}/>
             }));
         })
     };
