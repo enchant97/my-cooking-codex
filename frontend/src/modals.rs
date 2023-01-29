@@ -26,6 +26,8 @@ pub struct ModalProps {
     pub oncancel: Callback<()>,
     #[prop_or_default]
     pub onsave: Option<Callback<()>>,
+    #[prop_or_default]
+    pub loading: bool,
     pub children: Children,
 }
 
@@ -53,8 +55,10 @@ pub fn modal_controller(props: &ModalProps) -> Html {
                 { for props.children.iter() }
                 <div class="modal-action">
                     <div class="btn-group">
-                        if props.onsave.is_some() {
+                        if props.onsave.is_some() && !props.loading {
                             <button onclick={on_save_click} class="btn btn-primary">{"Save"}</button>
+                        } else if props.onsave.is_some() && props.loading {
+                            <button type="submit" disabled=true class="btn loading">{"Loading"}</button>
                         }
                         <button onclick={on_cancel_click} class="btn">{"Cancel"}</button>
                     </div>

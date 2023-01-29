@@ -16,6 +16,7 @@ pub struct EditTitleProps {
 pub fn recipe_title(props: &EditTitleProps) -> Html {
     let login_ctx = use_login().unwrap();
     let title_state = use_state(AttrValue::default);
+    let is_loading_state = use_state(bool::default);
 
     {
         let initial_title = props.title.clone();
@@ -33,12 +34,15 @@ pub fn recipe_title(props: &EditTitleProps) -> Html {
         let id = props.id.to_string();
         let on_close_callback = props.onclose.clone();
         let title_state = title_state.clone();
+        let is_loading_state = is_loading_state.clone();
         Callback::from(move |_| {
             let api = api.clone().unwrap();
             let id = id.clone();
             let on_close_callback = on_close_callback.clone();
             let title = (*title_state).clone();
+            let is_loading_state = is_loading_state.clone();
             wasm_bindgen_futures::spawn_local(async move {
+                is_loading_state.set(true);
                 api.patch_update_recipe(
                     id,
                     &UpdateRecipe {
@@ -52,6 +56,7 @@ pub fn recipe_title(props: &EditTitleProps) -> Html {
                 )
                 .await
                 .unwrap();
+                is_loading_state.set(false);
                 on_close_callback.emit(Some(title.to_string()));
             });
         })
@@ -76,7 +81,7 @@ pub fn recipe_title(props: &EditTitleProps) -> Html {
     };
 
     html! {
-        <Modal title={"Edit Title"} oncancel={on_cancel} onsave={on_save}>
+        <Modal title={"Edit Title"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
             <input oninput={on_title_input} value={(*title_state).clone()} class="my-4 input input-bordered w-full"/>
         </Modal>
     }
