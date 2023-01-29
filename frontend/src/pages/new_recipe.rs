@@ -5,6 +5,7 @@ use yew_hooks::use_async;
 use yew_router::prelude::use_navigator;
 
 use crate::components::drawer;
+use crate::components::loading::LoadingButton;
 use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::types;
@@ -102,7 +103,7 @@ pub fn new_recipe() -> Html {
                         </div>
                         <div class="form-control">
                             if create_new_recipe.loading {
-                                <button type="submit" disabled=true class="btn loading">{"Loading"}</button>
+                                <LoadingButton r#type="submit"/>
                             } else {
                                 <button type="submit" class="btn btn-primary">{"Create"}</button>
                             }

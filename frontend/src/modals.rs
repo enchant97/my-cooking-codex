@@ -2,6 +2,8 @@ pub mod recipe;
 
 use yew::prelude::*;
 
+use crate::components::loading::LoadingButton;
+
 #[derive(Properties, PartialEq)]
 pub struct ModalControllerProps {
     pub modal: Option<Html>,
@@ -58,7 +60,7 @@ pub fn modal_controller(props: &ModalProps) -> Html {
                         if props.onsave.is_some() && !props.loading {
                             <button onclick={on_save_click} class="btn btn-primary">{"Save"}</button>
                         } else if props.onsave.is_some() && props.loading {
-                            <button type="submit" disabled=true class="btn loading">{"Loading"}</button>
+                            <LoadingButton r#type="submit"/>
                         }
                         <button onclick={on_cancel_click} class="btn">{"Cancel"}</button>
                     </div>

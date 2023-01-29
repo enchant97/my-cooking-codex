@@ -5,6 +5,7 @@ use yew_hooks::use_async;
 use yew_router::prelude::Link;
 
 use crate::components::input::BaseUrlSelector;
+use crate::components::loading::LoadingButton;
 use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
@@ -135,7 +136,7 @@ pub fn login() -> Html {
                             </div>
                             <div class="form-control btn-group btn-group-vertical">
                                 if get_new_token.loading {
-                                    <button type="submit" disabled=true class="btn loading">{"Loading"}</button>
+                                    <LoadingButton r#type="submit"/>
                                 } else {
                                     <button type="submit" class="btn btn-primary">{"Login"}</button>
                                 }

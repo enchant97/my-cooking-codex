@@ -5,7 +5,7 @@ use yew_hooks::use_async;
 use yew_router::prelude::{use_navigator, Link};
 
 use crate::{
-    components::input::BaseUrlSelector,
+    components::{input::BaseUrlSelector, loading::LoadingButton},
     contexts::prelude::{create_push_toast_change, use_toasts, Toast},
     core::{
         api::{sanitise_base_url, Api},
@@ -200,7 +200,7 @@ pub fn signup() -> Html {
                             </div>
                             <div class="form-control btn-group btn-group-vertical">
                                 if get_new_user.loading {
-                                    <button type="submit" disabled=true class="btn loading">{"Loading"}</button>
+                                    <LoadingButton r#type="submit"/>
                                 } else {
                                     if error_tooltip.is_none() {
                                         <button type="submit" class="btn btn-primary">{"Signup"}</button>
