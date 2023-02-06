@@ -112,10 +112,25 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                         />
                     </figure>
                 }
-                <h1 class="text-2xl font-bold mb-2">{(*recipe_state).title.clone()}<button class="btn" onclick={on_edit_title_click}>{"Edit"}</button></h1>
+                <h1 class="flex text-2xl font-bold mb-2">
+                    <span class="mr-auto">{(*recipe_state).title.clone()}</span>
+                    <button class="btn" onclick={on_edit_title_click}>{"Edit"}</button>
+                </h1>
             </div>
-            <p class="mb-4 p-4 rounded bg-base-200">{(*recipe_state).short_description.clone()}</p>
-            <p class="mb-4 p-4 rounded bg-base-200">{(*recipe_state).long_description.clone()}</p>
+            <div class="mb-4 p-4 rounded bg-base-200">
+                <div class="flex mb-2">
+                    <h2 class="text-xl font-bold mr-auto">{"Description"}</h2>
+                    <button class="btn btn-disabled">{"Edit"}</button>
+                </div>
+                <p>{(*recipe_state).short_description.clone()}</p>
+            </div>
+            <div class="mb-4 p-4 rounded bg-base-200">
+                <div class="flex mb-2">
+                    <h2 class="text-xl font-bold mr-auto">{"Notes"}</h2>
+                    <button class="btn btn-disabled">{"Edit"}</button>
+                </div>
+                <p>{(*recipe_state).long_description.clone()}</p>
+            </div>
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200">
                     <div class="flex mb-2">
