@@ -89,12 +89,35 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         })
     };
 
+    let steps_modal_closed = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe_state = recipe_state.clone();
+        Callback::from(move |new_steps: Option<Vec<types::recipe::Step>>| {
+            modal_html_state.set(None);
+            if let Some(steps) = new_steps {
+                let mut recipe = (*recipe_state).clone();
+                recipe.steps = steps;
+                recipe_state.set(recipe)
+            }
+        })
+    };
+
     let on_edit_title_click = {
         let modal_html_state = modal_html_state.clone();
         let recipe = (*recipe_state).clone();
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
                 <modals::recipe::EditTitle id={recipe.id.clone()} title={recipe.title.clone()} onclose={title_modal_closed.clone()}/>
+            }));
+        })
+    };
+
+    let on_edit_steps_click = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe = (*recipe_state).clone();
+        Callback::from(move |_: MouseEvent| {
+            modal_html_state.set(Some(html! {
+                <modals::recipe::EditSteps id={recipe.id.clone()} steps={recipe.steps.clone()} onclose={steps_modal_closed.clone()}/>
             }));
         })
     };
@@ -142,7 +165,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                 <div class="w-full p-4 rounded bg-base-200">
                     <div class="flex mb-2">
                         <h2 class="text-xl font-bold mr-auto">{"Steps"}</h2>
-                        <button class="btn btn-disabled">{"Edit"}</button>
+                        <button class="btn" onclick={on_edit_steps_click}>{"Edit"}</button>
                     </div>
                     <Steps items={(*recipe_state).steps.clone()}/>
                 </div>
