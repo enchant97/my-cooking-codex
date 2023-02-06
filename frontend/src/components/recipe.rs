@@ -7,69 +7,59 @@ use crate::{
 
 #[derive(Properties, PartialEq)]
 pub struct IngredientsProps {
-    #[prop_or_default]
-    pub classes: Classes,
     pub items: Vec<types::recipe::Ingredient>,
 }
 
 #[function_component(Ingredients)]
 pub fn ingredients(props: &IngredientsProps) -> Html {
     html! {
-        <div class={props.classes.clone()}>
-            <h2 class="text-xl font-bold mb-2">{"Ingredients"}</h2>
-            <table class="table table-compact table-zebra w-full">
-                <thead>
-                    <tr>
-                        <th>{"Amount"}</th>
-                        <th>{"Unit Type"}</th>
-                        <th>{"Name"}</th>
-                        <th>{"Notes"}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        for props.items.iter().map(|ingredient| {
-                            html!{
-                                <tr>
-                                    <td class="whitespace-normal">{&ingredient.amount}</td>
-                                    <td class="whitespace-normal">{&ingredient.unit_type}</td>
-                                    <td class="whitespace-normal">{&ingredient.name}</td>
-                                    <td class="whitespace-normal">{&ingredient.description.clone().unwrap_or_default()}</td>
-                                </tr>
-                            }
-                        })
-                    }
-                </tbody>
-            </table>
-        </div>
+        <table class="table table-compact table-zebra w-full">
+            <thead>
+                <tr>
+                    <th>{"Amount"}</th>
+                    <th>{"Unit Type"}</th>
+                    <th>{"Name"}</th>
+                    <th>{"Notes"}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    for props.items.iter().map(|ingredient| {
+                        html!{
+                            <tr>
+                                <td class="whitespace-normal">{&ingredient.amount}</td>
+                                <td class="whitespace-normal">{&ingredient.unit_type}</td>
+                                <td class="whitespace-normal">{&ingredient.name}</td>
+                                <td class="whitespace-normal">{&ingredient.description.clone().unwrap_or_default()}</td>
+                            </tr>
+                        }
+                    })
+                }
+            </tbody>
+        </table>
     }
 }
 
 #[derive(Properties, PartialEq)]
 pub struct StepsProps {
-    #[prop_or_default]
-    pub classes: Classes,
     pub items: Vec<types::recipe::Step>,
 }
 
 #[function_component(Steps)]
 pub fn steps(props: &StepsProps) -> Html {
     html! {
-        <div class={props.classes.clone()}>
-            <h2 class="text-xl font-bold mb-2">{"Steps"}</h2>
-            <ul>
-            {
-                for props.items.iter().enumerate().map(|(i, step)| {
-                    html!{
-                        <li class="mb-2">
-                            <h2 class="text-l font-bold mb-2">{&step.title.clone().unwrap_or(format!("Step {}", i+1))}</h2>
-                            <p>{&step.description}</p>
-                        </li>
-                    }
-                })
-            }
-            </ul>
-        </div>
+        <ul>
+        {
+            for props.items.iter().enumerate().map(|(i, step)| {
+                html!{
+                    <li class="mb-2">
+                        <h2 class="text-l font-bold mb-2">{&step.title.clone().unwrap_or(format!("Step {}", i+1))}</h2>
+                        <p>{&step.description}</p>
+                    </li>
+                }
+            })
+        }
+        </ul>
     }
 }
 
@@ -127,8 +117,20 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
             <p class="mb-4 p-4 rounded bg-base-200">{(*recipe_state).short_description.clone()}</p>
             <p class="mb-4 p-4 rounded bg-base-200">{(*recipe_state).long_description.clone()}</p>
             <div class="flex flex-col md:flex-row gap-4">
-                <Ingredients classes="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200" items={(*recipe_state).ingredients.clone()}/>
-                <Steps classes="w-full p-4 rounded bg-base-200" items={(*recipe_state).steps.clone()}/>
+                <div class="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200">
+                    <div class="flex mb-2">
+                        <h2 class="text-xl font-bold mr-auto">{"Ingredients"}</h2>
+                        <button class="btn btn-disabled">{"Edit"}</button>
+                    </div>
+                    <Ingredients items={(*recipe_state).ingredients.clone()}/>
+                </div>
+                <div class="w-full p-4 rounded bg-base-200">
+                    <div class="flex mb-2">
+                        <h2 class="text-xl font-bold mr-auto">{"Steps"}</h2>
+                        <button class="btn btn-disabled">{"Edit"}</button>
+                    </div>
+                    <Steps items={(*recipe_state).steps.clone()}/>
+                </div>
             </div>
         </div>
         </>
