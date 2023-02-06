@@ -17,7 +17,6 @@ pub fn ingredients(props: &IngredientsProps) -> Html {
             <thead>
                 <tr>
                     <th>{"Amount"}</th>
-                    <th>{"Unit Type"}</th>
                     <th>{"Name"}</th>
                     <th>{"Notes"}</th>
                 </tr>
@@ -27,8 +26,7 @@ pub fn ingredients(props: &IngredientsProps) -> Html {
                     for props.items.iter().map(|ingredient| {
                         html!{
                             <tr>
-                                <td class="whitespace-normal">{&ingredient.amount}</td>
-                                <td class="whitespace-normal">{&ingredient.unit_type}</td>
+                                <td class="whitespace-normal">{&ingredient.amount} {&ingredient.unit_type}</td>
                                 <td class="whitespace-normal">{&ingredient.name}</td>
                                 <td class="whitespace-normal">{&ingredient.description.clone().unwrap_or_default()}</td>
                             </tr>
