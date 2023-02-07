@@ -1,4 +1,4 @@
-use crate::core::types::recipe::Step;
+use crate::core::types::recipe::{Step, UpdateStep};
 use crate::{contexts::login::use_login, core::types::recipe::UpdateRecipe};
 
 use super::Modal;
@@ -225,6 +225,7 @@ pub struct EditStepsProps {
 
 #[function_component(EditSteps)]
 pub fn recipe_steps(props: &EditStepsProps) -> Html {
+    let login_ctx = use_login().unwrap();
     let steps_state = use_state(Vec::default);
     let is_loading_state = use_state(bool::default);
 
@@ -242,15 +243,40 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
     let on_save = {
         let id = props.id.to_string();
         let on_close_callback = props.onclose.clone();
+        let api = login_ctx.http_api.clone();
+        let steps_state = steps_state.clone();
         let is_loading_state = is_loading_state.clone();
         Callback::from(move |_| {
+            let api = api.clone().unwrap();
             let id = id.clone();
             let on_close_callback = on_close_callback.clone();
             let is_loading_state = is_loading_state.clone();
+            let steps = (*steps_state).clone();
             wasm_bindgen_futures::spawn_local(async move {
                 is_loading_state.set(true);
+                api.patch_update_recipe(
+                    id,
+                    &UpdateRecipe {
+                        title: None,
+                        short_description: None,
+                        long_description: None,
+                        tags: None,
+                        ingredients: None,
+                        steps: Some(
+                            steps
+                                .iter()
+                                .map(|step| UpdateStep {
+                                    title: step.title.clone(),
+                                    description: Some(step.description.clone()),
+                                })
+                                .collect(),
+                        ),
+                    },
+                )
+                .await
+                .unwrap();
                 is_loading_state.set(false);
-                on_close_callback.emit(None);
+                on_close_callback.emit(Some(steps));
             });
         })
     };
@@ -302,6 +328,18 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
         })
     };
 
+    let on_add_step = {
+        let steps_state = steps_state.clone();
+        Callback::from(move |_| {
+            let mut steps = (*steps_state).clone();
+            steps.push(Step {
+                title: None,
+                description: "".to_owned(),
+            });
+            steps_state.set(steps);
+        })
+    };
+
     html! {
         <Modal title={"Edit Steps"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
             <ol>
@@ -319,7 +357,7 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
                 })
             }
             </ol>
-            <button type="button" class="btn w-full">{"Add Step"}</button>
+            <button type="button" class="btn w-full" onclick={on_add_step}>{"Add Step"}</button>
         </Modal>
     }
 }
