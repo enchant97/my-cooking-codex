@@ -83,7 +83,7 @@ pub fn recipe_title(props: &EditTitleProps) -> Html {
 
     html! {
         <Modal title={"Edit Title"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
-            <input oninput={on_title_input} value={(*title_state).clone()} class="my-4 input input-bordered w-full"/>
+            <input oninput={on_title_input} value={(*title_state).clone()} class="my-4 input input-bordered w-full" required=true/>
         </Modal>
     }
 }
@@ -190,19 +190,19 @@ pub fn recipe_step(props: &EditStepProps) -> Html {
                 <div class="btn-group">
                     {
                         if props.index == 0 {
-                            html!{<button class="btn btn-disabled">{"Up"}</button>}
+                            html!{<button type="button" class="btn btn-disabled">{"Up"}</button>}
                         } else {
-                            html!{<button class="btn" onclick={on_move_up}>{"Up"}</button>}
+                            html!{<button type="button" class="btn" onclick={on_move_up}>{"Up"}</button>}
                         }
                     }
                     {
                         if props.len == props.index+1 {
-                            html!{<button class="btn btn-disabled">{"Down"}</button>}
+                            html!{<button type="button" class="btn btn-disabled">{"Down"}</button>}
                         } else {
-                            html!{<button class="btn" onclick={on_move_down}>{"Down"}</button>}
+                            html!{<button type="button" class="btn" onclick={on_move_down}>{"Down"}</button>}
                         }
                     }
-                    <button class="btn" onclick={on_delete}>{"X"}</button>
+                    <button type="button" class="btn" onclick={on_delete}>{"X"}</button>
                 </div>
             </div>
             <textarea
@@ -319,7 +319,7 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
                 })
             }
             </ol>
-            <button class="btn w-full">{"Add Step"}</button>
+            <button type="button" class="btn w-full">{"Add Step"}</button>
         </Modal>
     }
 }

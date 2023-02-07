@@ -41,9 +41,10 @@ pub fn modal_controller(props: &ModalProps) -> Html {
             cancel_callback.emit(());
         })
     };
-    let on_save_click = {
+    let on_submit = {
         let save_callback = props.onsave.clone();
-        Callback::from(move |_: MouseEvent| {
+        Callback::from(move |e: SubmitEvent| {
+            e.prevent_default();
             if let Some(callback) = &save_callback {
                 callback.emit(());
             };
@@ -52,20 +53,20 @@ pub fn modal_controller(props: &ModalProps) -> Html {
 
     html! {
         <div class="modal modal-open">
-            <div class="modal-box">
+            <form class="modal-box" onsubmit={on_submit}>
                 <h3 class="font-bold text-lg">{props.title.clone()}</h3>
                 { for props.children.iter() }
                 <div class="modal-action">
                     <div class="btn-group">
                         if props.onsave.is_some() && !props.loading {
-                            <button onclick={on_save_click} class="btn btn-primary">{"Save"}</button>
+                            <button type="submit" class="btn btn-primary">{"Save"}</button>
                         } else if props.onsave.is_some() && props.loading {
                             <LoadingButton r#type="submit"/>
                         }
-                        <button onclick={on_cancel_click} class="btn">{"Cancel"}</button>
+                        <button type="button" onclick={on_cancel_click} class="btn">{"Cancel"}</button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     }
 }
