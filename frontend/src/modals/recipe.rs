@@ -89,6 +89,80 @@ pub fn recipe_title(props: &EditTitleProps) -> Html {
 }
 
 #[derive(Properties, PartialEq)]
+pub struct EditStepProps {
+    pub len: usize,
+    pub index: usize,
+    pub step: Step,
+    pub on_input: Callback<(usize, Step)>,
+    pub on_move_up: Callback<usize>,
+    pub on_move_down: Callback<usize>,
+    pub on_delete: Callback<usize>,
+}
+
+#[function_component(EditStep)]
+pub fn recipe_step(props: &EditStepProps) -> Html {
+    let on_move_up = {
+        let on_move_up_callback = props.on_move_up.clone();
+        let index = props.index;
+        Callback::from(move |_| {
+            on_move_up_callback.emit(index);
+        })
+    };
+
+    let on_move_down = {
+        let on_move_down_callback = props.on_move_down.clone();
+        let index = props.index;
+        Callback::from(move |_| {
+            on_move_down_callback.emit(index);
+        })
+    };
+
+    let on_delete = {
+        let on_delete_callback = props.on_delete.clone();
+        let index = props.index;
+        Callback::from(move |_| {
+            on_delete_callback.emit(index);
+        })
+    };
+
+    html! {
+        <li class="mb-4 p-4 rounded bg-base-200">
+            <div class="flex mb-2">
+                <input
+                    class="input input-bordered w-full mr-2"
+                    value={props.step.title.clone()}
+                    type="text"
+                    placeholder={format!("Step {}", props.index+1)}
+                />
+                <div class="btn-group">
+                    {
+                        if props.index == 0 {
+                            html!{<button class="btn btn-disabled" onclick={on_move_up}>{"Up"}</button>}
+                        } else {
+                            html!{<button class="btn" onclick={on_move_up}>{"Up"}</button>}
+                        }
+                    }
+                    {
+                        if props.len == props.index+1 {
+                            html!{<button class="btn btn-disabled" onclick={on_move_down}>{"Down"}</button>}
+                        } else {
+                            html!{<button class="btn" onclick={on_move_down}>{"Down"}</button>}
+                        }
+                    }
+                    <button class="btn" onclick={on_delete}>{"X"}</button>
+                </div>
+            </div>
+            <textarea
+                class="textarea textarea-bordered w-full"
+                value={props.step.description.clone()}
+                placeholder="Description here..."
+                required=true
+            />
+        </li>
+    }
+}
+
+#[derive(Properties, PartialEq)]
 pub struct EditStepsProps {
     pub id: String,
     pub steps: Vec<Step>,
@@ -134,24 +208,60 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
         })
     };
 
+    let on_step_input = {
+        let steps_state = steps_state.clone();
+        Callback::from(move |update: (usize, Step)| {
+            let mut steps = (*steps_state).clone();
+            steps[update.0] = update.1;
+            steps_state.set(steps);
+        })
+    };
+
+    let on_step_move_up = {
+        let steps_state = steps_state.clone();
+        Callback::from(move |index: usize| {
+            let mut steps = (*steps_state).clone();
+            if index != 0 {
+                steps.swap(index, index - 1);
+                steps_state.set(steps);
+            }
+        })
+    };
+
+    let on_step_move_down = {
+        let steps_state = steps_state.clone();
+        Callback::from(move |index: usize| {
+            let mut steps = (*steps_state).clone();
+            if index != steps.len() - 1 {
+                steps.swap(index, index + 1);
+                steps_state.set(steps);
+            }
+        })
+    };
+
+    let on_delete_step = {
+        let steps_state = steps_state.clone();
+        Callback::from(move |index: usize| {
+            let mut steps = (*steps_state).clone();
+            steps.remove(index);
+            steps_state.set(steps);
+        })
+    };
+
     html! {
         <Modal title={"Edit Steps"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
             <ol>
             {
                 for (*steps_state).clone().iter().enumerate().map(|(i, step)| {
-                    html!{
-                        <li class="mb-4 p-4 rounded bg-base-200">
-                            <div class="flex mb-2">
-                                <input class="input input-bordered w-full mr-2" value={step.title.clone()} type="text" placeholder={format!("Step {}", i+1)} />
-                                <div class="btn-group">
-                                    <button class="btn">{"Up"}</button>
-                                    <button class="btn">{"Down"}</button>
-                                    <button class="btn">{"X"}</button>
-                                </div>
-                            </div>
-                            <textarea class="textarea textarea-bordered w-full" value={step.description.clone()} placeholder="Description here..." required=true/>
-                        </li>
-                    }
+                    html!{<EditStep
+                        len={(*steps_state).clone().len()}
+                        index={i}
+                        step={step.clone()}
+                        on_input={on_step_input.clone()}
+                        on_move_up={on_step_move_up.clone()}
+                        on_move_down={on_step_move_down.clone()}
+                        on_delete={on_delete_step.clone()}
+                    />}
                 })
             }
             </ol>
