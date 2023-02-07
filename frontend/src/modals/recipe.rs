@@ -342,22 +342,24 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
 
     html! {
         <Modal title={"Edit Steps"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
-            <ol>
-            {
-                for (*steps_state).clone().iter().enumerate().map(|(i, step)| {
-                    html!{<EditStep
-                        len={(*steps_state).clone().len()}
-                        index={i}
-                        step={step.clone()}
-                        on_input={on_step_input.clone()}
-                        on_move_up={on_step_move_up.clone()}
-                        on_move_down={on_step_move_down.clone()}
-                        on_delete={on_delete_step.clone()}
-                    />}
-                })
-            }
-            </ol>
-            <button type="button" class="btn w-full" onclick={on_add_step}>{"Add Step"}</button>
+            <div class="max-h-[50vh] lg:max-h-[60vh] overflow-y-auto">
+                <ol>
+                {
+                    for (*steps_state).clone().iter().enumerate().map(|(i, step)| {
+                        html!{<EditStep
+                            len={(*steps_state).clone().len()}
+                            index={i}
+                            step={step.clone()}
+                            on_input={on_step_input.clone()}
+                            on_move_up={on_step_move_up.clone()}
+                            on_move_down={on_step_move_down.clone()}
+                            on_delete={on_delete_step.clone()}
+                        />}
+                    })
+                }
+                </ol>
+                <button type="button" class="btn w-full" onclick={on_add_step}>{"Add Step"}</button>
+            </div>
         </Modal>
     }
 }
