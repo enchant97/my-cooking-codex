@@ -3,7 +3,7 @@ use crate::{contexts::login::use_login, core::types::recipe::UpdateRecipe};
 
 use super::Modal;
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement};
+use web_sys::{EventTarget, HtmlInputElement, HtmlTextAreaElement};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -101,6 +101,22 @@ pub struct EditStepProps {
 
 #[function_component(EditStep)]
 pub fn recipe_step(props: &EditStepProps) -> Html {
+    let step_state = use_state(|| Step {
+        title: None,
+        description: "".to_owned(),
+    });
+
+    {
+        let initial_step = props.step.clone();
+        let step_state = step_state.clone();
+        use_effect_with_deps(
+            move |_| {
+                step_state.set(initial_step);
+            },
+            (),
+        );
+    }
+
     let on_move_up = {
         let on_move_up_callback = props.on_move_up.clone();
         let index = props.index;
@@ -125,26 +141,63 @@ pub fn recipe_step(props: &EditStepProps) -> Html {
         })
     };
 
+    let on_title_input = {
+        let on_input_callback = props.on_input.clone();
+        let index = props.index;
+        let step_state = step_state.clone();
+        Callback::from(move |e: InputEvent| {
+            let target: Option<EventTarget> = e.target();
+            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            if let Some(input) = input {
+                let mut step = (*step_state).clone();
+                if input.value().is_empty() {
+                    step.title = None;
+                } else {
+                    step.title = Some(input.value());
+                }
+                step_state.set(step.clone());
+                on_input_callback.emit((index, step));
+            }
+        })
+    };
+
+    let on_description_input = {
+        let on_input_callback = props.on_input.clone();
+        let index = props.index;
+        let step_state = step_state.clone();
+        Callback::from(move |e: InputEvent| {
+            let target: Option<EventTarget> = e.target();
+            let input = target.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+            if let Some(input) = input {
+                let mut step = (*step_state).clone();
+                step.description = input.value();
+                step_state.set(step.clone());
+                on_input_callback.emit((index, step));
+            }
+        })
+    };
+
     html! {
         <li class="mb-4 p-4 rounded bg-base-200">
             <div class="flex mb-2">
                 <input
                     class="input input-bordered w-full mr-2"
-                    value={props.step.title.clone()}
+                    oninput={on_title_input}
+                    value={props.step.title.clone().unwrap_or_default()}
                     type="text"
                     placeholder={format!("Step {}", props.index+1)}
                 />
                 <div class="btn-group">
                     {
                         if props.index == 0 {
-                            html!{<button class="btn btn-disabled" onclick={on_move_up}>{"Up"}</button>}
+                            html!{<button class="btn btn-disabled">{"Up"}</button>}
                         } else {
                             html!{<button class="btn" onclick={on_move_up}>{"Up"}</button>}
                         }
                     }
                     {
                         if props.len == props.index+1 {
-                            html!{<button class="btn btn-disabled" onclick={on_move_down}>{"Down"}</button>}
+                            html!{<button class="btn btn-disabled">{"Down"}</button>}
                         } else {
                             html!{<button class="btn" onclick={on_move_down}>{"Down"}</button>}
                         }
@@ -154,6 +207,7 @@ pub fn recipe_step(props: &EditStepProps) -> Html {
             </div>
             <textarea
                 class="textarea textarea-bordered w-full"
+                oninput={on_description_input}
                 value={props.step.description.clone()}
                 placeholder="Description here..."
                 required=true
@@ -220,10 +274,10 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
     let on_step_move_up = {
         let steps_state = steps_state.clone();
         Callback::from(move |index: usize| {
-            let mut steps = (*steps_state).clone();
             if index != 0 {
+                let mut steps = (*steps_state).clone();
                 steps.swap(index, index - 1);
-                steps_state.set(steps);
+                steps_state.set(steps.clone());
             }
         })
     };
