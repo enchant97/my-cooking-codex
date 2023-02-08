@@ -100,6 +100,19 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         })
     };
 
+    let long_description_modal_closed = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe_state = recipe_state.clone();
+        Callback::from(move |new_description: Option<String>| {
+            modal_html_state.set(None);
+            if let Some(description) = new_description {
+                let mut recipe = (*recipe_state).clone();
+                recipe.long_description = Some(description);
+                recipe_state.set(recipe)
+            }
+        })
+    };
+
     let steps_modal_closed = {
         let modal_html_state = modal_html_state.clone();
         let recipe_state = recipe_state.clone();
@@ -129,6 +142,16 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
                 <modals::recipe::EditDescription id={recipe.id.clone()} description={recipe.short_description.clone()} onclose={description_modal_closed.clone()}/>
+            }));
+        })
+    };
+
+    let on_edit_long_description_click = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe = (*recipe_state).clone();
+        Callback::from(move |_: MouseEvent| {
+            modal_html_state.set(Some(html! {
+                <modals::recipe::EditLongDescription id={recipe.id.clone()} description={recipe.long_description.clone()} onclose={long_description_modal_closed.clone()}/>
             }));
         })
     };
@@ -171,9 +194,9 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
             <div class="mb-4 p-4 rounded bg-base-200">
                 <div class="flex mb-2">
                     <h2 class="text-xl font-bold mr-auto">{"Notes"}</h2>
-                    <button class="btn btn-disabled">{"Edit"}</button>
+                    <button class="btn" onclick={on_edit_long_description_click}>{"Edit"}</button>
                 </div>
-                <p>{(*recipe_state).long_description.clone()}</p>
+                <pre>{(*recipe_state).long_description.clone()}</pre>
             </div>
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200">
