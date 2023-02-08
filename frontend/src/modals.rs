@@ -54,7 +54,7 @@ pub fn modal_controller(props: &ModalProps) -> Html {
     html! {
         <div class="modal modal-open">
             <form class="modal-box" onsubmit={on_submit}>
-                <h3 class="font-bold text-lg">{props.title.clone()}</h3>
+                <h3 class="font-bold text-lg mb-3">{props.title.clone()}</h3>
                 { for props.children.iter() }
                 <div class="modal-action">
                     <div class="btn-group">

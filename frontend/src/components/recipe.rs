@@ -52,7 +52,7 @@ pub fn steps(props: &StepsProps) -> Html {
                 html!{
                     <li class="mb-2">
                         <h2 class="text-l font-bold mb-2">{&step.title.clone().unwrap_or(format!("Step {}", i+1))}</h2>
-                        <p>{&step.description}</p>
+                        <pre>{&step.description}</pre>
                     </li>
                 }
             })
