@@ -113,6 +113,21 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         })
     };
 
+    let ingredients_modal_closed = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe_state = recipe_state.clone();
+        Callback::from(
+            move |new_ingredients: Option<Vec<types::recipe::Ingredient>>| {
+                modal_html_state.set(None);
+                if let Some(ingredients) = new_ingredients {
+                    let mut recipe = (*recipe_state).clone();
+                    recipe.ingredients = ingredients;
+                    recipe_state.set(recipe)
+                }
+            },
+        )
+    };
+
     let steps_modal_closed = {
         let modal_html_state = modal_html_state.clone();
         let recipe_state = recipe_state.clone();
@@ -131,7 +146,11 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         let recipe = (*recipe_state).clone();
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
-                <modals::recipe::EditTitle id={recipe.id.clone()} title={recipe.title.clone()} onclose={title_modal_closed.clone()}/>
+                <modals::recipe::EditTitle
+                    id={recipe.id.clone()}
+                    title={recipe.title.clone()}
+                    onclose={title_modal_closed.clone()}
+                />
             }));
         })
     };
@@ -141,7 +160,11 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         let recipe = (*recipe_state).clone();
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
-                <modals::recipe::EditDescription id={recipe.id.clone()} description={recipe.short_description.clone()} onclose={description_modal_closed.clone()}/>
+                <modals::recipe::EditDescription
+                    id={recipe.id.clone()}
+                    description={recipe.short_description.clone()}
+                    onclose={description_modal_closed.clone()}
+                />
             }));
         })
     };
@@ -151,7 +174,25 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         let recipe = (*recipe_state).clone();
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
-                <modals::recipe::EditLongDescription id={recipe.id.clone()} description={recipe.long_description.clone()} onclose={long_description_modal_closed.clone()}/>
+                <modals::recipe::EditLongDescription
+                    id={recipe.id.clone()}
+                    description={recipe.long_description.clone()}
+                    onclose={long_description_modal_closed.clone()}
+                />
+            }));
+        })
+    };
+
+    let on_edit_ingredients_click = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe = (*recipe_state).clone();
+        Callback::from(move |_: MouseEvent| {
+            modal_html_state.set(Some(html! {
+                <modals::recipe::EditIngredients
+                    id={recipe.id.clone()}
+                    ingredients={recipe.ingredients.clone()}
+                    onclose={ingredients_modal_closed.clone()}
+                />
             }));
         })
     };
@@ -161,7 +202,11 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         let recipe = (*recipe_state).clone();
         Callback::from(move |_: MouseEvent| {
             modal_html_state.set(Some(html! {
-                <modals::recipe::EditSteps id={recipe.id.clone()} steps={recipe.steps.clone()} onclose={steps_modal_closed.clone()}/>
+                <modals::recipe::EditSteps
+                    id={recipe.id.clone()}
+                    steps={recipe.steps.clone()}
+                    onclose={steps_modal_closed.clone()}
+                />
             }));
         })
     };
@@ -202,7 +247,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                 <div class="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200">
                     <div class="flex mb-2">
                         <h2 class="text-xl font-bold mr-auto">{"Ingredients"}</h2>
-                        <button class="btn btn-disabled">{"Edit"}</button>
+                        <button class="btn" onclick={on_edit_ingredients_click}>{"Edit"}</button>
                     </div>
                     <Ingredients items={(*recipe_state).ingredients.clone()}/>
                 </div>
