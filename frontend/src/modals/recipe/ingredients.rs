@@ -35,20 +35,30 @@ pub struct EditIngredientProps {
     pub index: usize,
     pub ingredient: Ingredient,
     // pub on_input: Callback<(usize, Ingredient)>,
-    // pub on_delete: Callback<usize>,
+    pub on_delete: Callback<usize>,
 }
 
 #[function_component(EditIngredient)]
 pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
+    let on_delete = {
+        let on_delete_callback = props.on_delete.clone();
+        let index = props.index;
+        Callback::from(move |_| {
+            on_delete_callback.emit(index);
+        })
+    };
     html! {
         <div class="mb-4 p-4 rounded bg-base-200">
-            <input
-                class="input input-bordered w-full mb-2"
-                value={props.ingredient.name.clone()}
-                type="text"
-                placeholder="name..."
-                required=true
-            />
+            <div class="grid grid-cols-[auto_3rem] gap-2 mb-2">
+                <input
+                    class="input input-bordered w-full"
+                    value={props.ingredient.name.clone()}
+                    type="text"
+                    placeholder="name..."
+                    required=true
+                />
+                <button class="btn" onclick={on_delete}>{"X"}</button>
+            </div>
             <div class="grid grid-cols-[8rem_auto] gap-2 mb-2">
                 <input
                     class="input input-bordered w-full"
@@ -85,22 +95,35 @@ pub struct EditIngredientsProps {
 
 #[function_component(EditIngredients)]
 pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
+    let ingredients_state = use_state(|| props.ingredients.clone());
+
     let on_cancel = {
         let on_close_callback = props.onclose.clone();
         Callback::from(move |_| {
             on_close_callback.emit(None);
         })
     };
+
+    let on_delete_ingredient = {
+        let ingredients_state = ingredients_state.clone();
+        Callback::from(move |index: usize| {
+            let mut ingredients = (*ingredients_state).clone();
+            ingredients.remove(index);
+            ingredients_state.set(ingredients);
+        })
+    };
+
     html! {
         <Modal title={"Edit Ingredients"} oncancel={on_cancel}>
             <div class="max-h-[50vh] lg:max-h-[60vh] overflow-y-auto">
                 <div>
-                    { for props.ingredients.iter().enumerate().map(|(index, ingredient)| {
+                    { for (*ingredients_state).clone().iter().enumerate().map(|(i, ingredient)| {
                         html! {
                             <EditIngredient
-                                len={props.ingredients.len()}
-                                index={index}
+                                len={(*ingredients_state).clone().len()}
+                                index={i}
                                 ingredient={ingredient.clone()}
+                                on_delete={on_delete_ingredient.clone()}
                             />
                         }
                     })}
