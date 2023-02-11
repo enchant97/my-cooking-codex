@@ -137,7 +137,7 @@ pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
                     placeholder="name..."
                     required=true
                 />
-                <button class="btn" onclick={on_delete}>{"X"}</button>
+                <button class="btn" type="button" onclick={on_delete}>{"X"}</button>
             </div>
             <div class="grid grid-cols-[8rem_auto] gap-2 mb-2">
                 <input
@@ -250,23 +250,35 @@ pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
         })
     };
 
+    let on_add_ingredient = {
+        let ingredients_state = ingredients_state.clone();
+        Callback::from(move |_| {
+            let mut ingredients = (*ingredients_state).clone();
+            ingredients.push(Ingredient {
+                name: String::from(""),
+                amount: 0,
+                unit_type: String::from(""),
+                description: None,
+            });
+            ingredients_state.set(ingredients);
+        })
+    };
+
     html! {
         <Modal title={"Edit Ingredients"} oncancel={on_cancel} onsave={on_save}>
             <div class="max-h-[50vh] lg:max-h-[60vh] overflow-y-auto">
                 <div>
                     { for (*ingredients_state).clone().iter().enumerate().map(|(i, ingredient)| {
-                        html! {
-                            <EditIngredient
-                                len={(*ingredients_state).clone().len()}
-                                index={i}
-                                ingredient={ingredient.clone()}
-                                on_input={on_ingredient_input.clone()}
-                                on_delete={on_delete_ingredient.clone()}
-                            />
-                        }
+                        html! {<EditIngredient
+                            len={(*ingredients_state).clone().len()}
+                            index={i}
+                            ingredient={ingredient.clone()}
+                            on_input={on_ingredient_input.clone()}
+                            on_delete={on_delete_ingredient.clone()}
+                        />}
                     })}
                 </div>
-                <button type="button" class="btn w-full">{"Add Ingredient"}</button>
+                <button class="btn w-full" onclick={on_add_ingredient} type="button">{"Add Ingredient"}</button>
             </div>
         </Modal>
     }
