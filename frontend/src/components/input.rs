@@ -147,7 +147,7 @@ pub fn fractional_input(props: &FractionalNumberInputProps) -> Html {
                 is_valid_state.set(true);
                 input_state.set(initial_value.to_string().into());
             },
-            (),
+            props.value,
         );
     }
 
