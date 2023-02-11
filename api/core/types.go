@@ -26,7 +26,7 @@ func (u *CreateUser) IntoUser() db.User {
 
 type CreateIngredient struct {
 	Name        string  `json:"name" validate:"required"`
-	Amount      uint    `json:"amount" validate:"required"`
+	Amount      float32 `json:"amount" validate:"required"`
 	UnitType    string  `json:"unitType" validate:"required"`
 	Description *string `json:"description,omitempty"`
 }
@@ -99,10 +99,10 @@ func (i *CreateRecipeImage) IntoRecipeImage(content []byte) db.RecipeImage {
 }
 
 type UpdateIngredient struct {
-	Name        *string `rethinkdb:"name,omitempty" json:"name,omitempty"`
-	Amount      *uint   `rethinkdb:"amount,omitempty" json:"amount,omitempty"`
-	UnitType    *string `rethinkdb:"unitType,omitempty" json:"unitType,omitempty"`
-	Description *string `rethinkdb:"description,omitempty" json:"description,omitempty"`
+	Name        *string  `rethinkdb:"name,omitempty" json:"name,omitempty"`
+	Amount      *float32 `rethinkdb:"amount,omitempty" json:"amount,omitempty"`
+	UnitType    *string  `rethinkdb:"unitType,omitempty" json:"unitType,omitempty"`
+	Description *string  `rethinkdb:"description,omitempty" json:"description,omitempty"`
 }
 
 type UpdateStep struct {

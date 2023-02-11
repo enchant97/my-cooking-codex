@@ -29,7 +29,7 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 
 type Ingredient struct {
 	Name        string  `rethinkdb:"name" json:"name"`
-	Amount      uint    `rethinkdb:"amount" json:"amount"`
+	Amount      float32 `rethinkdb:"amount" json:"amount"`
 	UnitType    string  `rethinkdb:"unitType" json:"unitType"`
 	Description *string `rethinkdb:"description,omitempty" json:"description,omitempty"`
 }
