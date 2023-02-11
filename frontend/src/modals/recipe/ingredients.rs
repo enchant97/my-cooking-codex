@@ -128,7 +128,7 @@ pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
         let ingredient_state = ingredient_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
-            let input = target.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = input {
                 let mut ingredient = (*ingredient_state).clone();
                 if input.value().is_empty() {
@@ -175,10 +175,11 @@ pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
                 />
                 <UnitSelector id="units" />
             </div>
-            <textarea
+            <input
                 class="textarea textarea-bordered w-full"
                 oninput={on_description_input}
                 value={props.ingredient.description.clone().unwrap_or_default()}
+                type="text"
                 placeholder="notes..."
             />
         </div>
