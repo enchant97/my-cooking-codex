@@ -1,8 +1,9 @@
+use crate::components::input::FractionalNumberInput;
 use crate::core::types::recipe::{UpdateIngredient, UpdateRecipe};
 use crate::modals::Modal;
 use crate::{contexts::login::use_login, core::types::recipe::Ingredient};
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement, HtmlTextAreaElement};
+use web_sys::{EventTarget, HtmlInputElement};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -50,7 +51,7 @@ pub struct EditIngredientProps {
 pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
     let ingredient_state = use_state(|| Ingredient {
         name: String::from(""),
-        amount: 0,
+        amount: 0.0,
         unit_type: String::from(""),
         description: None,
     });
@@ -94,15 +95,11 @@ pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
         let on_input_callback = props.on_input.clone();
         let index = props.index;
         let ingredient_state = ingredient_state.clone();
-        Callback::from(move |e: InputEvent| {
-            let target: Option<EventTarget> = e.target();
-            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = input {
-                let mut ingredient = (*ingredient_state).clone();
-                ingredient.amount = input.value().parse().unwrap_or(0);
-                ingredient_state.set(ingredient.clone());
-                on_input_callback.emit((index, ingredient));
-            }
+        Callback::from(move |new_value| {
+            let mut ingredient = (*ingredient_state).clone();
+            ingredient.amount = new_value;
+            ingredient_state.set(ingredient.clone());
+            on_input_callback.emit((index, ingredient));
         })
     };
 
@@ -156,11 +153,10 @@ pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
                 <button class="btn" type="button" onclick={on_delete}>{"X"}</button>
             </div>
             <div class="grid grid-cols-[8rem_auto] gap-2 mb-2">
-                <input
-                    class="input input-bordered w-full"
+                <FractionalNumberInput
+                    classes="input-bordered w-full"
                     oninput={on_amount_input}
-                    value={format!("{}", props.ingredient.amount)}
-                    type="number"
+                    value={props.ingredient.amount}
                     placeholder="amount..."
                     required=true
                 />
@@ -284,7 +280,7 @@ pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
             let mut ingredients = (*ingredients_state).clone();
             ingredients.push(Ingredient {
                 name: String::from(""),
-                amount: 0,
+                amount: 0.0,
                 unit_type: String::from(""),
                 description: None,
             });

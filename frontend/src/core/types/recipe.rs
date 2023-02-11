@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct CreateIngredient {
     pub name: String,
-    pub amount: usize,
+    pub amount: f32,
     pub unit_type: String,
     #[serde(default)]
     pub description: Option<String>,
@@ -40,7 +40,7 @@ pub struct UpdateIngredient {
     #[serde(default)]
     pub name: Option<String>,
     #[serde(default)]
-    pub amount: Option<usize>,
+    pub amount: Option<f32>,
     #[serde(default)]
     pub unit_type: Option<String>,
     #[serde(default)]
@@ -77,7 +77,7 @@ pub struct UpdateRecipe {
 #[serde(rename_all = "camelCase")]
 pub struct Ingredient {
     pub name: String,
-    pub amount: usize,
+    pub amount: f32,
     pub unit_type: String,
     #[serde(default)]
     pub description: Option<String>,

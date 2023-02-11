@@ -1,8 +1,12 @@
-use crate::core::api::sanitise_base_url;
+use crate::core::{api::sanitise_base_url, Fraction};
+use regex::Regex;
 use url::Url;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
 use yew::prelude::*;
+
+const VALID_FRACTIONAL_INPUT_REGEX: &str = r#"^(?:(?:\d+)|(?:\d+/\d+)|(?:\d+\.\d+))$"#;
+const VALID_FRACTION_REGEX: &str = r#"^(?:\d+/\d+)$"#;
 
 #[derive(Properties, PartialEq)]
 pub struct BaseUrlSelectorProps {
@@ -106,5 +110,98 @@ pub fn base_url_selector(props: &BaseUrlSelectorProps) -> Html {
                 }
             </div>
         </div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct FractionalNumberInputProps {
+    #[prop_or_default]
+    pub classes: Classes,
+    pub value: f32,
+    pub oninput: Callback<f32>,
+    #[prop_or_default]
+    pub placeholder: &'static str,
+    #[prop_or_default]
+    pub required: bool,
+}
+
+#[function_component(FractionalNumberInput)]
+pub fn fractional_input(props: &FractionalNumberInputProps) -> Html {
+    let actual_state = use_state(f32::default);
+    let input_state = use_state(AttrValue::default);
+    let is_valid_state = use_state(bool::default);
+
+    {
+        let initial_value = props.value;
+        let actual_state = actual_state.clone();
+        let input_state = input_state.clone();
+        let is_valid_state = is_valid_state.clone();
+        use_effect_with_deps(
+            move |_| {
+                actual_state.set(initial_value);
+                if initial_value == 0.0 {
+                    input_state.set("".into());
+                    is_valid_state.set(false);
+                    return;
+                }
+                is_valid_state.set(true);
+                input_state.set(initial_value.to_string().into());
+            },
+            (),
+        );
+    }
+
+    let on_input = {
+        let on_input_callback = props.oninput.clone();
+        let actual_state = actual_state.clone();
+        let input_state = input_state.clone();
+        let is_valid_state = is_valid_state.clone();
+        Callback::from(move |e: InputEvent| {
+            let target: Option<EventTarget> = e.target();
+            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            if let Some(input) = input {
+                if Regex::new(VALID_FRACTIONAL_INPUT_REGEX)
+                    .unwrap()
+                    .is_match(&input.value())
+                {
+                    // if the input is a valid fractional number, update the state
+                    let parsed: f32;
+                    input_state.set(input.value().into());
+                    if Regex::new(VALID_FRACTION_REGEX)
+                        .unwrap()
+                        .is_match(&input.value())
+                    {
+                        // if the input is a valid fraction, convert it to a float
+                        parsed = input
+                            .value()
+                            .parse::<Fraction>()
+                            .expect("Failed to parse fraction")
+                            .to_f32();
+                        actual_state.set(parsed);
+                    } else {
+                        // otherwise, just parse it as a float
+                        parsed = input.value().parse::<f32>().expect("Failed to parse float");
+                        actual_state.set(parsed);
+                    }
+                    is_valid_state.set(true);
+                    on_input_callback.emit(parsed);
+                } else {
+                    is_valid_state.set(false);
+                    input_state.set(input.value().into());
+                }
+            }
+        })
+    };
+
+    html! {
+        <input
+            class={classes!("input", props.classes.clone(), if !*is_valid_state {"input-error"} else {""})}
+            oninput={on_input}
+            value={(*input_state).clone()}
+            type="text"
+            pattern={VALID_FRACTIONAL_INPUT_REGEX}
+            placeholder={props.placeholder}
+            required={props.required}
+        />
     }
 }
