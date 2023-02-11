@@ -48,7 +48,23 @@ pub struct EditIngredientProps {
 
 #[function_component(EditIngredient)]
 pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
-    let ingredient_state = use_state(|| props.ingredient.clone());
+    let ingredient_state = use_state(|| Ingredient {
+        name: String::from(""),
+        amount: 0,
+        unit_type: String::from(""),
+        description: None,
+    });
+
+    {
+        let initial_ingredient = props.ingredient.clone();
+        let ingredient_state = ingredient_state.clone();
+        use_effect_with_deps(
+            move |_| {
+                ingredient_state.set(initial_ingredient);
+            },
+            props.ingredient.clone(),
+        );
+    }
 
     let on_delete = {
         let on_delete_callback = props.on_delete.clone();
@@ -162,7 +178,7 @@ pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
             <textarea
                 class="textarea textarea-bordered w-full"
                 oninput={on_description_input}
-                value={props.ingredient.description.clone()}
+                value={props.ingredient.description.clone().unwrap_or_default()}
                 placeholder="notes..."
             />
         </div>
@@ -179,8 +195,19 @@ pub struct EditIngredientsProps {
 #[function_component(EditIngredients)]
 pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
     let login_ctx = use_login().unwrap();
-    let ingredients_state = use_state(|| props.ingredients.clone());
+    let ingredients_state = use_state(Vec::default);
     let is_loading_state = use_state(bool::default);
+
+    {
+        let initial_ingredients = props.ingredients.clone();
+        let ingredients_state = ingredients_state.clone();
+        use_effect_with_deps(
+            move |_| {
+                ingredients_state.set(initial_ingredients);
+            },
+            (),
+        );
+    }
 
     let on_save = {
         let id = props.id.to_string();

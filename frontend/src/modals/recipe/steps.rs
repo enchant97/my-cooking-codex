@@ -31,7 +31,7 @@ pub fn recipe_step(props: &EditStepProps) -> Html {
             move |_| {
                 step_state.set(initial_step);
             },
-            (),
+            props.step.clone(),
         );
     }
 
