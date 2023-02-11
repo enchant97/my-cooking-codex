@@ -2,4 +2,4 @@ deps:
 	@cargo install --locked trunk
 	@pnpm i
 serve:
-	@trunk serve --open
+	@trunk serve
