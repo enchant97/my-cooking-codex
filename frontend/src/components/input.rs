@@ -153,7 +153,6 @@ pub fn fractional_input(props: &FractionalNumberInputProps) -> Html {
 
     let on_input = {
         let on_input_callback = props.oninput.clone();
-        let actual_state = actual_state.clone();
         let input_state = input_state.clone();
         let is_valid_state = is_valid_state.clone();
         Callback::from(move |e: InputEvent| {

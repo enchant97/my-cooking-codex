@@ -86,7 +86,7 @@ pub fn recipe_description(props: &EditDescriptionProps) -> Html {
     };
 
     html! {
-        <Modal title={"Edit Description"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
+        <Modal title={"Edit Description"} oncancel={on_cancel} onsave={on_save} loading={*is_loading_state}>
             <input oninput={on_description_input} value={(*description_state).clone()} class="my-4 input input-bordered w-full"/>
         </Modal>
     }

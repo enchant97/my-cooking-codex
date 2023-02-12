@@ -86,7 +86,7 @@ pub fn recipe_long_description(props: &EditLongDescriptionProps) -> Html {
     };
 
     html! {
-        <Modal title={"Edit Notes"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
+        <Modal title={"Edit Notes"} oncancel={on_cancel} onsave={on_save} loading={*is_loading_state}>
             <textarea oninput={on_description_input} value={(*description_state).clone()} class="my-4 input input-bordered w-full h-56"/>
         </Modal>
     }

@@ -58,9 +58,9 @@ impl FromStr for Fraction {
     }
 }
 
-impl Into<f32> for Fraction {
-    fn into(self) -> f32 {
-        self.numerator as f32 / self.denominator as f32
+impl From<Fraction> for f32 {
+    fn from(val: Fraction) -> Self {
+        val.numerator as f32 / val.denominator as f32
     }
 }
 

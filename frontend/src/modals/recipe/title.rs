@@ -81,7 +81,7 @@ pub fn recipe_title(props: &EditTitleProps) -> Html {
     };
 
     html! {
-        <Modal title={"Edit Title"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
+        <Modal title={"Edit Title"} oncancel={on_cancel} onsave={on_save} loading={*is_loading_state}>
             <input oninput={on_title_input} value={(*title_state).clone()} class="my-4 input input-bordered w-full" required=true/>
         </Modal>
     }

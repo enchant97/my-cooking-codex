@@ -26,7 +26,7 @@ pub fn ingredients(props: &IngredientsProps) -> Html {
                     for props.items.iter().map(|ingredient| {
                         html!{
                             <tr>
-                                <td class="whitespace-normal">{format!("{} {}", Fraction::from(ingredient.amount).to_string(), {&ingredient.unit_type})}</td>
+                                <td class="whitespace-normal">{format!("{} {}", Fraction::from(ingredient.amount), {&ingredient.unit_type})}</td>
                                 <td class="whitespace-normal">{&ingredient.name}</td>
                                 <td class="whitespace-normal">{&ingredient.description.clone().unwrap_or_default()}</td>
                             </tr>
@@ -216,16 +216,16 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         <ModalController modal={(*modal_html_state).clone()}/>
         <div class={props.classes.clone()}>
             <div class="mb-4 p-4 rounded bg-base-200">
-                if (*recipe_state).main_image_id.is_some() {
+                if recipe_state.main_image_id.is_some() {
                     <figure class="h-64 w-full mb-4">
                         <img
                             class="object-cover w-full h-full rounded"
-                            src={format!("{}/recipe-image/{}", props.media_url, (*recipe_state).main_image_id.as_ref().unwrap())}
+                            src={format!("{}/recipe-image/{}", props.media_url, recipe_state.main_image_id.as_ref().unwrap())}
                         />
                     </figure>
                 }
                 <h1 class="flex text-2xl font-bold mb-2">
-                    <span class="mr-auto">{(*recipe_state).title.clone()}</span>
+                    <span class="mr-auto">{recipe_state.title.clone()}</span>
                     <button class="btn" onclick={on_edit_title_click}>{"Edit"}</button>
                 </h1>
             </div>
@@ -234,14 +234,14 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                     <h2 class="text-xl font-bold mr-auto">{"Description"}</h2>
                     <button class="btn" onclick={on_edit_description_click}>{"Edit"}</button>
                 </div>
-                <p>{(*recipe_state).short_description.clone()}</p>
+                <p>{recipe_state.short_description.clone()}</p>
             </div>
             <div class="mb-4 p-4 rounded bg-base-200">
                 <div class="flex mb-2">
                     <h2 class="text-xl font-bold mr-auto">{"Notes"}</h2>
                     <button class="btn" onclick={on_edit_long_description_click}>{"Edit"}</button>
                 </div>
-                <pre>{(*recipe_state).long_description.clone()}</pre>
+                <pre>{recipe_state.long_description.clone()}</pre>
             </div>
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200">
@@ -249,14 +249,14 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                         <h2 class="text-xl font-bold mr-auto">{"Ingredients"}</h2>
                         <button class="btn" onclick={on_edit_ingredients_click}>{"Edit"}</button>
                     </div>
-                    <Ingredients items={(*recipe_state).ingredients.clone()}/>
+                    <Ingredients items={recipe_state.ingredients.clone()}/>
                 </div>
                 <div class="w-full p-4 rounded bg-base-200">
                     <div class="flex mb-2">
                         <h2 class="text-xl font-bold mr-auto">{"Steps"}</h2>
                         <button class="btn" onclick={on_edit_steps_click}>{"Edit"}</button>
                     </div>
-                    <Steps items={(*recipe_state).steps.clone()}/>
+                    <Steps items={recipe_state.steps.clone()}/>
                 </div>
             </div>
         </div>

@@ -82,7 +82,6 @@ pub fn recipe_step(props: &EditStepProps) -> Html {
     let on_description_input = {
         let on_input_callback = props.on_input.clone();
         let index = props.index;
-        let step_state = step_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
@@ -259,7 +258,7 @@ pub fn recipe_steps(props: &EditStepsProps) -> Html {
     };
 
     html! {
-        <Modal title={"Edit Steps"} oncancel={on_cancel} onsave={on_save} loading={(*is_loading_state).clone()}>
+        <Modal title={"Edit Steps"} oncancel={on_cancel} onsave={on_save} loading={*is_loading_state}>
             <div class="max-h-[50vh] lg:max-h-[60vh] overflow-y-auto">
                 <ol>
                 {

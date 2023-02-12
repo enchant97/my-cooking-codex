@@ -122,7 +122,6 @@ pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
     let on_description_input = {
         let on_input_callback = props.on_input.clone();
         let index = props.index;
-        let ingredient_state = ingredient_state.clone();
         Callback::from(move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
@@ -210,7 +209,6 @@ pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
         let id = props.id.to_string();
         let on_close_callback = props.onclose.clone();
         let api = login_ctx.http_api.clone();
-        let is_loading_state = is_loading_state.clone();
         let ingredients_state = ingredients_state.clone();
         Callback::from(move |_| {
             let api = api.clone().unwrap();
