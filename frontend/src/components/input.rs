@@ -176,7 +176,7 @@ pub fn fractional_input(props: &FractionalNumberInputProps) -> Html {
                             .value()
                             .parse::<Fraction>()
                             .expect("Failed to parse fraction")
-                            .to_f32();
+                            .into();
                         actual_state.set(parsed);
                     } else {
                         // otherwise, just parse it as a float
