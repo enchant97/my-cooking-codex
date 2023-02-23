@@ -80,7 +80,9 @@ impl Api {
     }
 
     fn get_authorization_value(&self) -> Option<String> {
-        self.login_token.as_ref().map(|token| format!("{} {}", token.r#type, token.token))
+        self.login_token
+            .as_ref()
+            .map(|token| format!("{} {}", token.r#type, token.token))
     }
 
     pub async fn post_login(&self, login: &Login) -> Result<LoginToken, ApiError> {
@@ -161,6 +163,17 @@ impl Api {
                 .header("Authorization", &self.get_authorization_value().unwrap())
                 .json(updated_recipe)
                 .unwrap()
+                .send()
+                .await,
+        )?;
+        Ok(())
+    }
+    pub async fn post_recipe_image(&self, id: String, file: web_sys::File) -> Result<(), ApiError> {
+        let req_url = format!("{}/recipes/{}/images/", self.base_url.clone(), id);
+        ApiError::from_response_result(
+            Request::post(&req_url)
+                .header("Authorization", &self.get_authorization_value().unwrap())
+                .body(file)
                 .send()
                 .await,
         )?;

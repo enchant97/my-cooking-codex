@@ -24,4 +24,5 @@ features = [
     "Event",
     "EventTarget",
     "MouseEvent",
+    "File",
 ]

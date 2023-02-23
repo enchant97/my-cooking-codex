@@ -74,6 +74,19 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
     let modal_html_state: UseStateHandle<Option<Html>> = use_state(Option::default);
     let recipe_state = use_state(|| props.recipe.clone());
 
+    let image_modal_closed = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe_state = recipe_state.clone();
+        Callback::from(move |has_image: Option<bool>| {
+            if let Some(has_image) = has_image {
+                let mut recipe = (*recipe_state).clone();
+                recipe.has_image = has_image;
+                recipe_state.set(recipe)
+            }
+            modal_html_state.set(None);
+        })
+    };
+
     let title_modal_closed = {
         let modal_html_state = modal_html_state.clone();
         let recipe_state = recipe_state.clone();
@@ -138,6 +151,19 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                 recipe.steps = steps;
                 recipe_state.set(recipe)
             }
+        })
+    };
+
+    let on_edit_image_click = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe = (*recipe_state).clone();
+        Callback::from(move |_: MouseEvent| {
+            modal_html_state.set(Some(html! {
+                <modals::recipe::SetImage
+                    id={recipe.id.clone()}
+                    onclose={image_modal_closed.clone()}
+                />
+            }));
         })
     };
 
@@ -227,6 +253,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                 <h1 class="flex text-2xl font-bold mb-2">
                     <span class="mr-auto">{recipe_state.title.clone()}</span>
                     <button class="btn" onclick={on_edit_title_click}>{"Edit"}</button>
+                    <button class="btn" onclick={on_edit_image_click}>{"Edit Image"}</button>
                 </h1>
             </div>
             <div class="mb-4 p-4 rounded bg-base-200">
