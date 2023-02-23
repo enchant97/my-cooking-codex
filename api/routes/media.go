@@ -15,6 +15,5 @@ func getRecipeImageContent(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(500)
 	}
-	ctx.Response().Header().Add("Recipe-Id", recipeImage.RecipeID)
 	return ctx.Blob(http.StatusOK, fmt.Sprintf("image/%s", recipeImage.ImageType), recipeImage.Content)
 }

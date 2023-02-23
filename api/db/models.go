@@ -48,12 +48,11 @@ type Recipe struct {
 	Tags             []string     `rethinkdb:"tags,omitempty" json:"tags,omitempty"`
 	Ingredients      []Ingredient `rethinkdb:"ingredients,omitempty" json:"ingredients,omitempty"`
 	Steps            []Step       `rethinkdb:"steps,omitempty" json:"steps,omitempty"`
-	MainImageID      *string      `rethinkdb:"mainImageId,omitempty" json:"mainImageId,omitempty"`
+	HasImage         bool         `rethinkdb:"hasImage" json:"hasImage"`
 }
 
 type RecipeImage struct {
-	ID        string `rethinkdb:"id,omitempty" json:"id"`
-	RecipeID  string `rethinkdb:"recipeId" json:"recipeId"`
+	RecipeID  string `rethinkdb:"id" json:"recipeId"`
 	ImageType string `rethinkdb:"imageType" json:"imageType"`
 	Content   []byte `rethinkdb:"content" json:"-"`
 }

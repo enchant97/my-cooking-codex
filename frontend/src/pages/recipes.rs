@@ -45,9 +45,9 @@ pub fn recipes() -> Html {
                     <card_grid::Grid>
                         {
                             for recipes.iter().map(|recipe| {
-                            let image_src = match &recipe.main_image_id {
-                                Some(v) => Some(format!("{}/recipe-image/{}", login_ctx.login.as_ref().unwrap().media_url, v)),
-                                None => None,
+                            let image_src = match recipe.has_image {
+                                true => Some(format!("{}/recipe-image/{}", login_ctx.login.as_ref().unwrap().media_url, recipe.id)),
+                                false => None,
                             };
                             html!{
                                 <card_grid::GridItem title={recipe.title.clone()} image_src={image_src}>

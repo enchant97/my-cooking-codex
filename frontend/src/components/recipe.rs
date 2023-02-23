@@ -216,11 +216,11 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         <ModalController modal={(*modal_html_state).clone()}/>
         <div class={props.classes.clone()}>
             <div class="mb-4 p-4 rounded bg-base-200">
-                if recipe_state.main_image_id.is_some() {
+                if recipe_state.has_image {
                     <figure class="h-64 w-full mb-4">
                         <img
                             class="object-cover w-full h-full rounded"
-                            src={format!("{}/recipe-image/{}", props.media_url, recipe_state.main_image_id.as_ref().unwrap())}
+                            src={format!("{}/recipe-image/{}", props.media_url, recipe_state.id)}
                         />
                     </figure>
                 }

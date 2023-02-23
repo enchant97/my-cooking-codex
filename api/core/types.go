@@ -118,5 +118,4 @@ type UpdateRecipe struct {
 	Tags             *[]string           `rethinkdb:"tags,omitempty" json:"tags,omitempty"`
 	Ingredients      *[]UpdateIngredient `rethinkdb:"ingredients,omitempty" json:"ingredients,omitempty"`
 	Steps            *[]UpdateStep       `rethinkdb:"steps,omitempty" json:"steps,omitempty"`
-	MainImageID      *string             `rethinkdb:"mainImageId,omitempty" json:"mainImageId,omitempty"`
 }

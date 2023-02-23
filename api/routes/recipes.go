@@ -87,7 +87,7 @@ func patchRecipe(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-func postAddRecipeImage(ctx echo.Context) error {
+func postSetRecipeImage(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
 	userToken := ctx.Get("user").(*jwt.Token)
 	tokenClaims := userToken.Claims.(*core.JWTClaims)
@@ -116,38 +116,15 @@ func postAddRecipeImage(ctx echo.Context) error {
 		ImageType: imageType,
 	}
 	recipeImage := recipeImageToCreate.IntoRecipeImage(content)
-	recipeImage, err = db.CreateRecipeImage(recipeImage)
+	recipeImage, err = db.SetRecipeImage(recipeImage)
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(500)
 	}
-	// NOTE we don't want to send the file content back to client
-	recipeImage.Content = nil
-
-	// set as main image, if one has not been set
-	if err = db.SetRecipeMainImageIfUnset(recipeID, recipeImage.ID); err != nil {
+	// HACK make specific method for this
+	if err := db.UpdateRecipe(recipeID, map[string]interface{}{"hasImage": true}); err != nil {
 		ctx.Logger().Error(err)
 	}
 
 	return ctx.JSON(http.StatusCreated, recipeImage)
-}
-
-func getRecipeImages(ctx echo.Context) error {
-	recipeID := ctx.Param("id")
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
-
-	// validate whether user can modify the recipe content
-	isOwner, err := db.DoesUserOwnRecipe(username, recipeID)
-	if err != nil {
-		ctx.Logger().Error(err)
-		return ctx.NoContent(500)
-	} else if !isOwner {
-		return ctx.NoContent(http.StatusForbidden)
-	}
-
-	images, _ := db.GetRecipeImagesByID(recipeID)
-
-	return ctx.JSON(http.StatusOK, images)
 }

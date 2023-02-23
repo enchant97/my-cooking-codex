@@ -82,39 +82,17 @@ func UpdateRecipe(recipeID string, newRecipe interface{}) error {
 	return err
 }
 
-// set the main recipe image id, if one has not been set already,
-// will not check for validity of image id
-func SetRecipeMainImageIfUnset(recipeID string, imageID string) error {
-	cursor, err := r.Table(TableNameRecipes).Get(recipeID).Pluck("mainImageId").Count().Eq(1).Run(session)
-	if err != nil {
-		return err
-	}
-	defer cursor.Close()
-	var isSet bool
-	if err = cursor.One(&isSet); err != nil {
-		return err
-	}
-	if !isSet {
-		_, err := r.Table(TableNameRecipes).Get(recipeID).Update(map[string]interface{}{"mainImageId": imageID}).RunWrite(session)
-		return err
-	}
-	return nil
-}
-
-func CreateRecipeImage(recipeImage RecipeImage) (RecipeImage, error) {
-	response, err := r.Table(TableNameRecipeImages).Insert(&recipeImage).RunWrite(session)
+func SetRecipeImage(recipeImage RecipeImage) (RecipeImage, error) {
+	_, err := r.Table(TableNameRecipeImages).Insert(&recipeImage, r.InsertOpts{Conflict: "replace"}).RunWrite(session)
 	if err != nil {
 		return RecipeImage{}, err
 	}
-	// HACK
-	id := response.GeneratedKeys[0]
-	recipeImage.ID = id
 	return recipeImage, nil
 }
 
 // Gets the recipe image by it's id without the binary content
-func GetRecipeImageWithoutContent(id string) (RecipeImage, error) {
-	cursor, err := r.Table(TableNameRecipeImages).Get(id).Without("content").Run(session)
+func GetRecipeImageWithoutContent(recipeID string) (RecipeImage, error) {
+	cursor, err := r.Table(TableNameRecipeImages).Get(recipeID).Without("content").Run(session)
 	if err != nil {
 		return RecipeImage{}, err
 	}
@@ -125,8 +103,8 @@ func GetRecipeImageWithoutContent(id string) (RecipeImage, error) {
 }
 
 // Gets the recipe image by it's id, including binary content
-func GetRecipeImage(id string) (RecipeImage, error) {
-	cursor, err := r.Table(TableNameRecipeImages).Get(id).Run(session)
+func GetRecipeImage(recipeID string) (RecipeImage, error) {
+	cursor, err := r.Table(TableNameRecipeImages).Get(recipeID).Run(session)
 	if err != nil {
 		return RecipeImage{}, err
 	}
@@ -137,8 +115,8 @@ func GetRecipeImage(id string) (RecipeImage, error) {
 }
 
 // Gets the recipe image by it's id, returning just the binary content
-func GetRecipeImageContentByID(id string) ([]byte, error) {
-	cursor, err := r.Table(TableNameRecipeImages).Get(id).Pluck("content").Run(session)
+func GetRecipeImageContent(recipeID string) ([]byte, error) {
+	cursor, err := r.Table(TableNameRecipeImages).Get(recipeID).Pluck("content").Run(session)
 	if err != nil {
 		return nil, err
 	}
@@ -146,16 +124,4 @@ func GetRecipeImageContentByID(id string) ([]byte, error) {
 	var content []byte
 	err = cursor.One(&content)
 	return content, err
-}
-
-// Gets images for given recipe id, will not include binary content
-func GetRecipeImagesByID(recipeID string) ([]RecipeImage, error) {
-	cursor, err := r.Table(TableNameRecipeImages).Filter(map[string]interface{}{"recipeId": recipeID}).Without("content").Run(session)
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close()
-	var images []RecipeImage
-	err = cursor.All(&images)
-	return images, err
 }
