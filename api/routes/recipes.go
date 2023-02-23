@@ -128,3 +128,30 @@ func postSetRecipeImage(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusCreated, recipeImage)
 }
+
+func deleteRecipeImage(ctx echo.Context) error {
+	recipeID := ctx.Param("id")
+	userToken := ctx.Get("user").(*jwt.Token)
+	tokenClaims := userToken.Claims.(*core.JWTClaims)
+	username := tokenClaims.Username
+
+	// validate whether user can modify the recipe content
+	isOwner, err := db.DoesUserOwnRecipe(username, recipeID)
+	if err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(500)
+	} else if !isOwner {
+		return ctx.NoContent(http.StatusForbidden)
+	}
+
+	if err := db.DeleteRecipeImage(recipeID); err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(500)
+	}
+	// HACK make specific method for this
+	if err := db.UpdateRecipe(recipeID, map[string]interface{}{"hasImage": false}); err != nil {
+		ctx.Logger().Error(err)
+	}
+
+	return ctx.NoContent(http.StatusNoContent)
+}

@@ -125,3 +125,8 @@ func GetRecipeImageContent(recipeID string) ([]byte, error) {
 	err = cursor.One(&content)
 	return content, err
 }
+
+func DeleteRecipeImage(recipeID string) error {
+	_, err := r.Table(TableNameRecipeImages).Get(recipeID).Delete().RunWrite(session)
+	return err
+}

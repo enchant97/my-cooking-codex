@@ -161,6 +161,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
             modal_html_state.set(Some(html! {
                 <modals::recipe::SetImage
                     id={recipe.id.clone()}
+                    has_image={recipe.has_image}
                     onclose={image_modal_closed.clone()}
                 />
             }));

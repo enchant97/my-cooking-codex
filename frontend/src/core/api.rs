@@ -179,6 +179,16 @@ impl Api {
         )?;
         Ok(())
     }
+    pub async fn delete_recipe_image(&self, id: String) -> Result<(), ApiError> {
+        let req_url = format!("{}/recipes/{}/image/", self.base_url.clone(), id);
+        ApiError::from_response_result(
+            Request::delete(&req_url)
+                .header("Authorization", &self.get_authorization_value().unwrap())
+                .send()
+                .await,
+        )?;
+        Ok(())
+    }
 }
 
 impl From<StoredLogin> for Api {
