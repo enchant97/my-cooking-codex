@@ -31,7 +31,7 @@ func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 		apiRoutes.GET("recipes/", getRecipes)
 		apiRoutes.GET("recipes/:id/", getRecipe)
 		apiRoutes.PATCH("recipes/:id/", patchRecipe)
-		apiRoutes.POST("recipes/:id/images/", postSetRecipeImage, middleware.BodyLimit("4M"))
+		apiRoutes.POST("recipes/:id/image/", postSetRecipeImage, middleware.BodyLimit("4M"))
 		apiRoutes.GET("stats/me/", getAccountStats)
 	}
 

@@ -169,7 +169,7 @@ impl Api {
         Ok(())
     }
     pub async fn post_recipe_image(&self, id: String, file: web_sys::File) -> Result<(), ApiError> {
-        let req_url = format!("{}/recipes/{}/images/", self.base_url.clone(), id);
+        let req_url = format!("{}/recipes/{}/image/", self.base_url.clone(), id);
         ApiError::from_response_result(
             Request::post(&req_url)
                 .header("Authorization", &self.get_authorization_value().unwrap())
