@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/enchant97/recipes/api/db"
+	"github.com/enchant97/my-cooking-codex/api/db"
 	"github.com/labstack/echo/v4"
 )
 

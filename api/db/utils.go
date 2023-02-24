@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/enchant97/recipes/api/config"
+	"github.com/enchant97/my-cooking-codex/api/config"
 	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 

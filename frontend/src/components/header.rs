@@ -1,7 +1,7 @@
 use yew::prelude::{classes, function_component, html, Html};
 use yew_router::prelude::Link;
 
-use crate::{contexts::prelude::use_login, Route};
+use crate::{contexts::prelude::use_login, Route, core::APP_TITLE};
 
 #[function_component(Header)]
 pub fn header() -> Html {
@@ -15,7 +15,7 @@ pub fn header() -> Html {
             </label>
         </div>
         <div class="flex-1">
-            <a class="btn btn-ghost normal-case text-xl">{"Recipes"}</a>
+            <a class="btn btn-ghost normal-case text-xl">{APP_TITLE}</a>
         </div>
         <div class="flex-none">
             if current_login.is_none() {

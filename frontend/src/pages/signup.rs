@@ -10,7 +10,7 @@ use crate::{
     core::{
         api::{sanitise_base_url, Api},
         effects::{use_login_redirect_effect, LoginState},
-        types::user,
+        types::user, APP_TITLE,
     },
     Route,
 };
@@ -157,7 +157,7 @@ pub fn signup() -> Html {
                 <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
                     <div class="card-body">
                         <div class="mb-4">
-                            <h1 class="text-5xl font-bold mb-4">{ "Recipes" }</h1>
+                            <h1 class="text-5xl font-bold mb-4">{APP_TITLE}</h1>
                             <h2 class="text-4xl font-bold">{ "Create Account" }</h2>
                         </div>
                         <form onsubmit={on_submit}>

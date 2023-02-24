@@ -7,6 +7,7 @@ use yew_router::prelude::Link;
 use crate::components::input::BaseUrlSelector;
 use crate::components::loading::LoadingButton;
 use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
+use crate::core::APP_TITLE;
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::{api::Api, types};
@@ -121,7 +122,7 @@ pub fn login() -> Html {
                 <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
                     <div class="card-body">
                         <div class="mb-4">
-                            <h1 class="text-5xl font-bold mb-4">{ "Recipes" }</h1>
+                            <h1 class="text-5xl font-bold mb-4">{APP_TITLE}</h1>
                             <h2 class="text-4xl font-bold">{ "Please Login" }</h2>
                         </div>
                         <form onsubmit={on_submit}>

@@ -1,4 +1,4 @@
-module github.com/enchant97/recipes/api
+module github.com/enchant97/my-cooking-codex/api
 
 go 1.19
 

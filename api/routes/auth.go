@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/enchant97/recipes/api/config"
-	"github.com/enchant97/recipes/api/core"
-	"github.com/enchant97/recipes/api/db"
+	"github.com/enchant97/my-cooking-codex/api/config"
+	"github.com/enchant97/my-cooking-codex/api/core"
+	"github.com/enchant97/my-cooking-codex/api/db"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )

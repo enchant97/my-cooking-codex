@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/enchant97/recipes/api/core"
-	"github.com/enchant97/recipes/api/db"
+	"github.com/enchant97/my-cooking-codex/api/core"
+	"github.com/enchant97/my-cooking-codex/api/db"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
