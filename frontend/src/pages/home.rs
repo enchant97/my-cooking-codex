@@ -15,26 +15,29 @@ fn home_account_stats() -> HtmlResult {
 
     let stats_state: UseStateHandle<Option<types::stats::AccountStats>> =
         use_state(Option::default);
-    let stats = (*stats_state).clone();
 
-    use_effect_with_deps(
-        move |_| {
-            let api = match &login_ctx.http_api {
-                Some(v) => v.clone(),
-                None => return,
-            };
-            wasm_bindgen_futures::spawn_local(async move {
-                let new_stats = api.get_stats().await.unwrap();
-                stats_state.set(Some(new_stats))
-            });
-        },
-        (),
-    );
+    {
+        let stats_state = stats_state.clone();
+        use_effect_with_deps(
+            move |_| {
+                let api = match &login_ctx.http_api {
+                    Some(v) => v.clone(),
+                    None => return,
+                };
+                wasm_bindgen_futures::spawn_local(async move {
+                    let new_stats = api.get_stats().await.unwrap();
+                    stats_state.set(Some(new_stats))
+                });
+            },
+            (),
+        );
+    }
 
     Ok(html! {
-        if stats.is_some() {
+        if let Some(stats) = (*stats_state).clone() {
             <stats::Stats>
-                <stats::Stat title={"Number Of Recipes"} value={format!("{}", stats.unwrap().recipe_count)}/>
+                <stats::Stat title={"Number Of Users"} value={format!("{}", stats.user_count)}/>
+                <stats::Stat title={"Number Of Recipes"} value={format!("{}", stats.recipe_count)}/>
                 <stats::Stat title={"Number Of Books"} value={"0"}/>
             </stats::Stats>
         }

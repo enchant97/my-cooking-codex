@@ -29,7 +29,7 @@ pub struct StatsProps {
 #[function_component(Stats)]
 pub fn stats(props: &StatsProps) -> Html {
     html! {
-        <div class="stats shadow">
+        <div class="stats stats-vertical sm:stats-horizontal shadow">
             { for props.children.iter() }
         </div>
     }

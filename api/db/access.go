@@ -22,6 +22,17 @@ func GetUserByUsername(username string) (User, error) {
 	return user, err
 }
 
+func GetUserCount() (int, error) {
+	cursor, err := r.Table(TableNameUsers).Count().Run(session)
+	if err != nil {
+		return 0, err
+	}
+	defer cursor.Close()
+	var count int
+	err = cursor.One(&count)
+	return count, err
+}
+
 func CreateRecipe(recipe Recipe) (Recipe, error) {
 	response, err := r.Table(TableNameRecipes).Insert(&recipe).RunWrite(session)
 	if err != nil {

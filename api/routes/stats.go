@@ -10,6 +10,7 @@ import (
 )
 
 type accountStats struct {
+	UserCount   int `json:"userCount"`
 	RecipeCount int `json:"recipeCount"`
 }
 
@@ -22,7 +23,13 @@ func getAccountStats(ctx echo.Context) error {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(500)
 	}
+	userCount, err := db.GetUserCount()
+	if err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(500)
+	}
 	return ctx.JSON(http.StatusOK, accountStats{
+		UserCount:   userCount,
 		RecipeCount: recipeCount,
 	})
 }
