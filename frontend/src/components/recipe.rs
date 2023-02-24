@@ -154,6 +154,21 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         })
     };
 
+    let on_print_click = {
+        let recipe = (*recipe_state).clone();
+        Callback::from(move |_: MouseEvent| {
+            let window = gloo::utils::window();
+            let print_window = window.open_with_url_and_target_and_features(
+                &format!("{}/print", recipe.id),
+                "_blank",
+                "Recipe Print",
+            );
+            if let Ok(Some(print_window)) = print_window {
+                print_window.open().unwrap();
+            }
+        })
+    };
+
     let on_edit_image_click = {
         let modal_html_state = modal_html_state.clone();
         let recipe = (*recipe_state).clone();
@@ -241,6 +256,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
     html! {
         <>
         <ModalController modal={(*modal_html_state).clone()}/>
+        <button class="btn" onclick={on_print_click}>{"Print"}</button>
         <div class={props.classes.clone()}>
             <div class="mb-4 p-4 rounded bg-base-200">
                 if recipe_state.has_image {
