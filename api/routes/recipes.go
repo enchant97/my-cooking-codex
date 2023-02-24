@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
@@ -94,7 +93,7 @@ func postSetRecipeImage(ctx echo.Context) error {
 	username := tokenClaims.Username
 
 	// TODO validate Content-Type & extract with error handling
-	imageType := strings.Split(ctx.Request().Header.Get("Content-Type"), "/")[1]
+	//imageType := strings.Split(ctx.Request().Header.Get("Content-Type"), "/")[1]
 
 	// validate whether user can modify the recipe content
 	isOwner, err := db.DoesUserOwnRecipe(username, recipeID)
@@ -110,10 +109,16 @@ func postSetRecipeImage(ctx echo.Context) error {
 	var b = bytes.Buffer{}
 	io.Copy(&b, ctx.Request().Body)
 	b.Read(content)
+	if optimisedContent, err := core.OptimiseImageToJPEG(content, 2000); err == nil {
+		content = optimisedContent
+	} else {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(500)
+	}
 
 	recipeImageToCreate := core.CreateRecipeImage{
 		RecipeID:  recipeID,
-		ImageType: imageType,
+		ImageType: "jpeg",
 	}
 	recipeImage := recipeImageToCreate.IntoRecipeImage(content)
 	recipeImage, err = db.SetRecipeImage(recipeImage)

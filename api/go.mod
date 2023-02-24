@@ -6,6 +6,7 @@ require (
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.3
+	github.com/h2non/bimg v1.1.9
 	github.com/labstack/echo-jwt/v4 v4.0.0
 	github.com/labstack/echo/v4 v4.10.0
 	golang.org/x/crypto v0.5.0
