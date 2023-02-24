@@ -1,8 +1,7 @@
 use yew::prelude::*;
-use yew_router::prelude::Link;
 
 use crate::{
-    components::{card_grid, drawer},
+    components::{thumbnail_link_grid, drawer},
     contexts::prelude::use_login,
     core::{
         effects::{use_login_redirect_effect, LoginState},
@@ -42,7 +41,7 @@ pub fn recipes() -> Html {
             <drawer::DrawerContent header=true>
                 <div class="p-4 rounded bg-base-200">
                     <h1 class={classes!("text-3xl", "font-bold", "mb-2")}>{ "Recipes" }</h1>
-                    <card_grid::Grid>
+                    <thumbnail_link_grid::Grid>
                         {
                             for recipes.iter().map(|recipe| {
                             let image_src = match recipe.has_image {
@@ -50,12 +49,14 @@ pub fn recipes() -> Html {
                                 false => None,
                             };
                             html!{
-                                <card_grid::GridItem title={recipe.title.clone()} image_src={image_src}>
-                                    <Link<Route> to={Route::Recipe { id: recipe.id.clone() }} classes="btn">{"View"}</Link<Route>>
-                                </card_grid::GridItem>
+                                <thumbnail_link_grid::GridItem
+                                    navigate_to={Route::Recipe { id: recipe.id.clone() }}
+                                    title={recipe.title.clone()}
+                                    image_src={image_src}
+                                />
                             }
                         })}
-                    </card_grid::Grid>
+                    </thumbnail_link_grid::Grid>
                 </div>
             </drawer::DrawerContent>
             <drawer::DrawerDraw r#for="main-drawer">
