@@ -256,22 +256,24 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
     html! {
         <>
         <ModalController modal={(*modal_html_state).clone()}/>
-        <button class="btn" onclick={on_print_click}>{"Print"}</button>
         <div class={props.classes.clone()}>
-            <div class="mb-4 p-4 rounded bg-base-200">
+            <div class="mb-4 relative h-64 o">
                 if recipe_state.has_image {
-                    <figure class="h-64 w-full mb-4">
-                        <img
-                            class="object-cover w-full h-full rounded"
-                            src={format!("{}/recipe-image/{}", props.media_url, recipe_state.id)}
-                        />
-                    </figure>
+                    <img
+                        class="object-cover w-full h-full rounded"
+                        src={format!("{}/recipe-image/{}", props.media_url, recipe_state.id)}
+                    />
+                } else {
+                    <div class="w-full h-full bg-neutral rounded"></div>
                 }
-                <h1 class="flex text-2xl font-bold mb-2">
-                    <span class="mr-auto">{recipe_state.title.clone()}</span>
+                <div class="flex items-center absolute bottom-0 left-0 p-2 w-full bg-[#000000cc] rounded-b">
+                    <h1 class="mr-auto text-2xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">{recipe_state.title.clone()}</h1>
                     <button class="btn" onclick={on_edit_title_click}>{"Edit"}</button>
                     <button class="btn" onclick={on_edit_image_click}>{"Edit Image"}</button>
-                </h1>
+                </div>
+            </div>
+            <div class="mb-4 p-4 rounded bg-base-200">
+                <button class="btn" onclick={on_print_click}>{"Print"}</button>
             </div>
             <div class="mb-4 p-4 rounded bg-base-200">
                 <div class="flex mb-2">
