@@ -17,7 +17,7 @@ func (base *UUIDBase) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 type User struct {
-	ID             uint     `gorm:"primarykey" json:"-"`
+	UUIDBase
 	Username       string   `gorm:"uniqueIndex;not null;type:varchar(30)" json:"username"`
 	HashedPassword []byte   `gorm:"not null" json:"-"`
 	Recipes        []Recipe `gorm:"foreignKey:OwnerID" json:"-"`
@@ -40,7 +40,7 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 
 type Recipe struct {
 	UUIDBase
-	OwnerID          uint                                    `gorm:"not null" json:"ownerId"`
+	OwnerID          uuid.UUID                               `gorm:"not null" json:"ownerId"`
 	Title            string                                  `gorm:"not null;type:varchar(30)" json:"title"`
 	ShortDescription *string                                 `gorm:"type:varchar(256)" json:"shortDescription,omitempty"`
 	LongDescription  *string                                 `json:"longDescription,omitempty"`

@@ -1,6 +1,9 @@
 package crud
 
-import "github.com/enchant97/my-cooking-codex/api2/db"
+import (
+	"github.com/enchant97/my-cooking-codex/api2/db"
+	"github.com/google/uuid"
+)
 
 func CreateUser(user db.CreateUser) (db.User, error) {
 	var newUser = user.IntoUser()
@@ -57,7 +60,7 @@ func GetRecipeById(id string) (db.Recipe, error) {
 	return recipe, nil
 }
 
-func DoesUserOwnRecipe(userID uint, recipeId string) (bool, error) {
+func DoesUserOwnRecipe(userID uuid.UUID, recipeId string) (bool, error) {
 	var recipe db.Recipe
 	if err := db.DB.First(&recipe, "id = ?, owner_id = ?", recipeId, userID).Error; err != nil {
 		return false, err
