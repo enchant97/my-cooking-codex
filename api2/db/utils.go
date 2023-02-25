@@ -13,6 +13,15 @@ func InitDB(conf config.DBConfig) error {
 	if err != nil {
 		return err
 	}
+
 	DB = db
+
+	DB.AutoMigrate(
+		&User{},
+		&Recipe{},
+		&RecipeIngredient{},
+		&RecipeStep{},
+	)
+
 	return nil
 }
