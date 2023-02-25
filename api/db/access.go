@@ -101,6 +101,11 @@ func SetRecipeImage(recipeImage RecipeImage) (RecipeImage, error) {
 	return recipeImage, nil
 }
 
+func DeleteRecipe(recipeID string) error {
+	_, err := r.Table(TableNameRecipes).Get(recipeID).Delete().RunWrite(session)
+	return err
+}
+
 // Gets the recipe image by it's id without the binary content
 func GetRecipeImageWithoutContent(recipeID string) (RecipeImage, error) {
 	cursor, err := r.Table(TableNameRecipeImages).Get(recipeID).Without("content").Run(session)
