@@ -70,7 +70,7 @@ func GetRecipeById(id uuid.UUID) (db.Recipe, error) {
 
 func DoesUserOwnRecipe(userID uuid.UUID, recipeId uuid.UUID) (bool, error) {
 	var recipe db.Recipe
-	if err := db.DB.First(&recipe, "id = ?, owner_id = ?", recipeId, userID).Error; err != nil {
+	if err := db.DB.First(&recipe, "id = ?", recipeId, "owner_id = ?", userID).Error; err != nil {
 		return false, err
 	}
 	return true, nil
@@ -86,7 +86,7 @@ func UpdateRecipe(recipeID uuid.UUID, recipe db.UpdateRecipe) (db.Recipe, error)
 
 func UpdateRecipeHasImage(recipeID uuid.UUID, hasImage bool) error {
 	var updatedRecipe db.Recipe
-	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(map[string]any{"HasImage": hasImage}).Error; err != nil {
+	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(map[string]any{"has_image": hasImage}).Error; err != nil {
 		return err
 	}
 	return nil

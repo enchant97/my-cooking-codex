@@ -27,7 +27,7 @@ func postCreateRecipe(ctx echo.Context) error {
 		return err
 	}
 
-	recipe, err := crud.CreateRecipe(recipeData.IntoRecipe(userID))
+	recipe, err := crud.CreateRecipe(recipeData.IntoRecipe(userID, false))
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -98,7 +98,7 @@ func patchRecipe(ctx echo.Context) error {
 }
 
 func deleteRecipe(ctx echo.Context) error {
-	appConfig := ctx.Get("config").(config.AppConfig)
+	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 	userID, _ := crud.GetUserIDByUsername(username)
@@ -123,7 +123,7 @@ func deleteRecipe(ctx echo.Context) error {
 }
 
 func postSetRecipeImage(ctx echo.Context) error {
-	appConfig := ctx.Get("config").(config.AppConfig)
+	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 	userID, _ := crud.GetUserIDByUsername(username)
@@ -162,7 +162,7 @@ func postSetRecipeImage(ctx echo.Context) error {
 }
 
 func deleteRecipeImage(ctx echo.Context) error {
-	appConfig := ctx.Get("config").(config.AppConfig)
+	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 	userID, _ := crud.GetUserIDByUsername(username)

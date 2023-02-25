@@ -36,12 +36,13 @@ type CreateRecipe struct {
 	Steps            []RecipeStep       `json:"steps,omitempty"`
 }
 
-func (r *CreateRecipe) IntoRecipe(ownerID uuid.UUID) Recipe {
+func (r *CreateRecipe) IntoRecipe(ownerID uuid.UUID, hasImage bool) Recipe {
 	return Recipe{
 		OwnerID:          ownerID,
 		Title:            r.Title,
 		ShortDescription: r.ShortDescription,
 		LongDescription:  r.LongDescription,
+		HasImage:         hasImage,
 	}
 }
 
