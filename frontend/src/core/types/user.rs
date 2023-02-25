@@ -8,5 +8,6 @@ pub struct CreateUser {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct User {
+    pub id: String,
     pub username: String,
 }
