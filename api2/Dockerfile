@@ -22,11 +22,7 @@ FROM alpine:${ALPINE_VERSION}
 
     ENV HOST=0.0.0.0
     ENV PORT=8000
-    ENV DATA_PATH=/data
-    ENV DB__URI=/data/db.sqlite
-    ENV DB__TYPE=sqlite
 
-    VOLUME "/data"
     EXPOSE 8000
 
     CMD ["app"]
