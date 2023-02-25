@@ -13,6 +13,14 @@ func CreateUser(user db.CreateUser) (db.User, error) {
 	return newUser, nil
 }
 
+func GetUserIDByUsername(username string) (uuid.UUID, error) {
+	var user db.User
+	if err := db.DB.First(&user, "username = ?", username).Select("id").Error; err != nil {
+		return uuid.Nil, err
+	}
+	return user.ID, nil
+}
+
 func GetUserByUsername(username string) (db.User, error) {
 	var user db.User
 	if err := db.DB.First(&user, "username = ?", username).Error; err != nil {
@@ -36,23 +44,23 @@ func CreateRecipe(recipe db.Recipe) (db.Recipe, error) {
 	return recipe, nil
 }
 
-func GetRecipesByUsername(username string) ([]db.Recipe, error) {
+func GetRecipesByUserID(userID uuid.UUID) ([]db.Recipe, error) {
 	var recipes []db.Recipe
-	if err := db.DB.Find(&recipes, "owner_id = ?", username).Error; err != nil {
+	if err := db.DB.Find(&recipes, "owner_id = ?", userID).Error; err != nil {
 		return nil, err
 	}
 	return recipes, nil
 }
 
-func GetRecipesByUsernameCount(username string) (int64, error) {
+func GetRecipesByUserIDCount(userID uuid.UUID) (int64, error) {
 	var count int64
-	if err := db.DB.Model(&db.Recipe{}).Where("owner_id = ?", username).Count(&count).Error; err != nil {
+	if err := db.DB.Model(&db.Recipe{}).Where("owner_id = ?", userID).Count(&count).Error; err != nil {
 		return 0, err
 	}
 	return count, nil
 }
 
-func GetRecipeById(id string) (db.Recipe, error) {
+func GetRecipeById(id uuid.UUID) (db.Recipe, error) {
 	var recipe db.Recipe
 	if err := db.DB.First(&recipe, "id = ?", id).Error; err != nil {
 		return db.Recipe{}, err
@@ -60,7 +68,7 @@ func GetRecipeById(id string) (db.Recipe, error) {
 	return recipe, nil
 }
 
-func DoesUserOwnRecipe(userID uuid.UUID, recipeId string) (bool, error) {
+func DoesUserOwnRecipe(userID uuid.UUID, recipeId uuid.UUID) (bool, error) {
 	var recipe db.Recipe
 	if err := db.DB.First(&recipe, "id = ?, owner_id = ?", recipeId, userID).Error; err != nil {
 		return false, err
@@ -68,14 +76,23 @@ func DoesUserOwnRecipe(userID uuid.UUID, recipeId string) (bool, error) {
 	return true, nil
 }
 
-func UpdateRecipe(recipeID uint, recipe db.Recipe) (db.Recipe, error) {
-	if err := db.DB.Model(&recipe).Where("id = ?", recipeID).Updates(recipe).Error; err != nil {
+func UpdateRecipe(recipeID uuid.UUID, recipe db.UpdateRecipe) (db.Recipe, error) {
+	var updatedRecipe db.Recipe
+	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(recipe).Error; err != nil {
 		return db.Recipe{}, err
 	}
-	return recipe, nil
+	return updatedRecipe, nil
 }
 
-func DeleteRecipe(recipeID uint) error {
+func UpdateRecipeHasImage(recipeID uuid.UUID, hasImage bool) error {
+	var updatedRecipe db.Recipe
+	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(map[string]any{"HasImage": hasImage}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteRecipe(recipeID uuid.UUID) error {
 	if err := db.DB.Delete(&db.Recipe{}, recipeID).Error; err != nil {
 		return err
 	}
