@@ -19,8 +19,6 @@ func InitDB(conf config.DBConfig) error {
 	DB.AutoMigrate(
 		&User{},
 		&Recipe{},
-		&RecipeIngredient{},
-		&RecipeStep{},
 	)
 
 	return nil

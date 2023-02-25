@@ -1,10 +1,24 @@
 package db
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
+)
+
+type UUIDBase struct {
+	ID uuid.UUID `gorm:"primarykey;type:uuid" json:"id"`
+}
+
+func (base *UUIDBase) BeforeCreate(tx *gorm.DB) (err error) {
+	base.ID = uuid.New()
+	return
+}
 
 type User struct {
-	ID             uint     `gorm:"primarykey" json:"id"`
-	Username       string   `gorm:"unique;not null;type:varchar(30)" json:"username"`
+	ID             uint     `gorm:"primarykey" json:"-"`
+	Username       string   `gorm:"uniqueIndex;not null;type:varchar(30)" json:"username"`
 	HashedPassword []byte   `gorm:"not null" json:"-"`
 	Recipes        []Recipe `gorm:"foreignKey:OwnerID" json:"-"`
 }
@@ -25,28 +39,12 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 }
 
 type Recipe struct {
-	ID               uint               `gorm:"primarykey" json:"id"`
-	OwnerID          uint               `gorm:"not null" json:"ownerId"`
-	Title            string             `gorm:"not null;type:varchar(30)" json:"title"`
-	ShortDescription *string            `gorm:"type:varchar(256)" json:"shortDescription,omitempty"`
-	LongDescription  *string            `json:"longDescription,omitempty"`
-	HasImage         bool               `gorm:"not null" json:"hasImage"`
-	Ingredients      []RecipeIngredient `gorm:"foreignKey:RecipeID" json:"ingredients,omitempty"`
-	Steps            []RecipeStep       `gorm:"foreignKey:RecipeID" json:"steps,omitempty"`
-}
-
-type RecipeIngredient struct {
-	ID          uint    `gorm:"primarykey" json:"id"`
-	RecipeID    uint    `gorm:"not null" json:"recipeId"`
-	Name        string  `gorm:"not null;type:varchar(128)" json:"name"`
-	Amount      float32 `gorm:"not null" json:"amount"`
-	UnitType    string  `gorm:"not null;type:varchar(128)" json:"unitType"`
-	Description *string `gorm:"type:varchar(255)" json:"description,omitempty"`
-}
-
-type RecipeStep struct {
-	ID          uint    `gorm:"primarykey" json:"id"`
-	RecipeID    uint    `gorm:"not null;index:idx_member" json:"recipeId"`
-	Title       *string `gorm:"type:varchar(128)" json:"title,omitempty"`
-	Description string  `gorm:"not null;type:varchar(8000)" json:"description"`
+	UUIDBase
+	OwnerID          uint                                    `gorm:"not null" json:"ownerId"`
+	Title            string                                  `gorm:"not null;type:varchar(30)" json:"title"`
+	ShortDescription *string                                 `gorm:"type:varchar(256)" json:"shortDescription,omitempty"`
+	LongDescription  *string                                 `json:"longDescription,omitempty"`
+	Ingredients      *datatypes.JSONType[[]RecipeIngredient] `json:"ingredients,omitempty"`
+	Steps            *datatypes.JSONType[[]RecipeStep]       `json:"steps,omitempty"`
+	HasImage         bool                                    `gorm:"not null" json:"hasImage"`
 }
