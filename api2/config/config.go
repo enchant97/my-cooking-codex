@@ -1,7 +1,8 @@
 package config
 
 type DBConfig struct {
-	SQLitePath string `env:"SQLITE_PATH,notEmpty"`
+	URI  string `env:"URI,notEmpty"`
+	Type string `env:"TYPE,notEmpty"`
 }
 
 type AppConfig struct {
