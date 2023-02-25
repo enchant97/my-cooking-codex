@@ -4,27 +4,28 @@ import (
 	"net/http"
 
 	"github.com/enchant97/my-cooking-codex/api/core"
-	"github.com/enchant97/my-cooking-codex/api/db"
+	"github.com/enchant97/my-cooking-codex/api/db/crud"
 	"github.com/labstack/echo/v4"
 )
 
 type accountStats struct {
-	UserCount   int `json:"userCount"`
-	RecipeCount int `json:"recipeCount"`
+	UserCount   int64 `json:"userCount"`
+	RecipeCount int64 `json:"recipeCount"`
 }
 
 func getAccountStats(ctx echo.Context) error {
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
+	userID, _ := crud.GetUserIDByUsername(username)
 
-	recipeCount, err := db.GetRecipesByUsernameCount(username)
+	recipeCount, err := crud.GetRecipesByUserIDCount(userID)
 	if err != nil {
 		ctx.Logger().Error(err)
-		return ctx.NoContent(500)
+		return ctx.NoContent(http.StatusInternalServerError)
 	}
-	userCount, err := db.GetUserCount()
+	userCount, err := crud.GetUserCount()
 	if err != nil {
 		ctx.Logger().Error(err)
-		return ctx.NoContent(500)
+		return ctx.NoContent(http.StatusInternalServerError)
 	}
 	return ctx.JSON(http.StatusOK, accountStats{
 		UserCount:   userCount,

@@ -1,25 +1,36 @@
 package db
 
 import (
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
-type User struct {
-	Username       string `rethinkdb:"id" json:"username"`
-	HashedPassword []byte `rethinkdb:"hashedPassword" json:"-"`
+type UUIDBase struct {
+	ID uuid.UUID `gorm:"primarykey;type:uuid" json:"id"`
 }
 
-// Set a new password (hashing it)
-func (u *User) SetPassword(newPlainPassword string) error {
+func (base *UUIDBase) BeforeCreate(tx *gorm.DB) (err error) {
+	base.ID = uuid.New()
+	return
+}
+
+type User struct {
+	UUIDBase
+	Username       string   `gorm:"uniqueIndex;not null;type:varchar(30)" json:"username"`
+	HashedPassword []byte   `gorm:"not null" json:"-"`
+	Recipes        []Recipe `gorm:"foreignKey:OwnerID" json:"-"`
+}
+
+func (u *User) SetPassword(newPlainPassword string) {
 	hashedPw, err := bcrypt.GenerateFromPassword([]byte(newPlainPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	u.HashedPassword = hashedPw
-	return nil
 }
 
-// Check if password matches the hashed stored one
 func (u *User) IsPasswordMatch(plainPassword string) bool {
 	if err := bcrypt.CompareHashAndPassword(u.HashedPassword, []byte(plainPassword)); err == nil {
 		return true
@@ -27,32 +38,13 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 	return false
 }
 
-type Ingredient struct {
-	Name        string  `rethinkdb:"name" json:"name"`
-	Amount      float32 `rethinkdb:"amount" json:"amount"`
-	UnitType    string  `rethinkdb:"unitType" json:"unitType"`
-	Description *string `rethinkdb:"description,omitempty" json:"description,omitempty"`
-}
-
-type Step struct {
-	Title       *string `rethinkdb:"title,omitempty" json:"title,omitempty"`
-	Description string  `rethinkdb:"description" json:"description"`
-}
-
 type Recipe struct {
-	ID               string       `rethinkdb:"id,omitempty" json:"id"`
-	OwnerID          string       `rethinkdb:"ownerId" json:"ownerId"`
-	Title            string       `rethinkdb:"title" json:"title"`
-	ShortDescription *string      `rethinkdb:"shortDescription,omitempty" json:"shortDescription,omitempty"`
-	LongDescription  *string      `rethinkdb:"longDescription,omitempty" json:"longDescription,omitempty"`
-	Tags             []string     `rethinkdb:"tags,omitempty" json:"tags,omitempty"`
-	Ingredients      []Ingredient `rethinkdb:"ingredients,omitempty" json:"ingredients,omitempty"`
-	Steps            []Step       `rethinkdb:"steps,omitempty" json:"steps,omitempty"`
-	HasImage         bool         `rethinkdb:"hasImage" json:"hasImage"`
-}
-
-type RecipeImage struct {
-	RecipeID  string `rethinkdb:"id" json:"recipeId"`
-	ImageType string `rethinkdb:"imageType" json:"imageType"`
-	Content   []byte `rethinkdb:"content" json:"-"`
+	UUIDBase
+	OwnerID          uuid.UUID                               `gorm:"not null;type:uuid" json:"ownerId"`
+	Title            string                                  `gorm:"not null;type:varchar(30)" json:"title"`
+	ShortDescription *string                                 `gorm:"type:varchar(256)" json:"shortDescription,omitempty"`
+	LongDescription  *string                                 `json:"longDescription,omitempty"`
+	Ingredients      *datatypes.JSONType[[]RecipeIngredient] `gorm:"type:json" json:"ingredients,omitempty"`
+	Steps            *datatypes.JSONType[[]RecipeStep]       `gorm:"type:json" json:"steps,omitempty"`
+	HasImage         bool                                    `gorm:"not null;default:false" json:"hasImage"`
 }

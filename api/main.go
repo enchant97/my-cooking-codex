@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path"
 
 	"github.com/enchant97/my-cooking-codex/api/config"
 	"github.com/enchant97/my-cooking-codex/api/db"
@@ -25,16 +27,21 @@ func (cv *Validator) Validate(i interface{}) error {
 }
 
 func main() {
+	// Parse config
 	var appConfig config.AppConfig
 	if err := appConfig.ParseConfig(); err != nil {
 		log.Fatalln(err)
 	}
-
+	// Create data directory if it doesn't exist
+	if err := os.MkdirAll(appConfig.DataPath, os.ModePerm); err != nil {
+		log.Fatalln(err)
+	}
+	os.Mkdir(path.Join(appConfig.DataPath, "recipe_images"), os.ModePerm)
+	// Connect to database
 	if err := db.InitDB(appConfig.DB); err != nil {
 		log.Fatalln(err)
 	}
-	defer db.CloseDB()
-
+	// Create & setup server
 	e := echo.New()
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
@@ -47,6 +54,6 @@ func main() {
 		}
 	})
 	routes.InitRoutes(e, appConfig)
-
+	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", appConfig.Host, appConfig.Port)))
 }

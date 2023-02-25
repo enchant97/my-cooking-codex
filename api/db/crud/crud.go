@@ -1,7 +1,7 @@
 package crud
 
 import (
-	"github.com/enchant97/my-cooking-codex/api2/db"
+	"github.com/enchant97/my-cooking-codex/api/db"
 	"github.com/google/uuid"
 )
 

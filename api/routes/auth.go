@@ -5,7 +5,7 @@ import (
 
 	"github.com/enchant97/my-cooking-codex/api/config"
 	"github.com/enchant97/my-cooking-codex/api/core"
-	"github.com/enchant97/my-cooking-codex/api/db"
+	"github.com/enchant97/my-cooking-codex/api/db/crud"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,7 +20,7 @@ func postLogin(ctx echo.Context) error {
 	}
 
 	// validate username & password
-	user, err := db.GetUserByUsername(loginData.Username)
+	user, err := crud.GetUserByUsername(loginData.Username)
 	// TODO catch the specific db error
 	if err != nil || !user.IsPasswordMatch(loginData.Password) {
 		return ctx.NoContent(http.StatusUnauthorized)

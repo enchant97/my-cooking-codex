@@ -5,30 +5,31 @@ import (
 
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
+	"github.com/enchant97/my-cooking-codex/api/db/crud"
 	"github.com/labstack/echo/v4"
 )
 
 func postCreateUser(ctx echo.Context) error {
-	var userData core.CreateUser
+	var userData db.CreateUser
 	if err := ctx.Bind(&userData); err != nil {
 		return ctx.NoContent(http.StatusBadRequest)
 	}
 	if err := ctx.Validate(userData); err != nil {
 		return err
 	}
-	user, err := db.CreateUser(userData.IntoUser())
+	user, err := crud.CreateUser(userData)
 	if err != nil {
 		ctx.Logger().Error(err)
-		return ctx.NoContent(500)
+		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	return ctx.JSON(201, user)
+	return ctx.JSON(http.StatusCreated, user)
 }
 
 func getUserMe(ctx echo.Context) error {
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 
-	user, err := db.GetUserByUsername(username)
+	user, err := crud.GetUserByUsername(username)
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)

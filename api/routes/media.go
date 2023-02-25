@@ -1,19 +1,16 @@
 package routes
 
 import (
-	"fmt"
-	"net/http"
+	"path"
 
-	"github.com/enchant97/my-cooking-codex/api/db"
+	"github.com/enchant97/my-cooking-codex/api/config"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
 func getRecipeImageContent(ctx echo.Context) error {
+	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	imageID := ctx.Param("id")
-	recipeImage, err := db.GetRecipeImage(imageID)
-	if err != nil {
-		ctx.Logger().Error(err)
-		return ctx.NoContent(500)
-	}
-	return ctx.Blob(http.StatusOK, fmt.Sprintf("image/%s", recipeImage.ImageType), recipeImage.Content)
+
+	return ctx.File(path.Join(appConfig.DataPath, "recipe_images", uuid.MustParse(imageID).String()+".jpg"))
 }

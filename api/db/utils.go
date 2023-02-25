@@ -1,54 +1,49 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/enchant97/my-cooking-codex/api/config"
-	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-var session *r.Session
+var DB *gorm.DB
 
-func ensureTableCreated(tableName string) error {
-	cursor, err := r.TableList().Contains(tableName).Not().Run(session)
-	if err != nil {
-		return err
-	}
-	defer cursor.Close()
-	var needsCreation bool
-	err = cursor.One(&needsCreation)
-	if err != nil {
-		return err
-	}
-	if needsCreation {
-		if _, err = r.TableCreate(tableName).RunWrite(session); err != nil {
-			return err
-		}
-	}
-	return nil
+func getSQLite(conf config.DBConfig) (*gorm.DB, error) {
+	return gorm.Open(sqlite.Open(conf.URI), &gorm.Config{})
+
 }
 
-func InitDB(config config.DBConfig) error {
+func getMySQL(conf config.DBConfig) (*gorm.DB, error) {
+	return gorm.Open(mysql.Open(conf.URI), &gorm.Config{})
+}
+
+func getPostgresSQL(conf config.DBConfig) (*gorm.DB, error) {
+	return gorm.Open(postgres.Open(conf.URI), &gorm.Config{})
+}
+
+func InitDB(conf config.DBConfig) error {
 	var err error
-	session, err = r.Connect(r.ConnectOpts{
-		Address:  config.Address,
-		Database: config.Database,
-		Username: config.Username,
-		Password: config.Password,
-	})
+	switch conf.Type {
+	case "sqlite":
+		DB, err = getSQLite(conf)
+	case "mysql":
+		DB, err = getMySQL(conf)
+	case "postgres":
+		DB, err = getPostgresSQL(conf)
+	default:
+		return fmt.Errorf("invalid db type '%s'", conf.Type)
+	}
+
 	if err != nil {
 		return err
 	}
-	if err = ensureTableCreated(TableNameUsers); err != nil {
-		return err
-	}
-	if err = ensureTableCreated(TableNameRecipes); err != nil {
-		return err
-	}
-	if err = ensureTableCreated(TableNameRecipeImages); err != nil {
-		return err
-	}
-	return nil
-}
 
-func CloseDB() error {
-	return session.Close()
+	return DB.AutoMigrate(
+		&User{},
+		&Recipe{},
+	)
 }
