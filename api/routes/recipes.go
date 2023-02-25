@@ -7,11 +7,12 @@ import (
 
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
 func postCreateRecipe(ctx echo.Context) error {
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
+
 	var recipeData core.CreateRecipe
 	if err := ctx.Bind(&recipeData); err != nil {
 		return ctx.NoContent(http.StatusBadRequest)
@@ -19,9 +20,7 @@ func postCreateRecipe(ctx echo.Context) error {
 	if err := ctx.Validate(recipeData); err != nil {
 		return err
 	}
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+
 	recipe, err := db.CreateRecipe(recipeData.IntoRecipe(username))
 	if err != nil {
 		ctx.Logger().Error(err)
@@ -31,9 +30,8 @@ func postCreateRecipe(ctx echo.Context) error {
 }
 
 func getRecipes(ctx echo.Context) error {
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
+
 	recipes, err := db.GetRecipesByUsername(username)
 	if err != nil {
 		ctx.Logger().Error(err)
@@ -44,9 +42,8 @@ func getRecipes(ctx echo.Context) error {
 
 func getRecipe(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
+
 	recipe, err := db.GetRecipeById(recipeID, username)
 	if err != nil {
 		ctx.Logger().Error(err)
@@ -57,9 +54,7 @@ func getRecipe(ctx echo.Context) error {
 
 func patchRecipe(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// validate whether user can modify the recipe content
 	isOwner, err := db.DoesUserOwnRecipe(username, recipeID)
@@ -88,9 +83,7 @@ func patchRecipe(ctx echo.Context) error {
 
 func deleteRecipe(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// validate whether user can modify the recipe content
 	isOwner, err := db.DoesUserOwnRecipe(username, recipeID)
@@ -116,9 +109,7 @@ func deleteRecipe(ctx echo.Context) error {
 
 func postSetRecipeImage(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// TODO validate Content-Type & extract with error handling
 	//imageType := strings.Split(ctx.Request().Header.Get("Content-Type"), "/")[1]
@@ -164,9 +155,7 @@ func postSetRecipeImage(ctx echo.Context) error {
 
 func deleteRecipeImage(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// validate whether user can modify the recipe content
 	isOwner, err := db.DoesUserOwnRecipe(username, recipeID)

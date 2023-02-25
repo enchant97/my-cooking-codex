@@ -5,7 +5,6 @@ import (
 
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,10 +26,9 @@ func postCreateUser(ctx echo.Context) error {
 }
 
 func getUserMe(ctx echo.Context) error {
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 
-	user, err := db.GetUserByUsername(tokenClaims.Username)
+	user, err := db.GetUserByUsername(username)
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)

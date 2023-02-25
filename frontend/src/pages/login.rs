@@ -7,9 +7,9 @@ use yew_router::prelude::Link;
 use crate::components::input::BaseUrlSelector;
 use crate::components::loading::LoadingButton;
 use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
-use crate::core::APP_TITLE;
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
+use crate::core::APP_TITLE;
 use crate::core::{api::Api, types};
 use crate::Route;
 
@@ -64,7 +64,10 @@ pub fn login() -> Html {
                                 media_url: base_url + "/media",
                                 token: token.clone(),
                             };
-                            gloo::console::debug!(format!("got details: '{:?}'", login_details));
+                            gloo::console::debug!(format!(
+                                "got authentication token, will expire at: '{:?}'",
+                                token.expiry,
+                            ));
                             login_ctx.dispatch(Some(login_details));
                         }
                         None => (),

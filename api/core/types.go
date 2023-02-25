@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"github.com/enchant97/my-cooking-codex/api/db"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -9,6 +11,17 @@ type JWTClaims struct {
 	Username string `json:"username"`
 	IsAdmin  bool   `json:"isAdmin"`
 	jwt.RegisteredClaims
+}
+
+type LoginToken struct {
+	Type   string    `json:"type"`
+	Token  string    `json:"token"`
+	Expiry time.Time `json:"expiry"`
+}
+
+type CreateLogin struct {
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type CreateUser struct {

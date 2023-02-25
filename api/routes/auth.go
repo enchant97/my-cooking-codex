@@ -2,28 +2,16 @@ package routes
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/enchant97/my-cooking-codex/api/config"
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
-type login struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}
-
-type loginToken struct {
-	Type  string `json:"type"`
-	Token string `json:"token"`
-}
-
 func postLogin(ctx echo.Context) error {
 	appConfig := ctx.Get("AppConfig").(config.AppConfig)
-	var loginData login
+	var loginData core.CreateLogin
 	if err := ctx.Bind(&loginData); err != nil {
 		return ctx.NoContent(http.StatusBadRequest)
 	}
@@ -38,21 +26,14 @@ func postLogin(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusUnauthorized)
 	}
 
-	claims := &core.JWTClaims{
-		Username: loginData.Username,
-		IsAdmin:  false,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	rawToken, err := token.SignedString([]byte(appConfig.SecretKey))
-	if err != nil {
+	// user is valid, create a token
+	if token, err := core.CreateAuthenticationToken(
+		loginData.Username,
+		false,
+		[]byte(appConfig.SecretKey),
+	); err != nil {
 		return err
+	} else {
+		return ctx.JSON(http.StatusOK, token)
 	}
-
-	return ctx.JSON(200, loginToken{
-		Type:  "Bearer",
-		Token: rawToken,
-	})
 }

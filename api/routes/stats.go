@@ -5,7 +5,6 @@ import (
 
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,9 +14,8 @@ type accountStats struct {
 }
 
 func getAccountStats(ctx echo.Context) error {
-	userToken := ctx.Get("user").(*jwt.Token)
-	tokenClaims := userToken.Claims.(*core.JWTClaims)
-	username := tokenClaims.Username
+	username, _ := core.GetAuthenticatedUserFromContext(ctx)
+
 	recipeCount, err := db.GetRecipesByUsernameCount(username)
 	if err != nil {
 		ctx.Logger().Error(err)

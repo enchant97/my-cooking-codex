@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 pub mod recipe;
@@ -14,6 +15,7 @@ pub struct Login {
 pub struct LoginToken {
     pub r#type: String,
     pub token: String,
+    pub expiry: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
