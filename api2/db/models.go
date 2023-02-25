@@ -40,11 +40,11 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 
 type Recipe struct {
 	UUIDBase
-	OwnerID          uuid.UUID                               `gorm:"not null" json:"ownerId"`
+	OwnerID          uuid.UUID                               `gorm:"not null;type:uuid" json:"ownerId"`
 	Title            string                                  `gorm:"not null;type:varchar(30)" json:"title"`
 	ShortDescription *string                                 `gorm:"type:varchar(256)" json:"shortDescription,omitempty"`
 	LongDescription  *string                                 `json:"longDescription,omitempty"`
-	Ingredients      *datatypes.JSONType[[]RecipeIngredient] `json:"ingredients,omitempty"`
-	Steps            *datatypes.JSONType[[]RecipeStep]       `json:"steps,omitempty"`
+	Ingredients      *datatypes.JSONType[[]RecipeIngredient] `gorm:"type:json" json:"ingredients,omitempty"`
+	Steps            *datatypes.JSONType[[]RecipeStep]       `gorm:"type:json" json:"steps,omitempty"`
 	HasImage         bool                                    `gorm:"not null;default:false" json:"hasImage"`
 }

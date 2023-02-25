@@ -1,6 +1,9 @@
 package db
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"gorm.io/datatypes"
+)
 
 type RecipeIngredient struct {
 	Name        string  `json:"name" validate:"required"`
@@ -31,7 +34,6 @@ type CreateRecipe struct {
 	Title            string             `json:"title" validate:"required"`
 	ShortDescription *string            `json:"shortDescription,omitempty"`
 	LongDescription  *string            `json:"longDescription,omitempty"`
-	Tags             []string           `json:"tags,omitempty"`
 	Ingredients      []RecipeIngredient `json:"ingredients,omitempty"`
 	Steps            []RecipeStep       `json:"steps,omitempty"`
 }
@@ -47,23 +49,51 @@ func (r *CreateRecipe) IntoRecipe(ownerID uuid.UUID, hasImage bool) Recipe {
 }
 
 type UpdateIngredient struct {
-	Name        *string  `json:"name,omitempty"`
-	Amount      *float32 `json:"amount,omitempty"`
-	UnitType    *string  `json:"unitType,omitempty"`
-	Description *string  `json:"description,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Amount      float32 `json:"amount,omitempty"`
+	UnitType    string  `json:"unitType,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 type UpdateStep struct {
 	Title       *string `json:"title,omitempty"`
-	Description *string `json:"description,omitempty"`
+	Description string  `json:"description,omitempty"`
 }
 
 type UpdateRecipe struct {
-	Title            *string             `json:"title,omitempty"`
+	Title            string              `json:"title,omitempty"`
 	ShortDescription *string             `json:"shortDescription,omitempty"`
 	LongDescription  *string             `json:"longDescription,omitempty"`
-	Tags             *[]string           `json:"tags,omitempty"`
 	Ingredients      *[]UpdateIngredient `json:"ingredients,omitempty"`
 	Steps            *[]UpdateStep       `json:"steps,omitempty"`
-	HasImage         *bool               `json:"hasImage,omitempty"`
+	HasImage         bool                `json:"-"`
+}
+
+func (r *UpdateRecipe) IntoRecipe() Recipe {
+	return Recipe{
+		Title:            r.Title,
+		ShortDescription: r.ShortDescription,
+		LongDescription:  r.LongDescription,
+		Ingredients: func() *datatypes.JSONType[[]RecipeIngredient] {
+			if r.Ingredients == nil {
+				return nil
+			}
+			ingredients := make([]RecipeIngredient, len(*r.Ingredients))
+			for i, ingredient := range *r.Ingredients {
+				ingredients[i] = RecipeIngredient(ingredient)
+			}
+			return &datatypes.JSONType[[]RecipeIngredient]{Data: ingredients}
+		}(),
+		Steps: func() *datatypes.JSONType[[]RecipeStep] {
+			if r.Steps == nil {
+				return nil
+			}
+			steps := make([]RecipeStep, len(*r.Steps))
+			for i, step := range *r.Steps {
+				steps[i] = RecipeStep(step)
+			}
+			return &datatypes.JSONType[[]RecipeStep]{Data: steps}
+		}(),
+		HasImage: r.HasImage,
+	}
 }

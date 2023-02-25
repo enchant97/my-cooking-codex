@@ -78,7 +78,8 @@ func DoesUserOwnRecipe(userID uuid.UUID, recipeId uuid.UUID) (bool, error) {
 
 func UpdateRecipe(recipeID uuid.UUID, recipe db.UpdateRecipe) (db.Recipe, error) {
 	var updatedRecipe db.Recipe
-	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(recipe).Error; err != nil {
+
+	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(recipe.IntoRecipe()).Error; err != nil {
 		return db.Recipe{}, err
 	}
 	return updatedRecipe, nil
