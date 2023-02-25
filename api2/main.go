@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/enchant97/my-cooking-codex/api2/config"
 	"github.com/enchant97/my-cooking-codex/api2/db"
@@ -35,6 +36,7 @@ func main() {
 	if err := os.MkdirAll(appConfig.DataPath, os.ModePerm); err != nil {
 		log.Fatalln(err)
 	}
+	os.Mkdir(path.Join(appConfig.DataPath, "recipe_images"), os.ModePerm)
 	// Connect to database
 	if err := db.InitDB(appConfig.DB); err != nil {
 		log.Fatalln(err)

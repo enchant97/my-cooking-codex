@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+	"os"
+	"path"
 
+	"github.com/enchant97/my-cooking-codex/api2/config"
 	"github.com/enchant97/my-cooking-codex/api2/core"
 	"github.com/enchant97/my-cooking-codex/api2/db"
 	"github.com/enchant97/my-cooking-codex/api2/db/crud"
@@ -95,6 +98,7 @@ func patchRecipe(ctx echo.Context) error {
 }
 
 func deleteRecipe(ctx echo.Context) error {
+	appConfig := ctx.Get("config").(config.AppConfig)
 	recipeID := ctx.Param("id")
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 	userID, _ := crud.GetUserIDByUsername(username)
@@ -113,12 +117,13 @@ func deleteRecipe(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	// TODO delete recipe image
+	os.Remove(path.Join(appConfig.DataPath, "recipe_images", uuid.MustParse(recipeID).String()+".jpg"))
 
 	return ctx.NoContent(http.StatusNoContent)
 }
 
 func postSetRecipeImage(ctx echo.Context) error {
+	appConfig := ctx.Get("config").(config.AppConfig)
 	recipeID := ctx.Param("id")
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 	userID, _ := crud.GetUserIDByUsername(username)
@@ -144,8 +149,10 @@ func postSetRecipeImage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	// TODO write recipe image to file
-	ctx.Logger().Info("Recipe image content len: ", len(content))
+	if err := os.WriteFile(path.Join(appConfig.DataPath, "recipe_images", uuid.MustParse(recipeID).String()+".jpg"), content, 0644); err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
 
 	if err := crud.UpdateRecipeHasImage(uuid.MustParse(recipeID), true); err != nil {
 		ctx.Logger().Error(err)
@@ -155,6 +162,7 @@ func postSetRecipeImage(ctx echo.Context) error {
 }
 
 func deleteRecipeImage(ctx echo.Context) error {
+	appConfig := ctx.Get("config").(config.AppConfig)
 	recipeID := ctx.Param("id")
 	username, _ := core.GetAuthenticatedUserFromContext(ctx)
 	userID, _ := crud.GetUserIDByUsername(username)
@@ -168,7 +176,7 @@ func deleteRecipeImage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusForbidden)
 	}
 
-	// TODO delete recipe image
+	os.Remove(path.Join(appConfig.DataPath, "recipe_images", uuid.MustParse(recipeID).String()+".jpg"))
 
 	if err := crud.UpdateRecipeHasImage(uuid.MustParse(recipeID), false); err != nil {
 		ctx.Logger().Error(err)
