@@ -7,21 +7,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Get the authenticated user from the context
-// and return the username and the JWTClaims
-func GetAuthenticatedUserFromContext(ctx echo.Context) (string, JWTClaims) {
-	userToken := ctx.Get("user").(*jwt.Token)
+// Get the authenticated user
+func GetAuthenticatedUserFromContext(ctx echo.Context) (AuthenticatedUser, error) {
+	userToken := ctx.Get("UserToken").(*jwt.Token)
 	tokenClaims := userToken.Claims.(*JWTClaims)
-	return tokenClaims.Username, *tokenClaims
+	return tokenClaims.ToAuthenticatedUser()
 }
 
 // Create token for authentication
-func CreateAuthenticationToken(username string, isAdmin bool, secretKey []byte) (LoginToken, error) {
+func CreateAuthenticationToken(user AuthenticatedUser, secretKey []byte) (LoginToken, error) {
 	expiresAt := time.Now().Add(time.Hour * 72)
 	claims := &JWTClaims{
-		Username: username,
-		IsAdmin:  isAdmin,
+		Username: user.Username,
+		IsAdmin:  user.IsAdmin,
 		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   user.UserID.String(),
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
 	}

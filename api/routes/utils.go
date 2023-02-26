@@ -21,6 +21,7 @@ func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 			return new(core.JWTClaims)
 		},
 		SigningKey: []byte(appConfig.SecretKey),
+		ContextKey: "UserToken",
 	}
 	jwtMiddleware := echojwt.WithConfig(config)
 

@@ -13,12 +13,12 @@ func CreateUser(user db.CreateUser) (db.User, error) {
 	return newUser, nil
 }
 
-func GetUserIDByUsername(username string) (uuid.UUID, error) {
+func GetUserById(userID uuid.UUID) (db.User, error) {
 	var user db.User
-	if err := db.DB.First(&user, "username = ?", username).Select("id").Error; err != nil {
-		return uuid.Nil, err
+	if err := db.DB.First(&user, "id = ?", userID).Error; err != nil {
+		return db.User{}, err
 	}
-	return user.ID, nil
+	return user, nil
 }
 
 func GetUserByUsername(username string) (db.User, error) {

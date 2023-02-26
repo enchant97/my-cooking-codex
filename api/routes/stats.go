@@ -14,10 +14,9 @@ type accountStats struct {
 }
 
 func getAccountStats(ctx echo.Context) error {
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
-	recipeCount, err := crud.GetRecipesByUserIDCount(userID)
+	recipeCount, err := crud.GetRecipesByUserIDCount(authenticatedUser.UserID)
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)

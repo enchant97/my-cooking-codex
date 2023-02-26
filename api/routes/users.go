@@ -27,9 +27,9 @@ func postCreateUser(ctx echo.Context) error {
 }
 
 func getUserMe(ctx echo.Context) error {
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
-	user, err := crud.GetUserByUsername(username)
+	user, err := crud.GetRecipeById(authenticatedUser.UserID)
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)

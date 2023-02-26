@@ -16,8 +16,7 @@ import (
 )
 
 func postCreateRecipe(ctx echo.Context) error {
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	var recipeData db.CreateRecipe
 	if err := ctx.Bind(&recipeData); err != nil {
@@ -27,7 +26,7 @@ func postCreateRecipe(ctx echo.Context) error {
 		return err
 	}
 
-	recipe, err := crud.CreateRecipe(recipeData.IntoRecipe(userID, false))
+	recipe, err := crud.CreateRecipe(recipeData.IntoRecipe(authenticatedUser.UserID, false))
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -36,10 +35,9 @@ func postCreateRecipe(ctx echo.Context) error {
 }
 
 func getRecipes(ctx echo.Context) error {
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
-	recipes, err := crud.GetRecipesByUserID(userID)
+	recipes, err := crud.GetRecipesByUserID(authenticatedUser.UserID)
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -49,10 +47,9 @@ func getRecipes(ctx echo.Context) error {
 
 func getRecipe(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
-	if hasAccess, err := crud.DoesUserOwnRecipe(userID, uuid.MustParse(recipeID)); err != nil {
+	if hasAccess, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID)); err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
 	} else if !hasAccess {
@@ -69,11 +66,10 @@ func getRecipe(ctx echo.Context) error {
 
 func patchRecipe(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// validate whether user can modify the recipe content
-	isOwner, err := crud.DoesUserOwnRecipe(userID, uuid.MustParse(recipeID))
+	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -100,11 +96,10 @@ func patchRecipe(ctx echo.Context) error {
 func deleteRecipe(ctx echo.Context) error {
 	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// validate whether user can modify the recipe content
-	isOwner, err := crud.DoesUserOwnRecipe(userID, uuid.MustParse(recipeID))
+	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -125,11 +120,10 @@ func deleteRecipe(ctx echo.Context) error {
 func postSetRecipeImage(ctx echo.Context) error {
 	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// validate whether user can modify the recipe content
-	isOwner, err := crud.DoesUserOwnRecipe(userID, uuid.MustParse(recipeID))
+	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -164,11 +158,10 @@ func postSetRecipeImage(ctx echo.Context) error {
 func deleteRecipeImage(ctx echo.Context) error {
 	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
-	username, _ := core.GetAuthenticatedUserFromContext(ctx)
-	userID, _ := crud.GetUserIDByUsername(username)
+	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
 
 	// validate whether user can modify the recipe content
-	isOwner, err := crud.DoesUserOwnRecipe(userID, uuid.MustParse(recipeID))
+	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)

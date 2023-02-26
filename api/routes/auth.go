@@ -26,10 +26,15 @@ func postLogin(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusUnauthorized)
 	}
 
+	authenticationData := core.AuthenticatedUser{
+		UserID:   user.ID,
+		Username: user.Username,
+		IsAdmin:  false,
+	}
+
 	// user is valid, create a token
 	if token, err := core.CreateAuthenticationToken(
-		loginData.Username,
-		false,
+		authenticationData,
 		[]byte(appConfig.SecretKey),
 	); err != nil {
 		return err
