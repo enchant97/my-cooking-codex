@@ -54,6 +54,17 @@ func main() {
 		}
 	})
 	routes.InitRoutes(e, appConfig)
+	if appConfig.StaticPath != nil {
+		log.Println("Serving static files from", *appConfig.StaticPath)
+		e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+			Root:  *appConfig.StaticPath,
+			HTML5: true,
+		}))
+	} else {
+		e.GET("/", func(ctx echo.Context) error {
+			return ctx.HTML(200, "<h1>API Backend Operational</h1>")
+		})
+	}
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", appConfig.Host, appConfig.Port)))
 }
