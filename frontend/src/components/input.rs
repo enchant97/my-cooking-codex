@@ -1,4 +1,4 @@
-use crate::core::{api::sanitise_base_url, Fraction};
+use crate::core::{api::sanitise_base_url, types::Fraction};
 use regex::Regex;
 use url::Url;
 use wasm_bindgen::JsCast;

@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
 use crate::{
-    core::{types, Fraction},
+    core::types::{self, Fraction},
     modals::{self, ModalController},
 };
 

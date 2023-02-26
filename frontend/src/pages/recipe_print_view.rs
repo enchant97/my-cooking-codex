@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use yew_hooks::{use_async_with_options, UseAsyncOptions};
 
-use crate::{contexts::login::use_login, core::Fraction};
+use crate::{contexts::login::use_login, core::types::Fraction};
 
 #[derive(Properties, PartialEq)]
 pub struct RecipePrintViewProps {
