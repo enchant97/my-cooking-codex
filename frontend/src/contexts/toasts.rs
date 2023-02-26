@@ -6,7 +6,7 @@ use yew::{hook, use_context, Reducible, UseReducerHandle};
 #[derive(Debug, PartialEq, Clone)]
 pub struct Toast {
     /// Message to display to user
-    pub message: &'static str,
+    pub message: String,
 }
 
 pub enum ToastChange {

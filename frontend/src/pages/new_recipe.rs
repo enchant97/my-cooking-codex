@@ -52,7 +52,7 @@ pub fn new_recipe() -> Html {
                     Some(_) => {
                         // TODO handle the actual errors
                         toasts_ctx.dispatch(create_push_toast_change(Toast {
-                            message: "failed recipe creation!",
+                            message: "failed recipe creation!".to_owned(),
                         }));
                     }
                     None => match &response.data {

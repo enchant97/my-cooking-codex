@@ -26,7 +26,7 @@ fn toast_row(props: &ToastProps) -> Html {
             (),
         );
     }
-    html! {<div class="alert alert-info"><span>{props.toast.message}</span></div>}
+    html! {<div class="alert alert-info"><span>{&props.toast.message}</span></div>}
 }
 
 #[function_component(Toasts)]

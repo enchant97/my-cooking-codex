@@ -6,9 +6,10 @@ use yew_router::prelude::Link;
 
 use crate::components::input::BaseUrlSelector;
 use crate::components::loading::LoadingButton;
-use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
+use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts};
 use crate::core::api::sanitise_base_url;
 use crate::core::effects::{use_login_redirect_effect, LoginState};
+use crate::core::handlers::api_error_to_toast;
 use crate::core::APP_TITLE;
 use crate::core::{api::Api, types};
 use crate::Route;
@@ -50,11 +51,11 @@ pub fn login() -> Html {
                     return;
                 }
                 match &token_response.error {
-                    Some(_) => {
-                        // TODO handle the actual errors
-                        toasts_ctx.dispatch(create_push_toast_change(Toast {
-                            message: "failed login!",
-                        }));
+                    Some(error) => {
+                        toasts_ctx.dispatch(create_push_toast_change(api_error_to_toast(
+                            error,
+                            "requesting login",
+                        )));
                     }
                     None => match &token_response.data {
                         Some(token) => {

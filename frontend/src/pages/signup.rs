@@ -10,7 +10,8 @@ use crate::{
     core::{
         api::{sanitise_base_url, Api},
         effects::{use_login_redirect_effect, LoginState},
-        types::user, APP_TITLE,
+        types::user,
+        APP_TITLE, handlers::api_error_to_toast,
     },
     Route,
 };
@@ -43,9 +44,7 @@ pub fn signup() -> Html {
                 username: username.to_string(),
                 password: password.to_string(),
             };
-            Api::new(api_url, None)
-                .post_create_account(&details)
-                .await
+            Api::new(api_url, None).post_create_account(&details).await
         })
     };
 
@@ -59,16 +58,16 @@ pub fn signup() -> Html {
                     return;
                 }
                 match &response.error {
-                    Some(_) => {
-                        // TODO handle the actual errors
-                        toasts_ctx.dispatch(create_push_toast_change(Toast {
-                            message: "failed account creation!",
-                        }));
+                    Some(error) => {
+                        toasts_ctx.dispatch(create_push_toast_change(api_error_to_toast(
+                            error,
+                            "creating new account",
+                        )));
                     }
                     None => match &response.data {
                         Some(_) => {
                             toasts_ctx.dispatch(create_push_toast_change(Toast {
-                                message: "Account Created",
+                                message: "Account Created".to_owned(),
                             }));
                             navigator.push(&Route::Login);
                         }
@@ -90,7 +89,7 @@ pub fn signup() -> Html {
 
             if password != password_confirm {
                 toasts_ctx.dispatch(create_push_toast_change(Toast {
-                    message: "Passwords do not match",
+                    message: "Passwords do not match".to_owned(),
                 }));
                 return;
             }
