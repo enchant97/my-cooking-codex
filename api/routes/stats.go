@@ -3,7 +3,6 @@ package routes
 import (
 	"net/http"
 
-	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db/crud"
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +13,7 @@ type accountStats struct {
 }
 
 func getAccountStats(ctx echo.Context) error {
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	recipeCount, err := crud.GetRecipesByUserIDCount(authenticatedUser.UserID)
 	if err != nil {

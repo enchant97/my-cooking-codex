@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/enchant97/my-cooking-codex/api/config"
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/golang-jwt/jwt/v4"
@@ -8,6 +10,28 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
+
+const (
+	AuthenticatedUserKey = "AuthenticatedUser"
+	UserTokenKey         = "UserToken"
+)
+
+func authenticatedUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		authenticatedUser, err := core.GetAuthenticatedUserFromContext(ctx)
+		if err != nil {
+			// invalid token contents
+			return ctx.NoContent(http.StatusUnauthorized)
+		}
+		// TODO validate username & userID match in database
+		ctx.Set(AuthenticatedUserKey, authenticatedUser)
+		return next(ctx)
+	}
+}
+
+func getAuthenticatedUser(ctx echo.Context) core.AuthenticatedUser {
+	return ctx.Get(AuthenticatedUserKey).(core.AuthenticatedUser)
+}
 
 func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 	e.GET("/", func(ctx echo.Context) error {
@@ -21,11 +45,11 @@ func InitRoutes(e *echo.Echo, appConfig config.AppConfig) {
 			return new(core.JWTClaims)
 		},
 		SigningKey: []byte(appConfig.SecretKey),
-		ContextKey: "UserToken",
+		ContextKey: UserTokenKey,
 	}
 	jwtMiddleware := echojwt.WithConfig(config)
 
-	apiRoutes := e.Group("/api/", jwtMiddleware)
+	apiRoutes := e.Group("/api/", jwtMiddleware, authenticatedUserMiddleware)
 	{
 		apiRoutes.GET("users/me/", getUserMe)
 		apiRoutes.POST("recipes/", postCreateRecipe)

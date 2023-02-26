@@ -16,7 +16,7 @@ import (
 )
 
 func postCreateRecipe(ctx echo.Context) error {
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	var recipeData db.CreateRecipe
 	if err := ctx.Bind(&recipeData); err != nil {
@@ -35,7 +35,7 @@ func postCreateRecipe(ctx echo.Context) error {
 }
 
 func getRecipes(ctx echo.Context) error {
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	recipes, err := crud.GetRecipesByUserID(authenticatedUser.UserID)
 	if err != nil {
@@ -47,7 +47,7 @@ func getRecipes(ctx echo.Context) error {
 
 func getRecipe(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	if hasAccess, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID)); err != nil {
 		ctx.Logger().Error(err)
@@ -66,7 +66,7 @@ func getRecipe(ctx echo.Context) error {
 
 func patchRecipe(ctx echo.Context) error {
 	recipeID := ctx.Param("id")
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	// validate whether user can modify the recipe content
 	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
@@ -96,7 +96,7 @@ func patchRecipe(ctx echo.Context) error {
 func deleteRecipe(ctx echo.Context) error {
 	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	// validate whether user can modify the recipe content
 	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
@@ -120,7 +120,7 @@ func deleteRecipe(ctx echo.Context) error {
 func postSetRecipeImage(ctx echo.Context) error {
 	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	// validate whether user can modify the recipe content
 	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
@@ -158,7 +158,7 @@ func postSetRecipeImage(ctx echo.Context) error {
 func deleteRecipeImage(ctx echo.Context) error {
 	appConfig := ctx.Get("AppConfig").(config.AppConfig)
 	recipeID := ctx.Param("id")
-	authenticatedUser, _ := core.GetAuthenticatedUserFromContext(ctx)
+	authenticatedUser := getAuthenticatedUser(ctx)
 
 	// validate whether user can modify the recipe content
 	isOwner, err := crud.DoesUserOwnRecipe(authenticatedUser.UserID, uuid.MustParse(recipeID))
