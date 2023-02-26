@@ -1,4 +1,6 @@
 use crate::components::input::FractionalNumberInput;
+use crate::contexts::prelude::{push_toast, use_toasts};
+use crate::core::handlers::{api_error_to_toast, logout_on_401};
 use crate::core::types::recipe::{UpdateIngredient, UpdateRecipe};
 use crate::modals::Modal;
 use crate::{contexts::login::use_login, core::types::recipe::Ingredient};
@@ -191,6 +193,7 @@ pub struct EditIngredientsProps {
 #[function_component(EditIngredients)]
 pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
     let login_ctx = use_login().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
     let ingredients_state = use_state(Vec::default);
     let is_loading_state = use_state(bool::default);
 
@@ -208,41 +211,53 @@ pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
     let on_save = {
         let id = props.id.to_string();
         let on_close_callback = props.onclose.clone();
-        let api = login_ctx.http_api.clone();
         let ingredients_state = ingredients_state.clone();
         Callback::from(move |_| {
-            let api = api.clone().unwrap();
+            let login_ctx = login_ctx.clone();
+            let toasts_ctx = toasts_ctx.clone();
+            let api = login_ctx.http_api.clone().unwrap();
             let id = id.clone();
             let on_close_callback = on_close_callback.clone();
             let is_loading_state = is_loading_state.clone();
             let ingredients = (*ingredients_state).clone();
             wasm_bindgen_futures::spawn_local(async move {
                 is_loading_state.set(true);
-                api.patch_update_recipe(
-                    id,
-                    &UpdateRecipe {
-                        title: None,
-                        short_description: None,
-                        long_description: None,
-                        tags: None,
-                        ingredients: Some(
-                            ingredients
-                                .iter()
-                                .map(|i| UpdateIngredient {
-                                    name: Some(i.name.clone()),
-                                    amount: Some(i.amount),
-                                    unit_type: Some(i.unit_type.clone()),
-                                    description: i.description.clone(),
-                                })
-                                .collect(),
-                        ),
-                        steps: None,
-                    },
-                )
-                .await
-                .unwrap();
+                let result = api
+                    .patch_update_recipe(
+                        id,
+                        &UpdateRecipe {
+                            title: None,
+                            short_description: None,
+                            long_description: None,
+                            tags: None,
+                            ingredients: Some(
+                                ingredients
+                                    .iter()
+                                    .map(|i| UpdateIngredient {
+                                        name: Some(i.name.clone()),
+                                        amount: Some(i.amount),
+                                        unit_type: Some(i.unit_type.clone()),
+                                        description: i.description.clone(),
+                                    })
+                                    .collect(),
+                            ),
+                            steps: None,
+                        },
+                    )
+                    .await;
                 is_loading_state.set(false);
-                on_close_callback.emit(Some(ingredients));
+                match result {
+                    Ok(_) => {
+                        on_close_callback.emit(Some(ingredients));
+                    }
+                    Err(e) => {
+                        push_toast(
+                            &toasts_ctx,
+                            api_error_to_toast(&e, "saving recipe ingredients"),
+                        );
+                        logout_on_401(&e, &login_ctx);
+                    }
+                }
             });
         })
     };
