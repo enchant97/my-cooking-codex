@@ -50,7 +50,6 @@ pub fn recipe_image(props: &SetImageProps) -> Html {
         let id = props.id.to_string();
         let api = login_ctx.http_api.clone();
         let is_loading_state = is_loading_state.clone();
-        let image_file = image_file.clone();
         Callback::from(move |_| {
             let on_close_callback = on_close_callback.clone();
             let id = id.clone();
