@@ -52,12 +52,12 @@ pub fn use_toasts() -> Option<UseReducerHandle<Toasts>> {
     use_context::<ToastsContext>()
 }
 
-/// Method to create a "push toast" change
-pub fn create_push_toast_change(toast: Toast) -> ToastChange {
-    ToastChange::Push(toast)
+/// Method to push a "push toast" change
+pub fn push_toast(ctx: &UseReducerHandle<Toasts>, toast: Toast) {
+    ctx.dispatch(ToastChange::Push(toast));
 }
 
-/// Method to create a "remove toast" change
-pub fn create_remove_toast_change(toast: Toast) -> ToastChange {
-    ToastChange::Remove(toast)
+/// Method to push a "remove toast" change
+pub fn remove_toast(ctx: &UseReducerHandle<Toasts>, toast: Toast) {
+    ctx.dispatch(ToastChange::Remove(toast));
 }

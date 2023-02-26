@@ -4,7 +4,7 @@ use yew::{
     use_effect_with_deps, Properties,
 };
 
-use crate::contexts::prelude::{create_remove_toast_change, use_toasts, Toast};
+use crate::contexts::prelude::{remove_toast, use_toasts, Toast};
 
 #[derive(Properties, PartialEq)]
 struct ToastProps {
@@ -19,7 +19,7 @@ fn toast_row(props: &ToastProps) -> Html {
         use_effect_with_deps(
             move |_| {
                 let timeout = Timeout::new(6_000, move || {
-                    toasts_ctx.dispatch(create_remove_toast_change(toast));
+                    remove_toast(&toasts_ctx, toast);
                 });
                 timeout.forget();
             },
@@ -34,7 +34,7 @@ pub fn toasts() -> Html {
     let toasts_ctx = use_toasts().unwrap();
     let toasts = toasts_ctx.inner.to_owned();
     html! {
-        <div class="toast toast-top toast-start">
+        <div class="toast toast-top toast-start z-[999]">
             {
                 for toasts.iter().map(|toast| {
                     html!{<ToastRow toast={toast.clone()}/>}

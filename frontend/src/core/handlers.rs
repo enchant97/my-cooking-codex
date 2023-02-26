@@ -1,4 +1,9 @@
-use crate::{contexts::prelude::Toast, core::api::ApiInternalError};
+use yew::UseReducerHandle;
+
+use crate::{
+    contexts::{login::CurrentLogin, prelude::Toast},
+    core::api::ApiInternalError,
+};
 
 use super::api::ApiError;
 
@@ -30,5 +35,14 @@ pub fn api_error_to_toast(error: &ApiError, when: &str) -> Toast {
                 ),
             },
         },
+    }
+}
+
+/// Logout the user if the API returns a 401
+pub fn logout_on_401(error: &ApiError, login_ctx: &UseReducerHandle<CurrentLogin>) {
+    if let ApiError::Response(e) = error {
+        if e.status_code == 401 {
+            login_ctx.dispatch(None);
+        }
     }
 }

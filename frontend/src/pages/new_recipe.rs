@@ -6,7 +6,7 @@ use yew_router::prelude::use_navigator;
 
 use crate::components::drawer;
 use crate::components::loading::LoadingButton;
-use crate::contexts::prelude::{create_push_toast_change, use_login, use_toasts, Toast};
+use crate::contexts::prelude::{push_toast, use_login, use_toasts, Toast};
 use crate::core::effects::{use_login_redirect_effect, LoginState};
 use crate::core::types;
 use crate::Route;
@@ -51,14 +51,19 @@ pub fn new_recipe() -> Html {
                 match &response.error {
                     Some(_) => {
                         // TODO handle the actual errors
-                        toasts_ctx.dispatch(create_push_toast_change(Toast {
-                            message: "failed recipe creation!".to_owned(),
-                        }));
+                        push_toast(
+                            &toasts_ctx,
+                            Toast {
+                                message: "failed recipe creation!".to_owned(),
+                            },
+                        );
                     }
                     None => match &response.data {
                         Some(recipe) => {
                             gloo::console::debug!(format!("new recipe created: '{:?}'", recipe));
-                            navigator.push(&Route::Recipe { id: recipe.id.clone() });
+                            navigator.push(&Route::Recipe {
+                                id: recipe.id.clone(),
+                            });
                         }
                         None => (),
                     },

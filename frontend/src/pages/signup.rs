@@ -6,12 +6,13 @@ use yew_router::prelude::{use_navigator, Link};
 
 use crate::{
     components::{input::BaseUrlSelector, loading::LoadingButton},
-    contexts::prelude::{create_push_toast_change, use_toasts, Toast},
+    contexts::prelude::{push_toast, use_toasts, Toast},
     core::{
         api::{sanitise_base_url, Api},
         effects::{use_login_redirect_effect, LoginState},
+        handlers::api_error_to_toast,
         types::user,
-        APP_TITLE, handlers::api_error_to_toast,
+        APP_TITLE,
     },
     Route,
 };
@@ -59,16 +60,19 @@ pub fn signup() -> Html {
                 }
                 match &response.error {
                     Some(error) => {
-                        toasts_ctx.dispatch(create_push_toast_change(api_error_to_toast(
-                            error,
-                            "creating new account",
-                        )));
+                        push_toast(
+                            &toasts_ctx,
+                            api_error_to_toast(error, "creating new account"),
+                        );
                     }
                     None => match &response.data {
                         Some(_) => {
-                            toasts_ctx.dispatch(create_push_toast_change(Toast {
-                                message: "Account Created".to_owned(),
-                            }));
+                            push_toast(
+                                &toasts_ctx,
+                                Toast {
+                                    message: "Account Created".to_owned(),
+                                },
+                            );
                             navigator.push(&Route::Login);
                         }
                         None => (),
@@ -88,9 +92,12 @@ pub fn signup() -> Html {
             e.prevent_default();
 
             if password != password_confirm {
-                toasts_ctx.dispatch(create_push_toast_change(Toast {
-                    message: "Passwords do not match".to_owned(),
-                }));
+                push_toast(
+                    &toasts_ctx,
+                    Toast {
+                        message: "Passwords do not match".to_owned(),
+                    },
+                );
                 return;
             }
             // create new user in background
