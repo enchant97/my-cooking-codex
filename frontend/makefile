@@ -9,6 +9,7 @@ help:
 	@echo "  deps-builder-pre-built  - install pre-built trunk binary"
 	@echo "  serve"
 	@echo "  build                   - build for releaes"
+	@echo "  build-in-docker 		 - build release in docker"
 	@echo "  clean                   - clean build artifacts"
 deps: deps-pnpm deps-builder-pre-built
 deps-pnpm:
@@ -22,5 +23,8 @@ serve:
 	@trunk serve
 build:
 	@trunk build --release
+build-in-docker:
+	@docker pull ghcr.io/enchant97/trunk-docker-builder:latest
+	@docker run --rm -v $(shell pwd):/app ghcr.io/enchant97/trunk-docker-builder
 clean:
 	@trunk clean
