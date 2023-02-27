@@ -6,8 +6,9 @@ use yew_router::prelude::use_navigator;
 
 use crate::components::drawer;
 use crate::components::loading::LoadingButton;
-use crate::contexts::prelude::{push_toast, use_login, use_toasts, Toast};
+use crate::contexts::prelude::{push_toast, use_login, use_toasts};
 use crate::core::effects::{use_login_redirect_effect, LoginState};
+use crate::core::handlers::{api_error_to_toast, logout_on_401};
 use crate::core::types;
 use crate::Route;
 
@@ -49,14 +50,9 @@ pub fn new_recipe() -> Html {
                     return;
                 }
                 match &response.error {
-                    Some(_) => {
-                        // TODO handle the actual errors
-                        push_toast(
-                            &toasts_ctx,
-                            Toast {
-                                message: "failed recipe creation!".to_owned(),
-                            },
-                        );
+                    Some(err) => {
+                        push_toast(&toasts_ctx, api_error_to_toast(err, "creating new recipe"));
+                        logout_on_401(err, &login_ctx)
                     }
                     None => match &response.data {
                         Some(recipe) => {

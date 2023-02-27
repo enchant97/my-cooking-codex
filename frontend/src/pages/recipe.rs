@@ -1,7 +1,8 @@
 use yew::prelude::*;
 use yew_hooks::prelude::{use_async_with_options, UseAsyncOptions};
 
-use crate::contexts::prelude::use_login;
+use crate::contexts::prelude::{push_toast, use_login, use_toasts};
+use crate::core::handlers::{api_error_to_toast, logout_on_401};
 use crate::{
     components::{drawer, recipe::RecipeContent},
     core::effects::{use_login_redirect_effect, LoginState},
@@ -16,14 +17,23 @@ pub struct RecipeProps {
 #[function_component(Recipe)]
 pub fn recipe(props: &RecipeProps) -> Html {
     let login_ctx = use_login().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
 
     let get_recipe = {
         let id = props.id.to_string();
+        let login_ctx = login_ctx.clone();
         let api = login_ctx.http_api.clone();
         use_async_with_options(
             async move {
                 let api = api.expect("expected api to exist");
-                api.get_recipe_by_id(id).await
+                match api.get_recipe_by_id(id).await {
+                    Ok(v) => Ok(v),
+                    Err(err) => {
+                        push_toast(&toasts_ctx, api_error_to_toast(&err, "loading recipe"));
+                        logout_on_401(&err, &login_ctx);
+                        Err(err)
+                    }
+                }
             },
             UseAsyncOptions::enable_auto(),
         )

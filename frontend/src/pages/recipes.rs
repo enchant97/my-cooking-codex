@@ -1,11 +1,11 @@
 use yew::prelude::*;
 
 use crate::{
-    components::{thumbnail_link_grid, drawer},
-    contexts::prelude::use_login,
+    components::{drawer, thumbnail_link_grid},
+    contexts::prelude::{use_login, use_toasts, push_toast},
     core::{
         effects::{use_login_redirect_effect, LoginState},
-        types::recipe,
+        types::recipe, handlers::{api_error_to_toast, logout_on_401},
     },
     Route,
 };
@@ -13,6 +13,7 @@ use crate::{
 #[function_component(Recipes)]
 pub fn recipes() -> Html {
     let login_ctx = use_login().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
 
     let recipes_state: UseStateHandle<Vec<recipe::Recipe>> = use_state(Vec::default);
 
@@ -28,8 +29,13 @@ pub fn recipes() -> Html {
                     None => return,
                 };
                 wasm_bindgen_futures::spawn_local(async move {
-                    let new_recipes = api.get_recipes().await.unwrap();
-                    recipes_state.set(new_recipes);
+                    match api.get_recipes().await {
+                        Ok(v) => recipes_state.set(v),
+                        Err(err) => {
+                            push_toast(&toasts_ctx, api_error_to_toast(&err, "loading recipes"));
+                            logout_on_401(&err, &login_ctx);
+                        },
+                    };
                 });
             },
             (),

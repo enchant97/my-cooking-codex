@@ -3,15 +3,19 @@ use yew::prelude::*;
 use crate::{
     components::drawer,
     components::stats,
-    contexts::prelude::use_login,
+    contexts::prelude::{push_toast, use_login, use_toasts},
     core::effects::{use_login_redirect_effect, LoginState},
-    core::types,
+    core::{
+        handlers::{api_error_to_toast, logout_on_401},
+        types,
+    },
     Route,
 };
 
 #[function_component(HomeAccountStats)]
 fn home_account_stats() -> HtmlResult {
     let login_ctx = use_login().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
 
     let stats_state: UseStateHandle<Option<types::stats::AccountStats>> =
         use_state(Option::default);
@@ -25,8 +29,13 @@ fn home_account_stats() -> HtmlResult {
                     None => return,
                 };
                 wasm_bindgen_futures::spawn_local(async move {
-                    let new_stats = api.get_stats().await.unwrap();
-                    stats_state.set(Some(new_stats))
+                    match api.get_stats().await {
+                        Ok(v) => stats_state.set(Some(v)),
+                        Err(err) => {
+                            push_toast(&toasts_ctx, api_error_to_toast(&err, "loading stats"));
+                            logout_on_401(&err, &login_ctx);
+                        }
+                    };
                 });
             },
             (),
