@@ -6,6 +6,39 @@ use crate::{
 };
 
 #[derive(Properties, PartialEq)]
+pub struct RecipeToolbarProps {
+    #[prop_or_default]
+    pub classes: Classes,
+    pub recipe: types::recipe::Recipe,
+}
+
+#[function_component(RecipeToolbar)]
+pub fn recipe_toolbar(props: &RecipeToolbarProps) -> Html {
+    let recipe_state = use_state(|| props.recipe.clone());
+
+    let on_print_click = {
+        let recipe_id = (*recipe_state).clone().id;
+        Callback::from(move |_: MouseEvent| {
+            let window = gloo::utils::window();
+            let print_window = window.open_with_url_and_target_and_features(
+                &format!("{}/print", recipe_id),
+                "_blank",
+                "Recipe Print",
+            );
+            if let Ok(Some(print_window)) = print_window {
+                print_window.open().unwrap();
+            }
+        })
+    };
+
+    html! {
+        <div class={classes!(props.classes.clone())}>
+            <button class="btn" onclick={on_print_click}>{"Print"}</button>
+        </div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
 pub struct IngredientsProps {
     pub items: Vec<types::recipe::Ingredient>,
 }
@@ -154,21 +187,6 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         })
     };
 
-    let on_print_click = {
-        let recipe = (*recipe_state).clone();
-        Callback::from(move |_: MouseEvent| {
-            let window = gloo::utils::window();
-            let print_window = window.open_with_url_and_target_and_features(
-                &format!("{}/print", recipe.id),
-                "_blank",
-                "Recipe Print",
-            );
-            if let Ok(Some(print_window)) = print_window {
-                print_window.open().unwrap();
-            }
-        })
-    };
-
     let on_edit_image_click = {
         let modal_html_state = modal_html_state.clone();
         let recipe = (*recipe_state).clone();
@@ -272,9 +290,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                     <button class="btn" onclick={on_edit_image_click}>{"Edit Image"}</button>
                 </div>
             </div>
-            <div class="mb-4 p-4 rounded bg-base-200">
-                <button class="btn" onclick={on_print_click}>{"Print"}</button>
-            </div>
+            <RecipeToolbar classes="mb-4 p-4 rounded bg-base-200" recipe={(*recipe_state).clone()} />
             <div class="mb-4 p-4 rounded bg-base-200">
                 <div class="flex mb-2">
                     <h2 class="text-xl font-bold mr-auto">{"Description"}</h2>
