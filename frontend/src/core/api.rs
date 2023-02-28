@@ -3,6 +3,8 @@ use gloo::net::http::Request;
 use serde::de::DeserializeOwned;
 use std::convert::From;
 
+/// Sanitise given URL:
+/// - Remove URLs ending with /
 pub fn sanitise_base_url(base: String) -> String {
     let base = match base.strip_suffix('/') {
         Some(v) => v.to_owned(),
@@ -23,13 +25,17 @@ pub struct ApiResponseError {
     pub status_code: u16,
 }
 
+/// When something goes wrong with a web request
 #[derive(Debug, Clone, PartialEq)]
 pub enum ApiError {
+    /// Something wrong with client
     Internal(ApiInternalError),
+    /// Something wrong with the received response
     Response(ApiResponseError),
 }
 
 impl ApiError {
+    /// Handle response errors
     pub fn from_response_result(
         response: Result<gloo::net::http::Response, gloo::net::Error>,
     ) -> Result<gloo::net::http::Response, Self> {
@@ -44,6 +50,8 @@ impl ApiError {
         }
     }
 
+    /// Handle internal errors,
+    /// validating the received JSON matches given type
     pub async fn check_json_response_ok<T>(response: gloo::net::http::Response) -> Result<T, Self>
     where
         T: DeserializeOwned,
@@ -152,6 +160,7 @@ impl Api {
         )?;
         ApiError::check_json_response_ok::<recipe::Recipe>(response).await
     }
+
     pub async fn patch_update_recipe(
         &self,
         id: String,
@@ -168,6 +177,18 @@ impl Api {
         )?;
         Ok(())
     }
+
+    pub async fn delete_recipe(&self, id: String) -> Result<(), ApiError> {
+        let req_url = format!("{}/recipes/{}/", self.base_url.clone(), id);
+        ApiError::from_response_result(
+            Request::delete(&req_url)
+                .header("Authorization", &self.get_authorization_value().unwrap())
+                .send()
+                .await,
+        )?;
+        Ok(())
+    }
+
     pub async fn post_recipe_image(&self, id: String, file: web_sys::File) -> Result<(), ApiError> {
         let req_url = format!("{}/recipes/{}/image/", self.base_url.clone(), id);
         ApiError::from_response_result(
@@ -179,6 +200,7 @@ impl Api {
         )?;
         Ok(())
     }
+
     pub async fn delete_recipe_image(&self, id: String) -> Result<(), ApiError> {
         let req_url = format!("{}/recipes/{}/image/", self.base_url.clone(), id);
         ApiError::from_response_result(
