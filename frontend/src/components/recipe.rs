@@ -1,8 +1,17 @@
 use yew::prelude::*;
+use yew_router::prelude::use_navigator;
 
 use crate::{
-    core::types::{self, Fraction},
+    contexts::{
+        login::use_login,
+        prelude::{push_toast, use_toasts},
+    },
+    core::{
+        handlers::{api_error_to_toast, logout_on_401},
+        types::{self, Fraction},
+    },
     modals::{self, ModalController},
+    Route,
 };
 
 #[derive(Properties, PartialEq)]
@@ -15,6 +24,9 @@ pub struct RecipeToolbarProps {
 #[function_component(RecipeToolbar)]
 pub fn recipe_toolbar(props: &RecipeToolbarProps) -> Html {
     let recipe_state = use_state(|| props.recipe.clone());
+    let navigator = use_navigator().unwrap();
+    let toasts_ctx = use_toasts().unwrap();
+    let login_ctx = use_login().unwrap();
 
     let on_print_click = {
         let recipe_id = (*recipe_state).clone().id;
@@ -31,9 +43,43 @@ pub fn recipe_toolbar(props: &RecipeToolbarProps) -> Html {
         })
     };
 
+    let on_delete_click = {
+        let recipe_id = (*recipe_state).clone().id;
+        Callback::from(move |_: MouseEvent| {
+            let recipe_id = recipe_id.clone();
+            let navigator = navigator.clone();
+            let toasts_ctx = toasts_ctx.clone();
+            let login_ctx = login_ctx.clone();
+            let api = login_ctx.http_api.clone().unwrap();
+            wasm_bindgen_futures::spawn_local(async move {
+                match api.delete_recipe(&recipe_id).await {
+                    Ok(_) => {
+                        navigator.push(&Route::Recipes);
+                    }
+                    Err(e) => {
+                        push_toast(&toasts_ctx, api_error_to_toast(&e, "deleting recipe"));
+                        logout_on_401(&e, &login_ctx);
+                    }
+                };
+            });
+        })
+    };
+
     html! {
         <div class={classes!(props.classes.clone())}>
             <button class="btn" onclick={on_print_click}>{"Print"}</button>
+        <div class="dropdown dropdown-bottom">
+            <label tabindex="0" class="btn m-1">{"Remove"}</label>
+            <div class="dropdown-content menu bg-base-200 rounded">
+                <button
+                    tabindex="0"
+                    class="btn btn-outline btn-error"
+                    onclick={on_delete_click}
+                    aria-label={"Confirm Deletion"}>
+                    {"Confirm"}
+                </button>
+            </div>
+        </div>
         </div>
     }
 }

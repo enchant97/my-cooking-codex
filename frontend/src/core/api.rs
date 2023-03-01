@@ -178,7 +178,7 @@ impl Api {
         Ok(())
     }
 
-    pub async fn delete_recipe(&self, id: String) -> Result<(), ApiError> {
+    pub async fn delete_recipe(&self, id: &str) -> Result<(), ApiError> {
         let req_url = format!("{}/recipes/{}/", self.base_url.clone(), id);
         ApiError::from_response_result(
             Request::delete(&req_url)
