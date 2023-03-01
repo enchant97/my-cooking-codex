@@ -8,6 +8,7 @@ import (
 	"path"
 
 	"github.com/enchant97/my-cooking-codex/api/config"
+	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
 	"github.com/enchant97/my-cooking-codex/api/routes"
 	"github.com/go-playground/validator"
@@ -36,7 +37,7 @@ func main() {
 	if err := os.MkdirAll(appConfig.DataPath, os.ModePerm); err != nil {
 		log.Fatalln(err)
 	}
-	os.Mkdir(path.Join(appConfig.DataPath, "recipe_images"), os.ModePerm)
+	os.MkdirAll(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath), os.ModePerm)
 	// Connect to database
 	if err := db.InitDB(appConfig.DB); err != nil {
 		log.Fatalln(err)

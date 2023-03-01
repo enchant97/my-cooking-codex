@@ -4,6 +4,10 @@ import (
 	"github.com/h2non/bimg"
 )
 
+const (
+	RecipeImagesOriginalPath = "recipe_images/original"
+)
+
 // Return the minimum of two integers
 func intMin(a, b int) int {
 	if a < b {

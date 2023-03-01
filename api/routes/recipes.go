@@ -112,7 +112,7 @@ func deleteRecipe(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	os.Remove(path.Join(appConfig.DataPath, "recipe_images", uuid.MustParse(recipeID).String()+".jpg"))
+	os.Remove(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, uuid.MustParse(recipeID).String()+".jpg"))
 
 	return ctx.NoContent(http.StatusNoContent)
 }
@@ -143,7 +143,7 @@ func postSetRecipeImage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	if err := os.WriteFile(path.Join(appConfig.DataPath, "recipe_images", uuid.MustParse(recipeID).String()+".jpg"), content, 0644); err != nil {
+	if err := os.WriteFile(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, uuid.MustParse(recipeID).String()+".jpg"), content, 0644); err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
@@ -169,7 +169,7 @@ func deleteRecipeImage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusForbidden)
 	}
 
-	os.Remove(path.Join(appConfig.DataPath, "recipe_images", uuid.MustParse(recipeID).String()+".jpg"))
+	os.Remove(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, uuid.MustParse(recipeID).String()+".jpg"))
 
 	if err := crud.UpdateRecipeHasImage(uuid.MustParse(recipeID), false); err != nil {
 		ctx.Logger().Error(err)
