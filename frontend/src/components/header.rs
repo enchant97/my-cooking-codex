@@ -15,7 +15,7 @@ pub fn header() -> Html {
             </label>
         </div>
         <div class="flex-1">
-            <a class="btn btn-ghost normal-case text-xl">{APP_TITLE}</a>
+            <span class="text-xl p-2">{APP_TITLE}</span>
         </div>
         <div class="flex-none">
             if current_login.is_none() {
