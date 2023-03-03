@@ -321,7 +321,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         <>
         <ModalController modal={(*modal_html_state).clone()}/>
         <div class={props.classes.clone()}>
-            <div class="mb-4 relative h-64 o">
+            <div class="mb-4 relative h-64">
                 if recipe_state.image_id.is_some() {
                     <img
                         class="object-cover w-full h-full rounded"
