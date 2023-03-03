@@ -85,9 +85,9 @@ func UpdateRecipe(recipeID uuid.UUID, recipe db.UpdateRecipe) (db.Recipe, error)
 	return updatedRecipe, nil
 }
 
-func UpdateRecipeHasImage(recipeID uuid.UUID, hasImage bool) error {
+func UpdateRecipeImage(recipeID uuid.UUID, imageID *uuid.UUID) error {
 	var updatedRecipe db.Recipe
-	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(map[string]any{"has_image": hasImage}).Error; err != nil {
+	if err := db.DB.Model(&updatedRecipe).Where("id = ?", recipeID).Updates(map[string]any{"image_id": imageID}).Error; err != nil {
 		return err
 	}
 	return nil

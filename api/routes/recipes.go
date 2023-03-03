@@ -26,7 +26,7 @@ func postCreateRecipe(ctx echo.Context) error {
 		return err
 	}
 
-	recipe, err := crud.CreateRecipe(recipeData.IntoRecipe(authenticatedUser.UserID, false))
+	recipe, err := crud.CreateRecipe(recipeData.IntoRecipe(authenticatedUser.UserID, nil))
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
@@ -107,12 +107,18 @@ func deleteRecipe(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusForbidden)
 	}
 
+	recipe, err := crud.GetRecipeById(uuid.MustParse(recipeID))
+	if err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
 	if err := crud.DeleteRecipe(uuid.MustParse(recipeID)); err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	os.Remove(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, uuid.MustParse(recipeID).String()+".jpg"))
+	os.Remove(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, recipe.ImageID.String()+".jpg"))
 
 	return ctx.NoContent(http.StatusNoContent)
 }
@@ -131,6 +137,12 @@ func postSetRecipeImage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusForbidden)
 	}
 
+	recipe, err := crud.GetRecipeById(uuid.MustParse(recipeID))
+	if err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
 	var content = make([]byte, ctx.Request().ContentLength)
 	// TODO handle errors
 	var b = bytes.Buffer{}
@@ -143,16 +155,23 @@ func postSetRecipeImage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	if err := os.WriteFile(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, uuid.MustParse(recipeID).String()+".jpg"), content, 0644); err != nil {
+	imageID := uuid.New()
+
+	if err := os.WriteFile(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, imageID.String()+".jpg"), content, 0644); err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
-	if err := crud.UpdateRecipeHasImage(uuid.MustParse(recipeID), true); err != nil {
+	if err := crud.UpdateRecipeImage(uuid.MustParse(recipeID), &imageID); err != nil {
 		ctx.Logger().Error(err)
 	}
 
-	return ctx.NoContent(http.StatusNoContent)
+	// Remove old image if one was set
+	if recipe.ImageID != nil {
+		os.Remove(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, recipe.ImageID.String()+".jpg"))
+	}
+
+	return ctx.JSON(http.StatusCreated, imageID.String())
 }
 
 func deleteRecipeImage(ctx echo.Context) error {
@@ -169,9 +188,15 @@ func deleteRecipeImage(ctx echo.Context) error {
 		return ctx.NoContent(http.StatusForbidden)
 	}
 
-	os.Remove(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, uuid.MustParse(recipeID).String()+".jpg"))
+	recipe, err := crud.GetRecipeById(uuid.MustParse(recipeID))
+	if err != nil {
+		ctx.Logger().Error(err)
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
 
-	if err := crud.UpdateRecipeHasImage(uuid.MustParse(recipeID), false); err != nil {
+	os.Remove(path.Join(appConfig.DataPath, core.RecipeImagesOriginalPath, recipe.ImageID.String()+".jpg"))
+
+	if err := crud.UpdateRecipeImage(uuid.MustParse(recipeID), nil); err != nil {
 		ctx.Logger().Error(err)
 	}
 

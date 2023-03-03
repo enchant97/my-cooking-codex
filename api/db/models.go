@@ -46,5 +46,5 @@ type Recipe struct {
 	LongDescription  *string                                 `json:"longDescription,omitempty"`
 	Ingredients      *datatypes.JSONType[[]RecipeIngredient] `gorm:"type:json" json:"ingredients,omitempty"`
 	Steps            *datatypes.JSONType[[]RecipeStep]       `gorm:"type:json" json:"steps,omitempty"`
-	HasImage         bool                                    `gorm:"not null;default:false" json:"hasImage"`
+	ImageID          *uuid.UUID                              `gorm:"type:uuid" json:"imageId"`
 }

@@ -108,5 +108,5 @@ pub struct Recipe {
     #[serde(default)]
     pub steps: Vec<Step>,
     #[serde(default)]
-    pub has_image: bool,
+    pub image_id: Option<String>,
 }

@@ -2,10 +2,11 @@ use yew::prelude::*;
 
 use crate::{
     components::{drawer, thumbnail_link_grid},
-    contexts::prelude::{use_login, use_toasts, push_toast},
+    contexts::prelude::{push_toast, use_login, use_toasts},
     core::{
         effects::{use_login_redirect_effect, LoginState},
-        types::recipe, handlers::{api_error_to_toast, logout_on_401},
+        handlers::{api_error_to_toast, logout_on_401},
+        types::recipe,
     },
     Route,
 };
@@ -34,7 +35,7 @@ pub fn recipes() -> Html {
                         Err(err) => {
                             push_toast(&toasts_ctx, api_error_to_toast(&err, "loading recipes"));
                             logout_on_401(&err, &login_ctx);
-                        },
+                        }
                     };
                 });
             },
@@ -50,9 +51,9 @@ pub fn recipes() -> Html {
                     <thumbnail_link_grid::Grid>
                         {
                             for recipes.iter().map(|recipe| {
-                            let image_src = match recipe.has_image {
-                                true => Some(format!("{}/recipe-image/{}", login_ctx.login.as_ref().unwrap().media_url, recipe.id)),
-                                false => None,
+                            let image_src = match &recipe.image_id {
+                                Some(v) => Some(format!("{}/recipe-image/{}", login_ctx.login.as_ref().unwrap().media_url, v)),
+                                None => None,
                             };
                             html!{
                                 <thumbnail_link_grid::GridItem

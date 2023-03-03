@@ -38,13 +38,13 @@ type CreateRecipe struct {
 	Steps            []RecipeStep       `json:"steps,omitempty"`
 }
 
-func (r *CreateRecipe) IntoRecipe(ownerID uuid.UUID, hasImage bool) Recipe {
+func (r *CreateRecipe) IntoRecipe(ownerID uuid.UUID, imageID *uuid.UUID) Recipe {
 	return Recipe{
 		OwnerID:          ownerID,
 		Title:            r.Title,
 		ShortDescription: r.ShortDescription,
 		LongDescription:  r.LongDescription,
-		HasImage:         hasImage,
+		ImageID:          imageID,
 	}
 }
 
@@ -66,7 +66,7 @@ type UpdateRecipe struct {
 	LongDescription  *string             `json:"longDescription,omitempty"`
 	Ingredients      *[]UpdateIngredient `json:"ingredients,omitempty"`
 	Steps            *[]UpdateStep       `json:"steps,omitempty"`
-	HasImage         bool                `json:"-"`
+	ImageID          *uuid.UUID          `json:"-"`
 }
 
 func (r *UpdateRecipe) IntoRecipe() Recipe {
@@ -94,6 +94,6 @@ func (r *UpdateRecipe) IntoRecipe() Recipe {
 			}
 			return &datatypes.JSONType[[]RecipeStep]{Data: steps}
 		}(),
-		HasImage: r.HasImage,
+		ImageID: r.ImageID,
 	}
 }

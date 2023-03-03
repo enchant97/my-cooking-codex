@@ -189,16 +189,16 @@ impl Api {
         Ok(())
     }
 
-    pub async fn post_recipe_image(&self, id: String, file: web_sys::File) -> Result<(), ApiError> {
+    pub async fn post_recipe_image(&self, id: String, file: web_sys::File) -> Result<String, ApiError> {
         let req_url = format!("{}/recipes/{}/image/", self.base_url.clone(), id);
-        ApiError::from_response_result(
+        let response = ApiError::from_response_result(
             Request::post(&req_url)
                 .header("Authorization", &self.get_authorization_value().unwrap())
                 .body(file)
                 .send()
                 .await,
         )?;
-        Ok(())
+        ApiError::check_json_response_ok::<String>(response).await
     }
 
     pub async fn delete_recipe_image(&self, id: String) -> Result<(), ApiError> {

@@ -9,8 +9,8 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq)]
 pub struct SetImageProps {
     pub id: String,
-    pub has_image: bool,
-    pub onclose: Callback<Option<bool>>,
+    pub image_id: Option<String>,
+    pub onclose: Callback<Option<Option<String>>>,
 }
 
 #[function_component(SetImage)]
@@ -39,7 +39,7 @@ pub fn recipe_image(props: &SetImageProps) -> Html {
                 is_loading_state.set(false);
                 match result {
                     Ok(_) => {
-                        on_close_callback.emit(Some(true));
+                        on_close_callback.emit(Some(None));
                     }
                     Err(e) => {
                         push_toast(&toasts_ctx, api_error_to_toast(&e, "deleting recipe image"));
@@ -76,8 +76,8 @@ pub fn recipe_image(props: &SetImageProps) -> Html {
                     let result = api.post_recipe_image(id, file).await;
                     is_loading_state.set(false);
                     match result {
-                        Ok(_) => {
-                            on_close_callback.emit(Some(true));
+                        Ok(image_id) => {
+                            on_close_callback.emit(Some(Some(image_id)));
                         }
                         Err(e) => {
                             push_toast(
@@ -101,7 +101,7 @@ pub fn recipe_image(props: &SetImageProps) -> Html {
 
     html! {
         <Modal title={"Edit Image"} oncancel={on_cancel} onsave={on_save} loading={*is_loading_state}>
-            if props.has_image {
+            if props.image_id.is_some() {
                 <button class="btn btn-outline btn-error mb-2" onclick={on_image_delete_click} type="button">{"Delete Existing"}</button>
             }
             <div>

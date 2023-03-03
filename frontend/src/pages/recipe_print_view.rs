@@ -27,11 +27,11 @@ pub fn recipe_print_view(props: &RecipePrintViewProps) -> Html {
     html! {
         <div class="p-2" data-theme="light">
             if !get_recipe.loading && get_recipe.error.is_none() && get_recipe.data.is_some() {
-                if get_recipe.data.as_ref().unwrap().has_image {
+                if get_recipe.data.as_ref().unwrap().image_id.is_some() {
                     <figure class="h-64 w-full mb-4">
                         <img
                             class="object-cover w-full h-full rounded"
-                            src={format!("{}/recipe-image/{}", {login_ctx.login.as_ref().unwrap().media_url.clone()}, props.id)}
+                            src={format!("{}/recipe-image/{}", {login_ctx.login.as_ref().unwrap().media_url.clone()}, get_recipe.data.as_ref().unwrap().image_id.as_ref().unwrap())}
                         />
                     </figure>
                 }

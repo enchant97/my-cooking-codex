@@ -156,10 +156,10 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
     let image_modal_closed = {
         let modal_html_state = modal_html_state.clone();
         let recipe_state = recipe_state.clone();
-        Callback::from(move |has_image: Option<bool>| {
-            if let Some(has_image) = has_image {
+        Callback::from(move |image_id: Option<Option<String>>| {
+            if let Some(image_id) = image_id {
                 let mut recipe = (*recipe_state).clone();
-                recipe.has_image = has_image;
+                recipe.image_id = image_id;
                 recipe_state.set(recipe)
             }
             modal_html_state.set(None);
@@ -240,7 +240,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
             modal_html_state.set(Some(html! {
                 <modals::recipe::SetImage
                     id={recipe.id.clone()}
-                    has_image={recipe.has_image}
+                    image_id={recipe.image_id.clone()}
                     onclose={image_modal_closed.clone()}
                 />
             }));
@@ -322,10 +322,10 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         <ModalController modal={(*modal_html_state).clone()}/>
         <div class={props.classes.clone()}>
             <div class="mb-4 relative h-64 o">
-                if recipe_state.has_image {
+                if recipe_state.image_id.is_some() {
                     <img
                         class="object-cover w-full h-full rounded"
-                        src={format!("{}/recipe-image/{}", props.media_url, recipe_state.id)}
+                        src={format!("{}/recipe-image/{}", props.media_url, recipe_state.image_id.as_ref().unwrap())}
                     />
                 } else {
                     <div class="w-full h-full bg-neutral rounded"></div>
