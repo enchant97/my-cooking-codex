@@ -42,7 +42,7 @@ pub fn recipe_print_view(props: &RecipePrintViewProps) -> Html {
                 </div>
                 <div class="mb-4">
                     <h2 class="text-xl font-bold mb-1">{"Notes"}</h2>
-                    <pre class="whitespace-normal">{get_recipe.data.as_ref().unwrap().long_description.clone()}</pre>
+                    <pre class="whitespace-normal text-base font-sans">{get_recipe.data.as_ref().unwrap().long_description.clone()}</pre>
                 </div>
                 <div class="mb-4">
                     <h2 class="text-xl font-bold mb-1">{"Ingredients"}</h2>
@@ -77,7 +77,7 @@ pub fn recipe_print_view(props: &RecipePrintViewProps) -> Html {
                             html!{
                                 <li class="mb-2">
                                     <h2 class="text-l font-bold mb-2">{&step.title.clone().unwrap_or(format!("Step {}", i+1))}</h2>
-                                    <pre class="whitespace-normal">{&step.description}</pre>
+                                    <pre class="whitespace-normal text-base font-sans">{&step.description}</pre>
                                 </li>
                             }
                         })

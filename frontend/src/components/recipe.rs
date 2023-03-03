@@ -131,7 +131,7 @@ pub fn steps(props: &StepsProps) -> Html {
                 html!{
                     <li class="mb-2">
                         <h2 class="text-l font-bold mb-2">{&step.title.clone().unwrap_or(format!("Step {}", i+1))}</h2>
-                        <pre class="whitespace-normal">{&step.description}</pre>
+                        <pre class="whitespace-normal text-base font-sans">{&step.description}</pre>
                     </li>
                 }
             })
@@ -349,7 +349,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                     <h2 class="text-xl font-bold mr-auto">{"Notes"}</h2>
                     <button class="btn" onclick={on_edit_long_description_click}>{"Edit"}</button>
                 </div>
-                <pre class="whitespace-normal">{recipe_state.long_description.clone()}</pre>
+                <pre class="whitespace-normal text-base font-sans">{recipe_state.long_description.clone()}</pre>
             </div>
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="basis-full md:basis-3/4 lg:basis-11/12 p-4 rounded bg-base-200">
