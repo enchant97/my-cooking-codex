@@ -37,7 +37,17 @@ func postCreateRecipe(ctx echo.Context) error {
 func getRecipes(ctx echo.Context) error {
 	authenticatedUser := getAuthenticatedUser(ctx)
 
-	recipes, err := crud.GetRecipesByUserID(authenticatedUser.UserID)
+	var filterParams core.RecipesFilterParams
+	if err := ctx.Bind(&filterParams); err != nil {
+		return ctx.NoContent(http.StatusBadRequest)
+	}
+	if err := ctx.Validate(filterParams); err != nil {
+		return err
+	}
+    // convert human page number into database offset
+    rowOffset := (filterParams.Page - 1) * filterParams.PerPage
+
+	recipes, err := crud.GetRecipesByUserID(authenticatedUser.UserID, rowOffset, filterParams.PerPage)
 	if err != nil {
 		ctx.Logger().Error(err)
 		return ctx.NoContent(http.StatusInternalServerError)

@@ -11,7 +11,7 @@ import (
 	"github.com/enchant97/my-cooking-codex/api/core"
 	"github.com/enchant97/my-cooking-codex/api/db"
 	"github.com/enchant97/my-cooking-codex/api/routes"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )

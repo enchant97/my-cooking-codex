@@ -41,3 +41,8 @@ type CreateLogin struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
+
+type RecipesFilterParams struct {
+	Page    uint `query:"page" validate:"required,gt=0"`
+	PerPage uint `query:"perPage" validate:"required,gt=0,lte=120"`
+}
