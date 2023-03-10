@@ -5,10 +5,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
+	"time"
 )
 
 type UUIDBase struct {
 	ID uuid.UUID `gorm:"primarykey;type:uuid" json:"id"`
+}
+
+type TimeBase struct {
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (base *UUIDBase) BeforeCreate(tx *gorm.DB) (err error) {
@@ -18,6 +24,7 @@ func (base *UUIDBase) BeforeCreate(tx *gorm.DB) (err error) {
 
 type User struct {
 	UUIDBase
+	TimeBase
 	Username       string   `gorm:"uniqueIndex;not null;type:varchar(30)" json:"username"`
 	HashedPassword []byte   `gorm:"not null" json:"-"`
 	Recipes        []Recipe `gorm:"foreignKey:OwnerID" json:"-"`
@@ -40,6 +47,7 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 
 type Recipe struct {
 	UUIDBase
+	TimeBase
 	OwnerID          uuid.UUID                               `gorm:"not null;type:uuid" json:"ownerId"`
 	Title            string                                  `gorm:"not null;type:varchar(30)" json:"title"`
 	ShortDescription *string                                 `gorm:"type:varchar(256)" json:"shortDescription,omitempty"`

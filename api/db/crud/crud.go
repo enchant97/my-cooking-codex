@@ -46,7 +46,7 @@ func CreateRecipe(recipe db.Recipe) (db.Recipe, error) {
 
 func GetRecipesByUserID(userID uuid.UUID) ([]db.Recipe, error) {
 	var recipes []db.Recipe
-	if err := db.DB.Find(&recipes, "owner_id = ?", userID).Error; err != nil {
+	if err := db.DB.Order("created_at DESC").Find(&recipes, "owner_id = ?", userID).Error; err != nil {
 		return nil, err
 	}
 	return recipes, nil
