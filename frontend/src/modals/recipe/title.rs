@@ -52,11 +52,7 @@ pub fn recipe_title(props: &EditTitleProps) -> Html {
                         id,
                         &UpdateRecipe {
                             title: Some(title.to_string()),
-                            short_description: None,
-                            long_description: None,
-                            tags: None,
-                            ingredients: None,
-                            steps: None,
+                            ..Default::default()
                         },
                     )
                     .await;

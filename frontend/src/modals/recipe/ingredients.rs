@@ -226,10 +226,6 @@ pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
                     .patch_update_recipe(
                         id,
                         &UpdateRecipe {
-                            title: None,
-                            short_description: None,
-                            long_description: None,
-                            tags: None,
                             ingredients: Some(
                                 ingredients
                                     .iter()
@@ -241,7 +237,7 @@ pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
                                     })
                                     .collect(),
                             ),
-                            steps: None,
+                            ..Default::default()
                         },
                     )
                     .await;

@@ -53,12 +53,8 @@ pub fn recipe_long_description(props: &EditLongDescriptionProps) -> Html {
                             .patch_update_recipe(
                                 id,
                                 &UpdateRecipe {
-                                    title: None,
-                                    short_description: None,
                                     long_description: Some(v.to_string()),
-                                    tags: None,
-                                    ingredients: None,
-                                    steps: None,
+                                    ..Default::default()
                                 },
                             )
                             .await;
