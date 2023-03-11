@@ -331,7 +331,7 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                     <div class="w-full h-full bg-neutral rounded"></div>
                 }
                 <div class="flex items-center absolute bottom-0 left-0 p-2 w-full bg-[#000000cc] rounded-b">
-                    <h1 class="mr-auto text-2xl font-bold whitespace-nowrap overflow-hidden text-ellipsis">{recipe_state.title.clone()}</h1>
+                    <h1 class="mr-auto text-2xl font-bold text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis">{recipe_state.title.clone()}</h1>
                     <button class="btn" onclick={on_edit_title_click}>{"Edit"}</button>
                     <button class="btn" onclick={on_edit_image_click}>{"Edit Image"}</button>
                 </div>

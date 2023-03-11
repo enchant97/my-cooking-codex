@@ -21,7 +21,7 @@ pub fn grid_item(props: &GridItemProps) -> Html {
                 <div class="w-full h-full rounded-md hover:bg-neutral-focus hover:duration-200"></div>
             }
             <span
-                class="absolute bottom-0 left-0 p-1 w-full bg-[#000000cc] rounded-b-md whitespace-nowrap overflow-hidden text-ellipsis text-lg font-bold">{props.title.clone()}</span>
+                class="absolute bottom-0 left-0 p-1 w-full bg-[#000000cc] rounded-b-md whitespace-nowrap overflow-hidden text-ellipsis text-lg font-bold text-slate-300">{props.title.clone()}</span>
         </Link<Route>>
     }
 }
