@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+pub mod query;
 pub mod recipe;
 pub mod stats;
 pub mod user;

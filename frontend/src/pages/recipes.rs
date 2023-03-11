@@ -6,7 +6,7 @@ use crate::{
     core::{
         effects::{use_login_redirect_effect, LoginState},
         handlers::{api_error_to_toast, logout_on_401},
-        types::recipe,
+        types::{recipe, query::RecipesFilter},
     },
     Route,
 };
@@ -30,7 +30,7 @@ pub fn recipes() -> Html {
                     None => return,
                 };
                 wasm_bindgen_futures::spawn_local(async move {
-                    match api.get_recipes().await {
+                    match api.get_recipes(&RecipesFilter::default()).await {
                         Ok(v) => recipes_state.set(v),
                         Err(err) => {
                             push_toast(&toasts_ctx, api_error_to_toast(&err, "loading recipes"));

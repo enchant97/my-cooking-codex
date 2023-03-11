@@ -1,4 +1,4 @@
-use super::types::{recipe, stats, user, Login, LoginToken, StoredLogin};
+use super::types::{query::RecipesFilter, recipe, stats, user, Login, LoginToken, StoredLogin};
 use gloo::net::http::Request;
 use serde::de::DeserializeOwned;
 use std::convert::From;
@@ -112,8 +112,12 @@ impl Api {
         ApiError::check_json_response_ok::<user::User>(response).await
     }
 
-    pub async fn get_recipes(&self) -> Result<Vec<recipe::Recipe>, ApiError> {
-        let req_url = self.base_url.clone() + "/recipes/";
+    pub async fn get_recipes(&self, filters: &RecipesFilter) -> Result<Vec<recipe::Recipe>, ApiError> {
+        let req_url = format!(
+            "{}/recipes/?{}",
+            self.base_url.clone(),
+            serde_url_params::to_string(&filters).unwrap(),
+        );
         let response = ApiError::from_response_result(
             Request::get(&req_url)
                 .header("Authorization", &self.get_authorization_value().unwrap())
@@ -189,7 +193,11 @@ impl Api {
         Ok(())
     }
 
-    pub async fn post_recipe_image(&self, id: String, file: web_sys::File) -> Result<String, ApiError> {
+    pub async fn post_recipe_image(
+        &self,
+        id: String,
+        file: web_sys::File,
+    ) -> Result<String, ApiError> {
         let req_url = format!("{}/recipes/{}/image/", self.base_url.clone(), id);
         let response = ApiError::from_response_result(
             Request::post(&req_url)
