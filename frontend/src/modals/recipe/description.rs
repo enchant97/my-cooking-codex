@@ -18,19 +18,8 @@ pub struct EditDescriptionProps {
 pub fn recipe_description(props: &EditDescriptionProps) -> Html {
     let login_ctx = use_login().unwrap();
     let toasts_ctx = use_toasts().unwrap();
-    let description_state = use_state(Option::default);
+    let description_state = use_state(|| props.description.clone());
     let is_loading_state = use_state(bool::default);
-
-    {
-        let initial_description = props.description.clone();
-        let description_state = description_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                description_state.set(initial_description.clone());
-            },
-            (),
-        );
-    }
 
     let on_save = {
         let id = props.id.to_string();

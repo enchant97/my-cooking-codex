@@ -18,19 +18,8 @@ pub struct EditTitleProps {
 pub fn recipe_title(props: &EditTitleProps) -> Html {
     let login_ctx = use_login().unwrap();
     let toasts_ctx = use_toasts().unwrap();
-    let title_state = use_state(AttrValue::default);
+    let title_state = use_state(|| props.title.clone());
     let is_loading_state = use_state(bool::default);
-
-    {
-        let initial_title = props.title.clone();
-        let title_state = title_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                title_state.set(initial_title.clone());
-            },
-            (),
-        );
-    }
 
     let on_save = {
         let id = props.id.to_string();

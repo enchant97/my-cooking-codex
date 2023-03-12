@@ -21,21 +21,7 @@ pub struct EditStepProps {
 
 #[function_component(EditStep)]
 pub fn recipe_step(props: &EditStepProps) -> Html {
-    let step_state = use_state(|| Step {
-        title: None,
-        description: "".to_owned(),
-    });
-
-    {
-        let initial_step = props.step.clone();
-        let step_state = step_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                step_state.set(initial_step);
-            },
-            props.step.clone(),
-        );
-    }
+    let step_state = use_state(|| props.step.clone());
 
     let on_move_up = {
         let on_move_up_callback = props.on_move_up.clone();
@@ -146,19 +132,8 @@ pub struct EditStepsProps {
 pub fn recipe_steps(props: &EditStepsProps) -> Html {
     let login_ctx = use_login().unwrap();
     let toasts_ctx = use_toasts().unwrap();
-    let steps_state = use_state(Vec::default);
+    let steps_state = use_state(|| props.steps.clone());
     let is_loading_state = use_state(bool::default);
-
-    {
-        let initial_steps = props.steps.clone();
-        let steps_state = steps_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                steps_state.set(initial_steps.clone());
-            },
-            (),
-        );
-    }
 
     let on_save = {
         let id = props.id.to_string();

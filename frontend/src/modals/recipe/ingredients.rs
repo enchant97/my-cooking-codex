@@ -51,23 +51,7 @@ pub struct EditIngredientProps {
 
 #[function_component(EditIngredient)]
 pub fn recipe_ingredient(props: &EditIngredientProps) -> Html {
-    let ingredient_state = use_state(|| Ingredient {
-        name: String::from(""),
-        amount: 0.0,
-        unit_type: String::from(""),
-        description: None,
-    });
-
-    {
-        let initial_ingredient = props.ingredient.clone();
-        let ingredient_state = ingredient_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                ingredient_state.set(initial_ingredient);
-            },
-            props.ingredient.clone(),
-        );
-    }
+    let ingredient_state = use_state(|| props.ingredient.clone());
 
     let on_delete = {
         let on_delete_callback = props.on_delete.clone();
@@ -194,19 +178,8 @@ pub struct EditIngredientsProps {
 pub fn recipe_ingredients(props: &EditIngredientsProps) -> Html {
     let login_ctx = use_login().unwrap();
     let toasts_ctx = use_toasts().unwrap();
-    let ingredients_state = use_state(Vec::default);
+    let ingredients_state = use_state(|| props.ingredients.clone());
     let is_loading_state = use_state(bool::default);
-
-    {
-        let initial_ingredients = props.ingredients.clone();
-        let ingredients_state = ingredients_state.clone();
-        use_effect_with_deps(
-            move |_| {
-                ingredients_state.set(initial_ingredients);
-            },
-            (),
-        );
-    }
 
     let on_save = {
         let id = props.id.to_string();
