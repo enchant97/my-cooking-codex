@@ -102,14 +102,14 @@ pub struct Step {
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct InfoYields {
-    value: usize,
-    unit_type: String,
+    pub value: usize,
+    pub unit_type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Info {
-    yields: Option<InfoYields>,
+    pub yields: Option<InfoYields>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

@@ -93,10 +93,22 @@ pub struct InfoProps {
 
 #[function_component(Info)]
 pub fn info(props: &InfoProps) -> Html {
-    // TODO implement display for recipe info
     html! {
-        <div classes={props.classes.clone()}>
-        </div>
+        <table classes={classes!("table", "w-full", props.classes.clone())}>
+            <tbody>
+                if let Some(v) = &props.info.yields {
+                    <tr>
+                        <th>{v.unit_type.clone()}</th>
+                        <td>{v.value.to_string()}</td>
+                    </tr>
+                } else {
+                    <tr>
+                        <th>{"Servings"}</th>
+                        <td>{"0"}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     }
 }
 
