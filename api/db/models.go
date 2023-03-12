@@ -45,11 +45,16 @@ func (u *User) IsPasswordMatch(plainPassword string) bool {
 	return false
 }
 
+type RecipeInfo struct {
+	Yields *datatypes.JSONType[RecipeInfoYields] `gorm:"type:json" json:"yields,omitempty"`
+}
+
 type Recipe struct {
 	UUIDBase
 	TimeBase
 	OwnerID          uuid.UUID                               `gorm:"not null;type:uuid" json:"ownerId"`
 	Title            string                                  `gorm:"not null;type:varchar(30)" json:"title"`
+	Info             RecipeInfo                              `gorm:"embedded;embeddedPrefix:info_"`
 	ShortDescription *string                                 `gorm:"type:varchar(256)" json:"shortDescription,omitempty"`
 	LongDescription  *string                                 `json:"longDescription,omitempty"`
 	Ingredients      *datatypes.JSONType[[]RecipeIngredient] `gorm:"type:json" json:"ingredients,omitempty"`

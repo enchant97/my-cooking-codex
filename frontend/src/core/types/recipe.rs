@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateIngredient {
     pub name: String,
@@ -10,7 +10,7 @@ pub struct CreateIngredient {
     pub description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateStep {
     #[serde(default)]
@@ -18,10 +18,14 @@ pub struct CreateStep {
     pub description: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+pub type CreateInfo = Info;
+
+#[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateRecipe {
     pub title: String,
+    #[serde(default)]
+    pub info: CreateInfo,
     #[serde(default)]
     pub short_description: Option<String>,
     #[serde(default)]
@@ -56,11 +60,15 @@ pub struct UpdateStep {
     pub description: Option<String>,
 }
 
+pub type UpdateInfo = Info;
+
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateRecipe {
     #[serde(default)]
     pub title: Option<String>,
+    #[serde(default)]
+    pub info: UpdateInfo,
     #[serde(default)]
     pub short_description: Option<String>,
     #[serde(default)]
@@ -91,12 +99,27 @@ pub struct Step {
     pub description: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct InfoYields {
+    value: usize,
+    unit_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Info {
+    yields: Option<InfoYields>,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Recipe {
     pub id: String,
     pub owner_id: String,
     pub title: String,
+    #[serde(default)]
+    pub info: Info,
     #[serde(default)]
     pub short_description: Option<String>,
     #[serde(default)]

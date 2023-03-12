@@ -17,6 +17,11 @@ type RecipeStep struct {
 	Description string  `json:"description" validate:"required"`
 }
 
+type RecipeInfoYields struct {
+	Value    uint   `json:"value" validate:"required"`
+	UnitType string `json:"unitType" validate:"required"`
+}
+
 type CreateUser struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
@@ -30,8 +35,11 @@ func (u *CreateUser) IntoUser() User {
 	return user
 }
 
+type CreateRecipeInfo RecipeInfo
+
 type CreateRecipe struct {
 	Title            string             `json:"title" validate:"required"`
+	Info             CreateRecipeInfo   `json:"info,omitempty"`
 	ShortDescription *string            `json:"shortDescription,omitempty"`
 	LongDescription  *string            `json:"longDescription,omitempty"`
 	Ingredients      []RecipeIngredient `json:"ingredients,omitempty"`
@@ -42,6 +50,7 @@ func (r *CreateRecipe) IntoRecipe(ownerID uuid.UUID, imageID *uuid.UUID) Recipe 
 	return Recipe{
 		OwnerID:          ownerID,
 		Title:            r.Title,
+		Info:             RecipeInfo(r.Info),
 		ShortDescription: r.ShortDescription,
 		LongDescription:  r.LongDescription,
 		ImageID:          imageID,
@@ -60,8 +69,11 @@ type UpdateStep struct {
 	Description string  `json:"description,omitempty"`
 }
 
+type UpdateRecipeInfo RecipeInfo
+
 type UpdateRecipe struct {
 	Title            string              `json:"title,omitempty"`
+	Info             UpdateRecipeInfo    `json:"info,omitempty"`
 	ShortDescription *string             `json:"shortDescription,omitempty"`
 	LongDescription  *string             `json:"longDescription,omitempty"`
 	Ingredients      *[]UpdateIngredient `json:"ingredients,omitempty"`
@@ -72,6 +84,7 @@ type UpdateRecipe struct {
 func (r *UpdateRecipe) IntoRecipe() Recipe {
 	return Recipe{
 		Title:            r.Title,
+		Info:             RecipeInfo(r.Info),
 		ShortDescription: r.ShortDescription,
 		LongDescription:  r.LongDescription,
 		Ingredients: func() *datatypes.JSONType[[]RecipeIngredient] {
