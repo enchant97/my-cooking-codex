@@ -85,6 +85,22 @@ pub fn recipe_toolbar(props: &RecipeToolbarProps) -> Html {
 }
 
 #[derive(Properties, PartialEq)]
+pub struct InfoProps {
+    #[prop_or_default]
+    pub classes: Classes,
+    pub info: types::recipe::Info,
+}
+
+#[function_component(Info)]
+pub fn info(props: &InfoProps) -> Html {
+    // TODO implement display for recipe info
+    html! {
+        <div classes={props.classes.clone()}>
+        </div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
 pub struct IngredientsProps {
     pub items: Vec<types::recipe::Ingredient>,
 }
@@ -179,6 +195,19 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         })
     };
 
+    let info_modal_closed = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe_state = recipe_state.clone();
+        Callback::from(move |new_info: Option<types::recipe::Info>| {
+            modal_html_state.set(None);
+            if let Some(info) = new_info {
+                let mut recipe = (*recipe_state).clone();
+                recipe.info = info;
+                recipe_state.set(recipe)
+            }
+        })
+    };
+
     let description_modal_closed = {
         let modal_html_state = modal_html_state.clone();
         let recipe_state = recipe_state.clone();
@@ -261,6 +290,20 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
         })
     };
 
+    let on_edit_info_click = {
+        let modal_html_state = modal_html_state.clone();
+        let recipe = (*recipe_state).clone();
+        Callback::from(move |_: MouseEvent| {
+            modal_html_state.set(Some(html! {
+                <modals::recipe::EditInfo
+                    id={recipe.id.clone()}
+                    info={recipe.info.clone()}
+                    onclose={info_modal_closed.clone()}
+                />
+            }));
+        })
+    };
+
     let on_edit_description_click = {
         let modal_html_state = modal_html_state.clone();
         let recipe = (*recipe_state).clone();
@@ -337,6 +380,13 @@ pub fn recipe_content(props: &RecipeContentProps) -> Html {
                 </div>
             </div>
             <RecipeToolbar classes="mb-4 p-4 rounded bg-base-200" recipe={(*recipe_state).clone()} />
+            <div class="mb-4 p-4 rounded bg-base-200">
+                <div class="flex mb-2">
+                    <h2 class="text-xl font-bold mr-auto">{"Info"}</h2>
+                    <button class="btn" onclick={on_edit_info_click}>{"Edit"}</button>
+                </div>
+                <Info info={recipe_state.info.clone()} />
+            </div>
             <div class="mb-4 p-4 rounded bg-base-200">
                 <div class="flex mb-2">
                     <h2 class="text-xl font-bold mr-auto">{"Description"}</h2>

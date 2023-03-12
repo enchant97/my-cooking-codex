@@ -31,11 +31,7 @@ pub fn new_recipe() -> Html {
             api.unwrap()
                 .post_new_recipe(&types::recipe::CreateRecipe {
                     title,
-                    short_description: None,
-                    long_description: None,
-                    tags: vec![],
-                    ingredients: vec![],
-                    steps: vec![],
+                    ..Default::default()
                 })
                 .await
         })
