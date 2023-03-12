@@ -169,7 +169,7 @@ pub fn recipe_info(props: &EditInfoProps) -> Html {
         <Modal title={"Edit Info"} oncancel={on_cancel} onsave={on_save} loading={*is_loading_state}>
             <h2 class="text-lg mb-2">{"Serving Size"}</h2>
             <YieldInput
-                yields={(*info_state).yields.clone().unwrap_or_default()}
+                yields={info_state.yields.clone().unwrap_or_default()}
                 onchange={on_yield_change}
             />
         </Modal>

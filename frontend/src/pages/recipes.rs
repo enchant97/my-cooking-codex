@@ -36,7 +36,7 @@ pub fn recipes() -> Html {
                             &toasts_ctx,
                             api_error_to_toast(
                                 &err,
-                                &format!("loading recipes page {}", &filters.page).to_owned(),
+                                &format!("loading recipes page {}", &filters.page),
                             ),
                         );
                         logout_on_401(&err, &login_ctx);
@@ -50,13 +50,12 @@ pub fn recipes() -> Html {
 
     {
         let filters_state = filters_state.clone();
-        let filters_state_ref = filters_state.clone();
         let current_page = current_page.clone();
         use_effect_with_deps(
             move |_| {
                 current_page.run();
             },
-            filters_state_ref,
+            filters_state,
         );
     }
 
@@ -114,7 +113,7 @@ pub fn recipes() -> Html {
                     if current_page.loading {
                        <LoadingButton classes="btn-block" r#type="button" />
                     } else if !current_page.loading && current_page.error.is_none() && current_page.data.is_some() {
-                        if current_page.data.as_ref().unwrap().len() == (*filters_state).per_page {
+                        if current_page.data.as_ref().unwrap().len() == filters_state.per_page {
                             <button class="btn btn-block" onclick={on_load_more_click}>{"More"}</button>
                         } else {
                             <div class="text-center">{"Reached Bottom"}</div>
