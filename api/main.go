@@ -27,6 +27,17 @@ func (cv *Validator) Validate(i interface{}) error {
 	return nil
 }
 
+// HTTP error handler, to handle unexpected errors
+func errorHandler(err error, ctx echo.Context) {
+	if e, ok := err.(*echo.HTTPError); ok {
+		// normal HTTP error
+		ctx.JSON(e.Code, e.Message)
+		return
+	}
+	ctx.Logger().Error(err)
+	ctx.NoContent(http.StatusInternalServerError)
+}
+
 func main() {
 	// Parse config
 	var appConfig config.AppConfig
@@ -44,6 +55,7 @@ func main() {
 	}
 	// Create & setup server
 	e := echo.New()
+	e.HTTPErrorHandler = errorHandler
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
